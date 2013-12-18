@@ -1,0 +1,18 @@
+build/
+.gradle/
+src/main/webapp/WEB-INF/lib/
+src/main/webapp/WEB-INF/classes/
+src/main/webapp/WEB-INF/appengine-generated/
+
+# IDEA
+.idea
+out/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+bin/
+.settings/
+.classpath
+.project

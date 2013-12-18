@@ -1,0 +1,57 @@
+apply plugin: 'war'
+apply plugin: 'appengine'
+
+description='Blank template of application on the Google App Engine'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.appengine:gradle-appengine-plugin:1.8.6'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def gaeVersion = '1.8.8'
+
+    compile "com.google.appengine:appengine-api-1.0-sdk:$gaeVersion"
+    compile "com.google.appengine:appengine-api-labs:$gaeVersion"
+    compile 'javax.servlet:servlet-api:2.5'
+
+    testCompile "com.google.appengine:appengine-api-stubs:$gaeVersion"
+    testCompile "com.google.appengine:appengine-testing:$gaeVersion"
+
+    appengineSdk "com.google.appengine:appengine-java-sdk:$gaeVersion"
+}
+
+appengine {
+    httpPort = 8888
+    stopPort = 8889
+    stopKey = project.name
+    disableUpdateCheck = true
+    downloadSdk = true
+    warDir = file('src/main/webapp')
+
+    appcfg {
+        oauth2 = true
+    }
+}
+
+sourceSets {
+    main.output.classesDir = 'src/main/webapp/WEB-INF/classes'
+}
+
+task copyWebInfLib(type: Sync) {
+    from configurations.runtime
+    into 'src/main/webapp/WEB-INF/lib'
+}
+tasks.appengineRun.dependsOn(tasks.copyWebInfLib)
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.9'
+}
