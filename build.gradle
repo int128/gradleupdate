@@ -1,0 +1,64 @@
+buildscript {
+    ext.gaeVersion = '1.9.17'
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "com.google.appengine:gradle-appengine-plugin:$gaeVersion"
+    }
+}
+
+plugins {
+    id 'groovy'
+    id 'war'
+    id 'idea'
+}
+apply plugin: 'appengine'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.9'
+
+    compile "com.google.appengine:appengine-api-1.0-sdk:$gaeVersion"
+    compile "com.google.appengine:appengine-api-labs:$gaeVersion"
+    compile 'javax.servlet:servlet-api:2.5'
+
+    testCompile "com.google.appengine:appengine-api-stubs:$gaeVersion"
+    testCompile "com.google.appengine:appengine-testing:$gaeVersion"
+}
+
+war {
+    webAppDirName = file('static')
+}
+
+appengine {
+    disableUpdateCheck = true
+    warDir = file('static')
+    jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
+    appcfg {
+        oauth2 = true
+    }
+}
+
+sourceSets.main.output.classesDir = "${appengine.warDir}/WEB-INF/classes"
+
+task syncDependencies(type: Sync) {
+    from configurations.runtime
+    into "${appengine.warDir}/WEB-INF/lib"
+}
+tasks.appengineRun.dependsOn(tasks.syncDependencies)
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = sourceSets.main.output.classesDir
+        testOutputDir = sourceSets.test.output.classesDir
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}
