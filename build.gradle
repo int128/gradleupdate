@@ -1,5 +1,6 @@
 apply plugin: 'war'
 apply plugin: 'appengine'
+apply plugin: 'idea'
 
 description='Blank template of application on the Google App Engine'
 
@@ -52,6 +53,14 @@ task copyWebInfLib(type: Sync) {
     into 'src/main/webapp/WEB-INF/lib'
 }
 tasks.appengineRun.dependsOn(tasks.copyWebInfLib)
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = sourceSets.main.output.classesDir
+        testOutputDir = sourceSets.test.output.classesDir
+    }
+}
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.9'
