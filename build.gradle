@@ -36,6 +36,7 @@ appengine {
     disableUpdateCheck = true
     downloadSdk = true
     warDir = file('src/main/webapp')
+    jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
 
     appcfg {
         oauth2 = true
