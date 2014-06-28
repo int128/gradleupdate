@@ -5,11 +5,14 @@ apply plugin: 'idea'
 description='Blank template of application on the Google App Engine'
 
 buildscript {
+    ext {
+        gaeVersion = '1.9.6'
+    }
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.appengine:gradle-appengine-plugin:1.8.6'
+        classpath "com.google.appengine:gradle-appengine-plugin:$gaeVersion"
     }
 }
 
@@ -18,8 +21,6 @@ repositories {
 }
 
 dependencies {
-    def gaeVersion = '1.8.8'
-
     compile "com.google.appengine:appengine-api-1.0-sdk:$gaeVersion"
     compile "com.google.appengine:appengine-api-labs:$gaeVersion"
     compile 'javax.servlet:servlet-api:2.5'
