@@ -26,8 +26,6 @@ dependencies {
 
     testCompile "com.google.appengine:appengine-api-stubs:$gaeVersion"
     testCompile "com.google.appengine:appengine-testing:$gaeVersion"
-
-    appengineSdk "com.google.appengine:appengine-java-sdk:$gaeVersion"
 }
 
 appengine {
@@ -35,7 +33,6 @@ appengine {
     stopPort = 8889
     stopKey = project.name
     disableUpdateCheck = true
-    downloadSdk = true
     warDir = file('src/main/webapp')
     jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
 

@@ -9,6 +9,13 @@ How to use
 
 `git clone` the repository and rename it.
 
+Unpack the App Engine SDK and set the environment variable `APPENGINE_HOME`.
+
+```bash
+# ~/.bashrc
+export APPENGINE_HOME="$HOME/App/appengine-java-sdk-x.y.z"
+```
+
 Open `src/main/webapp/WEB-INF/appengine-web.xml` and change application id.
 
 ```xml
