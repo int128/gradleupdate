@@ -1,42 +1,49 @@
-App Engine Blank Project
-========================
+App Engine Hello World [![Build Status](https://travis-ci.org/int128/gradle-appengine-blank.svg)](https://travis-ci.org/int128/gradle-appengine-blank)
+======================
 
-Template project of App Engine application.
+An App Engine application with Gradle.
 
+
+Architecture
+------------
+
+* Product
+  * Groovy
+  * Blank implementation of the router
+* Build system
+  * Gradle with App Engine plugin
+  * Groovy lang support
+  * IntelliJ IDEA support
 
 How to use
 ----------
 
-`git clone` the repository and rename it.
+### Setting up environment
 
-Unpack the App Engine SDK and set the environment variable `APPENGINE_HOME`.
+Java 7 or later is required.
+
+Install App Engine SDK.
 
 ```bash
-# ~/.bashrc
-export APPENGINE_HOME="$HOME/App/appengine-java-sdk-x.y.z"
+brew install app-engine-sdk-java
 ```
 
-Open `src/main/webapp/WEB-INF/appengine-web.xml` and change application id.
+And set environment variables in `.bashrc` or `.zshrc`.
 
-```xml
-<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-    <application>myapp</application>
+```bash
+export APPENGINE_HOME=/usr/local/Cellar/app-engine-java-sdk/x.y.z/libexec
 ```
 
-Then, invoke the gradle wrapper.
+### Run app
+
+Run the development server.
 
 ```bash
 ./gradlew appengineRun
 ```
 
+Stop the development server.
 
-Features
---------
-
-This project contains these features:
-
-  * Blank implementation of the router
-  * Continuous integration support on Travis CI
-  * Gradle Wrapper
-  * `.gitignore` for Gradle, IDEA and Eclipse
-
+```bash
+./gradlew appengineStop
+```
