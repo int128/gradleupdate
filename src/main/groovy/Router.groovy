@@ -9,10 +9,13 @@ import javax.servlet.http.HttpServletResponse
 @CompileStatic
 class Router extends HttpServlet {
     void doGet(HttpServletRequest request, HttpServletResponse response) {
-        log.info("GET request to ${request.pathInfo}")
-    }
+        switch (request.pathInfo) {
+            case '/feed':
+                // TODO
+                break
 
-    void doPost(HttpServletRequest request, HttpServletResponse response) {
-        log.info("POST request to ${request.pathInfo}")
+            default:
+                super.doGet(request, response)
+        }
     }
 }
