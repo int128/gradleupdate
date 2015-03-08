@@ -1,3 +1,4 @@
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovyx.net.http.HttpURLClient
 
@@ -12,6 +13,15 @@ class GradleService {
 
     def fetchCurrentVersion() {
         client.request(path: '/versions/current').data
+    }
+
+    List fetchAllVersions() {
+        client.request(path: '/versions/all').data as List
+    }
+
+    @CompileDynamic
+    List fetchStableVersions() {
+        fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
     }
 
 }

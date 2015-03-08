@@ -11,7 +11,7 @@ class Router extends HttpServlet {
     void doGet(HttpServletRequest request, HttpServletResponse response) {
         switch (request.pathInfo) {
             case '/feed':
-                // TODO
+                new FeedController(request, response).stableVersions()
                 break
 
             default:
