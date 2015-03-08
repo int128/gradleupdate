@@ -51,14 +51,14 @@ class FeedService {
             link(href: 'https://gradleupdate.appspot.com')
             id('https://gradleupdate.appspot.com')
             author('Gradle Update')
-            updated()
+            updated(formatTime(new Date()))
 
             versions.each { version ->
                 entry {
                     title(version.version)
                     link(href: version.downloadUrl)
                     id(version.downloadUrl)
-                    updated(datetime(version.buildTime))
+                    updated(formatTime(parseTime(version.buildTime)))
                     summary("Gradle $version.version")
 
                     raw {
@@ -76,10 +76,14 @@ class FeedService {
         writer.toString()
     }
 
-    static datetime(String datetimeInJson) {
+    static parseTime(String datetimeInJson) {
         // 20120912104602+0000
+        Date.parse('yyyyMMddHHmmssZ', datetimeInJson)
+    }
+
+    static formatTime(Date time) {
         // 2005-07-31T12:29:29Z
-        Date.parse('yyyyMMddHHmmssZ', datetimeInJson).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+        time.format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
     }
 
 }
