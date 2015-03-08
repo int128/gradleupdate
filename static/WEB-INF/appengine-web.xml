@@ -30,5 +30,7 @@
     <precompilation-enabled>true</precompilation-enabled>
     
     <static-files>
+        <exclude path="/WEB-INF/**.groovy" />
+        <exclude path="**.gtpl" />
     </static-files>
 </appengine-web-app>
