@@ -32,20 +32,20 @@ dependencies {
 
 appengine {
     disableUpdateCheck = true
-    warDir = file('src/main/webapp')
+    warDir = file('static')
     jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
     appcfg {
         oauth2 = true
     }
 }
 
-sourceSets.main.output.classesDir = 'src/main/webapp/WEB-INF/classes'
+sourceSets.main.output.classesDir = "${appengine.warDir}/WEB-INF/classes"
 
-task copyWebInfLib(type: Sync) {
+task syncDependencies(type: Sync) {
     from configurations.runtime
-    into 'src/main/webapp/WEB-INF/lib'
+    into "${appengine.warDir}/WEB-INF/lib"
 }
-tasks.appengineRun.dependsOn(tasks.copyWebInfLib)
+tasks.appengineRun.dependsOn(tasks.syncDependencies)
 
 idea {
     module {

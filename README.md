@@ -53,6 +53,5 @@ Structure
 
 * `src/main/groovy/` - Groovy sources of the product
 * `src/test/groovy/` - Groovy sources of the test
-* `static/public/` - Static files
-* `static/target/` - Compiled assets
+* `static/` - Static files
 * `build.gradle` - Build settings

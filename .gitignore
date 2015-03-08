@@ -1,8 +1,9 @@
 build/
 .gradle/
-src/main/webapp/WEB-INF/lib/
-src/main/webapp/WEB-INF/classes/
-src/main/webapp/WEB-INF/appengine-generated/
+
+/static/WEB-INF/lib/
+/static/WEB-INF/classes/
+/static/WEB-INF/appengine-generated/
 
 # IDEA
 .idea
