@@ -1,49 +1,58 @@
-App Engine Hello World [![Build Status](https://travis-ci.org/int128/gradle-appengine-blank.svg)](https://travis-ci.org/int128/gradle-appengine-blank)
-======================
+App Engine Groovy Template [![Build Status](https://travis-ci.org/int128/gradle-appengine-blank.svg)](https://travis-ci.org/int128/gradle-appengine-blank)
+==========================
 
-An App Engine application with Gradle.
+A template project with Groovy on Google App Engine.
 
 
-Architecture
-------------
-
-* Product
-  * Groovy
-  * Blank implementation of the router
-* Build system
-  * Gradle with App Engine plugin
+* Groovy
+* Gradle
+  * App Engine support with [gradle-appengine-plugin](https://github.com/GoogleCloudPlatform/gradle-appengine-plugin)
   * Groovy lang support
   * IntelliJ IDEA support
 
-How to use
-----------
 
-### Setting up environment
+Prepare
+-------
 
 Java 7 or later is required.
 
 Install App Engine SDK.
 
-```bash
-brew install app-engine-sdk-java
+```sh
+gcloud components update gae-java
 ```
 
-And set environment variables in `.bashrc` or `.zshrc`.
+Set environment variables in `.bashrc` or `.zshrc`.
 
-```bash
-export APPENGINE_HOME=/usr/local/Cellar/app-engine-java-sdk/x.y.z/libexec
+```sh
+export APPENGINE_HOME=$HOME/Library/google-cloud-sdk/platform/appengine-java-sdk
 ```
 
-### Run app
+Run
+---
 
 Run the development server.
 
 ```bash
 ./gradlew appengineRun
-```
 
-Stop the development server.
-
-```bash
 ./gradlew appengineStop
 ```
+
+Deploy
+------
+
+Deploy the application to the production platform.
+
+```bash
+./gradlew appengineUpdate
+```
+
+Structure
+---------
+
+* `src/main/groovy/` - Groovy sources of the product
+* `src/test/groovy/` - Groovy sources of the test
+* `static/public/` - Static files
+* `static/target/` - Compiled assets
+* `build.gradle` - Build settings
