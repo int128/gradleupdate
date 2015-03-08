@@ -32,6 +32,10 @@ dependencies {
     testCompile "com.google.appengine:appengine-testing:$gaeVersion"
 }
 
+war {
+    webAppDirName = file('static')
+}
+
 appengine {
     disableUpdateCheck = true
     warDir = file('static')
