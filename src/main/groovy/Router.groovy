@@ -10,8 +10,16 @@ import javax.servlet.http.HttpServletResponse
 class Router extends HttpServlet {
     void doGet(HttpServletRequest request, HttpServletResponse response) {
         switch (request.pathInfo) {
-            case '/feed':
+            case '/feed/stable':
                 new FeedController(request, response).stableVersions()
+                break
+
+            case '/feed/all':
+                new FeedController(request, response).allVersions()
+                break
+
+            case '/internal/feed/purge-cache':
+                new InternalController(request, response).purgeVersionCache()
                 break
 
             default:

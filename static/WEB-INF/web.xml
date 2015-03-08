@@ -9,19 +9,15 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Uncomment the following security constraint if you want to secure your incoming email endpoint -->
-    <!-- Only allow the SDK and administrators to have access to the incoming email endpoint -->
-    <!--
     <security-constraint>
         <web-resource-collection>
-            <url-pattern>/_ah/mail/*</url-pattern>
-            <url-pattern>/_ah/xmpp/message/chat/</url-pattern>
+            <web-resource-name>Internal URLs such as cron and task queue</web-resource-name>
+            <url-pattern>/internal/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
-    -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
