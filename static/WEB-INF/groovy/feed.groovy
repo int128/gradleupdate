@@ -16,11 +16,14 @@ switch (params.filter) {
 
 def feed(Map data) {
     response.contentType = 'application/xml'
-    html.feed {
+
+    html.feed(xmlns: 'http://www.w3.org/2005/Atom') {
         title(data.title)
         link(href: 'https://gradleupdate.appspot.com')
         id("https://gradleupdate.appspot.com/feed/${params.filter}")
-        author('gradleupdate')
+        author {
+            name('gradleupdate')
+        }
         updated(formatTime(new Date()))
 
         data.versions.each { version ->
@@ -31,7 +34,7 @@ def feed(Map data) {
                 updated(formatTime(parseTime(version.buildTime)))
                 summary("Gradle $version.version")
 
-                content(type: 'xml') {
+                content(type: 'application/xml') {
                     buildTime(version.buildTime)
                     current(version.current)
                     snapshot(version.snapshot)
