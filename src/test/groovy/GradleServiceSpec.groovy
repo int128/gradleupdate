@@ -7,7 +7,7 @@ class GradleServiceSpec extends Specification {
         def service = new GradleService()
 
         when:
-        def version = service.fetchCurrentVersion()
+        def version = service.fetchCurrentStableVersion()
 
         then:
         version.current

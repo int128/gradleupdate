@@ -11,8 +11,16 @@ class GradleService {
         client = new HttpURLClient(url: url)
     }
 
-    def fetchCurrentVersion() {
+    def fetchCurrentStableVersion() {
         client.request(path: '/versions/current').data
+    }
+
+    def fetchCurrentReleaseCandidateVersion() {
+        client.request(path: '/versions/release-candidate').data
+    }
+
+    def fetchCurrentNightlyVersion() {
+        client.request(path: '/versions/nightly').data
     }
 
     List fetchAllVersions() {
