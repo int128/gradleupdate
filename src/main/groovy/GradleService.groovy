@@ -32,4 +32,16 @@ class GradleService {
         fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
     }
 
+    @CompileDynamic
+    List fetchStableVersionsWithFixedIssues(int targetVersionCount) {
+        def versions = fetchStableVersions()
+        versions.take(targetVersionCount).each { version ->
+            version.fixedIssues = fetchIssuesFixedIn(version.version)
+        }
+        versions
+    }
+
+    List fetchIssuesFixedIn(String version) {
+        client.request(path: "/fixed-issues/$version").data as List
+    }
 }

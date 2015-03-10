@@ -2,7 +2,7 @@ final service = new GradleService()
 
 switch (params.filter) {
     case 'stable':
-        feed(versions: service.fetchStableVersions(), title: 'Gradle Releases (Stable)')
+        feed(versions: service.fetchStableVersionsWithFixedIssues(3), title: 'Gradle Releases (Stable)')
         break
 
     case 'all':
@@ -28,20 +28,25 @@ def feed(Map data) {
 
         data.versions.each { version ->
             entry {
-                title(version.version)
+                title("Gradle $version.version")
                 link(href: version.downloadUrl)
                 id(version.downloadUrl)
                 updated(formatTime(parseTime(version.buildTime)))
-                summary("Gradle $version.version")
+                summary("Gradle $version.version build $version.buildTime")
 
-                content(type: 'application/xml') {
-                    buildTime(version.buildTime)
-                    current(version.current)
-                    snapshot(version.snapshot)
-                    nightly(version.nightly)
-                    activeRc(version.activeRc)
-                    rcFor(version.rcFor)
-                    broken(version.broken)
+                content(type: 'xhtml') {
+                    div {
+                        p("Gradle $version.version build $version.buildTime")
+                        ul {
+                            version.fixedIssues?.each { issue ->
+                                li {
+                                    a(href: issue.link, issue.key)
+                                    span(issue.summary)
+                                    span("($issue.type)")
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
