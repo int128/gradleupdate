@@ -1,8 +1,5 @@
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import groovyx.net.http.HttpURLClient
 
-@CompileStatic
 class GradleService {
 
     final HttpURLClient client
@@ -27,12 +24,10 @@ class GradleService {
         client.request(path: '/versions/all').data as List
     }
 
-    @CompileDynamic
     List fetchStableVersions() {
         fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
     }
 
-    @CompileDynamic
     List fetchStableVersionsWithFixedIssues(int targetVersionCount) {
         def versions = fetchStableVersions()
         versions.take(targetVersionCount).each { version ->
