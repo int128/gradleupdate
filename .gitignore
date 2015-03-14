@@ -1,6 +1,8 @@
 build/
 .gradle/
 
+Credential.groovy
+
 /static/WEB-INF/lib/
 /static/WEB-INF/classes/
 /static/WEB-INF/appengine-generated/

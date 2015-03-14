@@ -1,4 +1,6 @@
-final service = new GradleService()
+import service.GradleVersionService
+
+final service = new GradleVersionService()
 
 switch (params.filter) {
     case 'stable':

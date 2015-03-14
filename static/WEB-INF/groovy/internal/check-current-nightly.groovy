@@ -1,4 +1,7 @@
-final service = new GradleService()
+import service.GradleVersionService
+import model.CurrentGradleVersion
+
+final service = new GradleVersionService()
 
 datastore.withTransaction {
     final last = CurrentGradleVersion.get('nightly')?.version

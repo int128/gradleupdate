@@ -1,12 +1,10 @@
+package service
+
 import groovyx.net.http.HttpURLClient
 
-class GradleService {
+class GradleVersionService {
 
-    final HttpURLClient client
-
-    def GradleService(String url = 'https://services.gradle.org') {
-        client = new HttpURLClient(url: url)
-    }
+    private final client = new HttpURLClient(url: 'https://services.gradle.org')
 
     def fetchCurrentStableVersion() {
         client.request(path: '/versions/current').data
@@ -20,15 +18,15 @@ class GradleService {
         client.request(path: '/versions/nightly').data
     }
 
-    List fetchAllVersions() {
+    def fetchAllVersions() {
         client.request(path: '/versions/all').data as List
     }
 
-    List fetchStableVersions() {
+    def fetchStableVersions() {
         fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
     }
 
-    List fetchStableVersionsWithFixedIssues(int targetVersionCount) {
+    def fetchStableVersionsWithFixedIssues(int targetVersionCount) {
         def versions = fetchStableVersions()
         versions.take(targetVersionCount).each { version ->
             version.fixedIssues = fetchIssuesFixedIn(version.version)
@@ -36,7 +34,7 @@ class GradleService {
         versions
     }
 
-    List fetchIssuesFixedIn(String version) {
+    def fetchIssuesFixedIn(String version) {
         client.request(path: "/fixed-issues/$version").data as List
     }
 }

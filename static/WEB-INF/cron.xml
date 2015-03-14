@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
     <cron>
-        <url>/internal/check-current</url>
+        <url>/internal/check-current.groovy</url>
         <description>Check the current version and trigger events if it has been changed</description>
         <schedule>every 1 hours</schedule>
     </cron>

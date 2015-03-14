@@ -1,3 +1,5 @@
+package model
+
 import groovyx.gaelyk.datastore.Entity
 import groovyx.gaelyk.datastore.Key
 

@@ -1,10 +1,13 @@
+package service
+
+import service.GradleVersionService
 import spock.lang.Specification
 
-class GradleServiceSpec extends Specification {
+class GradleVersionServiceSpec extends Specification {
 
     def "fetchCurrentVersion() should return metadata of current version"() {
         given:
-        def service = new GradleService()
+        def service = new GradleVersionService()
 
         when:
         def version = service.fetchCurrentStableVersion()
@@ -16,7 +19,7 @@ class GradleServiceSpec extends Specification {
 
     def "fetchAllVersions() should return versions"() {
         given:
-        def service = new GradleService()
+        def service = new GradleVersionService()
 
         when:
         def versions = service.fetchAllVersions()

@@ -1,4 +1,7 @@
-final service = new GradleService()
+import model.CurrentGradleVersion
+import service.GradleVersionService
+
+final service = new GradleVersionService()
 
 datastore.withTransaction {
     final last = CurrentGradleVersion.get('stable')?.version
@@ -12,6 +15,12 @@ datastore.withTransaction {
 
         log.info('Clear the cache for Feed: /feed/stable')
         memcache.clearCacheForUri('/feed/stable')
+
+        log.info('Queue updating the Gradle template repository')
+        defaultQueue.add(
+                taskName: "update-gradle-template-$fetched",
+                url: '/internal/update-gradle-template.groovy',
+                params: ['gradle-version': fetched])
 
         new CurrentGradleVersion(label: 'stable', version: fetched).save()
     }
