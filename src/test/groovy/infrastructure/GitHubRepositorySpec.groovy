@@ -7,7 +7,7 @@ class GitHubRepositorySpec extends Specification {
 
     def "getReference(master) should return refs and sha"() {
         given:
-        def repository = new GitHubRepository('gradleupdate/gradle-template', Credential.github)
+        def repository = new GitHubRepository('gradleupdate/Spoon-Knife', Credential.github)
 
         when:
         def ref = repository.getReference('master')
@@ -20,7 +20,7 @@ class GitHubRepositorySpec extends Specification {
 
     def "branch should be created and removed on each method"() {
         given:
-        def repository = new GitHubRepository('gradleupdate/gradle-template', Credential.github)
+        def repository = new GitHubRepository('gradleupdate/Spoon-Knife', Credential.github)
         def branchName = "test${Math.random() * 1000 as int}"
 
         when:
