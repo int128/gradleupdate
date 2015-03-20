@@ -1,21 +1,21 @@
 package service
 
-import infrastructure.GitHubRepository
+import infrastructure.GitHub
 
 class GradleUpdateWorker {
 
-    final templateRepository = new GitHubRepository('gradleupdate/GradleUpdateWorker')
+    final templateRepository = new GitHub()
 
     def bumpTemplate(String version) {
         def branch = "update-gradle-template-$version"
-        templateRepository.removeBranch(branch)
-        templateRepository.createBranch(branch, 'master')
+        templateRepository.removeBranch('gradleupdate/GradleUpdateWorker', branch)
+        templateRepository.createBranch('gradleupdate/GradleUpdateWorker', branch, 'master')
     }
 
     def bumpUserRepository(String repo) {
         def branch = "update-gradle-of-$repo"
-        templateRepository.removeBranch(branch)
-        templateRepository.createBranch(branch, 'master')
+        templateRepository.removeBranch('gradleupdate/GradleUpdateWorker', branch)
+        templateRepository.createBranch('gradleupdate/GradleUpdateWorker', branch, 'master')
     }
 
 }

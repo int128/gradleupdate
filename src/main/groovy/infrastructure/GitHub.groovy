@@ -8,27 +8,20 @@ import groovyx.net.http.HttpURLClient
 import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.POST
 
-class GitHubRepository {
+class GitHub {
 
-    private final String repo
+    private final HttpURLClient client = new HttpURLClient(url: 'https://api.github.com', headers: [
+            'Authorization': "token $Credential.githubToken",
+            'User-Agent': 'gradleupdate'
+    ])
 
-    private final HttpURLClient client
-
-    def GitHubRepository(String repo) {
-        this.repo = repo
-        this.client = new HttpURLClient(url: 'https://api.github.com', headers: [
-                'Authorization': "token $Credential.githubToken",
-                'User-Agent': 'gradleupdate'
-        ])
-    }
-
-    def createBranch(String branchName, String from) {
-        def sha = getReference(from).object.sha
+    def createBranch(String repo, String branchName, String from) {
+        def sha = getReference(repo, from).object.sha
         assert sha
-        createReference(branchName, sha)
+        createReference(repo, branchName, sha)
     }
 
-    boolean removeBranch(String branchName) {
+    boolean removeBranch(String repo, String branchName) {
         try {
             client.request(path: "/repos/$repo/git/refs/heads/$branchName", method: DELETE).success
         } catch (HttpResponseException e) {
@@ -44,11 +37,11 @@ class GitHubRepository {
         }
     }
 
-    def getReference(String branchName) {
+    def getReference(String repo, String branchName) {
         client.request(path: "/repos/$repo/git/refs/heads/$branchName").data
     }
 
-    def createReference(String branchName, String shaRef) {
+    def createReference(String repo, String branchName, String shaRef) {
         client.request(path: "/repos/$repo/git/refs", method: POST,
             requestContentType: ContentType.JSON,
             body: [[

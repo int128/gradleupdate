@@ -2,14 +2,14 @@ package infrastructure
 
 import spock.lang.Specification
 
-class GitHubRepositorySpec extends Specification {
+class GitHubSpec extends Specification {
 
     def "getReference(master) should return refs and sha"() {
         given:
-        def repository = new GitHubRepository('gradleupdate/Spoon-Knife')
+        def repository = new GitHub()
 
         when:
-        def ref = repository.getReference('master')
+        def ref = repository.getReference('gradleupdate/Spoon-Knife', 'master')
 
         then:
         ref.ref == 'refs/heads/master'
@@ -19,11 +19,11 @@ class GitHubRepositorySpec extends Specification {
 
     def "branch should be created and removed on each method"() {
         given:
-        def repository = new GitHubRepository('gradleupdate/Spoon-Knife')
+        def repository = new GitHub()
         def branchName = "test${Math.random() * 1000 as int}"
 
         when:
-        def ref = repository.createBranch(branchName, 'master')
+        def ref = repository.createBranch('gradleupdate/Spoon-Knife', branchName, 'master')
 
         then:
         ref.ref == "refs/heads/$branchName"
@@ -31,7 +31,7 @@ class GitHubRepositorySpec extends Specification {
         ref.object.sha =~ /[0-9a-z]{32}/
 
         when:
-        def removed = repository.removeBranch(branchName)
+        def removed = repository.removeBranch('gradleupdate/Spoon-Knife', branchName)
 
         then:
         removed
