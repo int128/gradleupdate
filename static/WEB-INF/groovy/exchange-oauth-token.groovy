@@ -1,10 +1,10 @@
 import groovy.json.JsonBuilder
-import infrastructure.GitHubOAuth
+import infrastructure.GitHub
 
 assert params.code, 'code parameter should be given'
 assert headers.origin, 'origin header should be given'
 
-final exchanged = new GitHubOAuth().exchange(params.code)
+final exchanged = GitHub.exchangeOAuthToken(params.code)
 
 assert exchanged
 assert !exchanged.error

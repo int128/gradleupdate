@@ -49,4 +49,14 @@ class GitHub {
                sha: "$shaRef".toString()
             ], null]).data
     }
+
+    static exchangeOAuthToken(String code) {
+        final client = new HttpURLClient(url: 'https://github.com/login/oauth/access_token')
+        client.request(query: [
+                client_id: Credential.githubClientId,
+                client_secret: Credential.githubClientSecret,
+                code: code
+        ]).data
+    }
+
 }
