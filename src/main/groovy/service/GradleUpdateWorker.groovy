@@ -1,11 +1,10 @@
 package service
 
-import config.Credential
 import infrastructure.GitHubRepository
 
 class GradleUpdateWorker {
 
-    final templateRepository = new GitHubRepository('gradleupdate/GradleUpdateWorker', Credential.github)
+    final templateRepository = new GitHubRepository('gradleupdate/GradleUpdateWorker')
 
     def bumpTemplate(String version) {
         def branch = "update-gradle-template-$version"

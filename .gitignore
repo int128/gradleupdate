@@ -1,7 +1,7 @@
 build/
 .gradle/
 
-Credential.groovy
+credential.properties
 
 /static/WEB-INF/lib/
 /static/WEB-INF/classes/

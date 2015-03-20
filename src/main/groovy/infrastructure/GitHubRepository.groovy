@@ -1,5 +1,6 @@
 package infrastructure
 
+import config.Credential
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.HttpURLClient
@@ -13,10 +14,10 @@ class GitHubRepository {
 
     private final HttpURLClient client
 
-    def GitHubRepository(String repo, String token) {
+    def GitHubRepository(String repo) {
         this.repo = repo
         this.client = new HttpURLClient(url: 'https://api.github.com', headers: [
-                'Authorization': "token $token",
+                'Authorization': "token $Credential.githubToken",
                 'User-Agent': 'gradleupdate'
         ])
     }
