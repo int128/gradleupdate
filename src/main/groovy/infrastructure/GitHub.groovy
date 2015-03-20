@@ -1,6 +1,5 @@
 package infrastructure
 
-import config.Credential
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.HttpURLClient

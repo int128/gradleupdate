@@ -1,5 +1,8 @@
-package config
+package infrastructure
 
+import groovy.transform.PackageScope
+
+@PackageScope
 class Credential {
 
     static githubToken
