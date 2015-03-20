@@ -9,10 +9,14 @@ import static groovyx.net.http.Method.POST
 
 class GitHub {
 
-    private final HttpURLClient client = new HttpURLClient(url: 'https://api.github.com', headers: [
+    private final client = new HttpURLClient(url: 'https://api.github.com', headers: [
             'Authorization': "token $Credential.githubToken",
             'User-Agent': 'gradleupdate'
     ])
+
+    def getRepository(String repo) {
+        client.request(path: "/repos/$repo").data
+    }
 
     def createBranch(String repo, String branchName, String from) {
         def sha = getReference(repo, from).object.sha
