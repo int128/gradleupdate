@@ -3,12 +3,10 @@ import util.CrossOrigin
 
 CrossOrigin.sendAccessControlAllowOriginForAny(response)
 
-assert params.label
-
-final version = CurrentGradleVersion.get(params.label)
+final version = CurrentGradleVersion.get('stable')
 if (version == null) {
     response.sendError(404)
+} else {
+    response.contentType = 'text/plain'
+    print version.version
 }
-
-response.contentType = 'text/plain'
-print version.version

@@ -4,11 +4,11 @@ final service = new GradleVersionService()
 
 switch (params.filter) {
     case 'stable':
-        feed(versions: service.fetchStableVersionsWithFixedIssues(3), title: 'Gradle Releases (Stable)')
+        feed(versions: service.fetchStableVersionsWithFixedIssues(3), title: 'Gradle Releases')
         break
 
-    case 'all':
-        feed(versions: service.fetchAllVersions(), title: 'Gradle Releases')
+    case 'rc':
+        feed(versions: service.fetchRcVersionsWithFixedIssues(), title: 'Gradle Releases including Candidates')
         break
 
     default:

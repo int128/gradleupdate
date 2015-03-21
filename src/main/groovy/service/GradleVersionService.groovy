@@ -26,11 +26,32 @@ class GradleVersionService {
         fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
     }
 
+    def fetchRcVersions() {
+        fetchAllVersions().findAll { !it.snapshot }
+    }
+
     def fetchStableVersionsWithFixedIssues(int targetVersionCount) {
         def versions = fetchStableVersions()
         versions.take(targetVersionCount).each { version ->
             version.fixedIssues = fetchIssuesFixedIn(version.version)
         }
+        versions
+    }
+
+    def fetchRcVersionsWithFixedIssues() {
+        def versions = fetchRcVersions()
+
+        def rcFor = versions.find { it.rcFor }?.rcFor
+        def fixedIssues = fetchIssuesFixedIn(rcFor)
+
+        versions.each { version ->
+            if (version.version == rcFor) {
+                version.fixedIssues = fixedIssues
+            } else if (version.rcFor == rcFor) {
+                version.fixedIssues = fixedIssues.findAll { it.fixedin == version.version }
+            }
+        }
+
         versions
     }
 
