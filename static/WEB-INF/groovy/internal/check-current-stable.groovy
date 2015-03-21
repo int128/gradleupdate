@@ -13,8 +13,8 @@ datastore.withTransaction {
     } else {
         log.info("New stable version $fetched has been released")
 
-        log.info('Clear the cache for Feed: /feed/stable')
-        memcache.clearCacheForUri('/feed/stable')
+        log.info('Clear cache')
+        memcache.clearCacheForUri('/stable/feed')
 
         log.info('Queue updating the Gradle template repository')
         defaultQueue.add(

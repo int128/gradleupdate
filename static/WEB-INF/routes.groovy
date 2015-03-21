@@ -1,6 +1,5 @@
-get '/feed/@filter', forward: '/feed.groovy?filter=@filter', cache: (7 * 24).hours
-
-get '/version/@label', forward: '/get-current-version.groovy?label=@label'
+get '/stable', forward: '/get-current-version.groovy?label=stable'
+get '/stable/feed', forward: '/feed.groovy?filter=stable', cache: (7 * 24).hours
 
 post '/authorize', forward: '/exchange-oauth-token.groovy'
 
