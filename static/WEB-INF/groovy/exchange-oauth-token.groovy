@@ -14,10 +14,7 @@ assert exchanged.access_token
 assert exchanged.scope
 
 response.contentType = 'application/json'
-
-def json = new JsonBuilder()
-json {
+println new JsonBuilder({
     token exchanged.access_token
     scope exchanged.scope
-}
-println json
+})
