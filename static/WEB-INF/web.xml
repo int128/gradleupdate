@@ -46,7 +46,7 @@
 
     <error-page>
         <exception-type>groovyx.net.http.HttpResponseException</exception-type>
-        <location>/logging-http-exception.groovy</location>
+        <location>/util/logging-http-exception.groovy</location>
     </error-page>
 
     <welcome-file-list>
