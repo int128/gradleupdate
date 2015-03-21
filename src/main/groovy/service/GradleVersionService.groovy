@@ -30,9 +30,9 @@ class GradleVersionService {
         fetchAllVersions().findAll { !it.snapshot }
     }
 
-    def fetchStableVersionsWithFixedIssues(int targetVersionCount) {
+    def fetchStableVersionsWithFixedIssues() {
         def versions = fetchStableVersions()
-        versions.take(targetVersionCount).each { version ->
+        versions.take(1).each { version ->
             version.fixedIssues = fetchIssuesFixedIn(version.version)
         }
         versions
