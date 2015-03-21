@@ -1,8 +1,10 @@
 import groovy.json.JsonBuilder
 import infrastructure.GitHub
+import util.CrossOrigin
+
+CrossOrigin.sendAccessControlAllowOrigin(response, headers)
 
 assert params.code, 'code parameter should be given'
-assert headers.origin, 'origin header should be given'
 
 final exchanged = GitHub.exchangeOAuthToken(params.code)
 
@@ -11,10 +13,8 @@ assert !exchanged.error
 assert exchanged.access_token
 assert exchanged.scope
 
-response.headers.'Access-Control-Allow-Origin' =
-    headers.origin.matches(/http:\/\/localhost(\:\d+)?/) ? headers.origin : 'https://gradleupdate.github.io'
-
 response.contentType = 'application/json'
+
 def json = new JsonBuilder()
 json {
     token exchanged.access_token

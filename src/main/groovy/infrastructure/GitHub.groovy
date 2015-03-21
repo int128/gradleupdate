@@ -9,10 +9,18 @@ import static groovyx.net.http.Method.POST
 
 class GitHub {
 
-    private final client = new HttpURLClient(url: 'https://api.github.com', headers: [
-            'Authorization': "token $Credential.githubToken",
-            'User-Agent': 'gradleupdate'
-    ])
+    private final HttpURLClient client
+
+    def GitHub(Map headers = [:]) {
+        client = new HttpURLClient(url: 'https://api.github.com', headers: [
+                'Authorization': "token $Credential.githubToken",
+                'User-Agent': 'gradleupdate'
+        ] + headers)
+    }
+
+    def whoAmI() {
+        client.request(path: '/user').data
+    }
 
     def getRepository(String repo) {
         client.request(path: "/repos/$repo").data
