@@ -10,6 +10,10 @@ class CrossOrigin {
             headers.Origin.matches(/http:\/\/localhost(\:\d+)?/) ? headers.Origin : 'https://gradleupdate.github.io'
     }
 
+    static sendAccessControlAllowOriginForAny(HttpServletResponse response) {
+        response.headers.'Access-Control-Allow-Origin' = '*'
+    }
+
     static sendAccessControlAllowHeaders(HttpServletResponse response, String[] headers) {
         response.headers.'Access-Control-Allow-Headers' = headers.join(',')
     }
