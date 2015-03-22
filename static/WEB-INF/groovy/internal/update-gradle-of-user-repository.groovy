@@ -1,4 +1,4 @@
-import service.GradleUpdateWorker
+import infrastructure.GradleUpdateWorker
 
 assert params.repo
 

@@ -1,4 +1,4 @@
-import service.GradleVersionService
+import infrastructure.GradleVersionService
 import model.CurrentGradleVersion
 
 final service = new GradleVersionService()

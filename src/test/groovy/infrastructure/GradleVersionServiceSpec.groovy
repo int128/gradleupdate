@@ -1,6 +1,6 @@
-package service
+package infrastructure
 
-import service.GradleVersionService
+import infrastructure.GradleVersionService
 import spock.lang.Specification
 
 class GradleVersionServiceSpec extends Specification {
