@@ -9,10 +9,8 @@ CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.fullName
 assert app.env.name == Development || headers.Authorization
-assert app.env.name == Development || headers.Authorization.startsWith('token ')
 
-final gitHub = headers.Authorization ? new GitHub(Authorization: headers.Authorization) : new GitHub()
-
+final gitHub = GitHub.authorizationOrDefault(headers.Authorization)
 final service = new GitHubRepositoryService(gitHub)
 final metadata = service.queryMetadata(params.fullName)
 

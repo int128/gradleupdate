@@ -4,16 +4,19 @@ import infrastructure.GitHub
 import model.GitHubRepository
 import util.CrossOriginPolicy
 
+import static com.google.appengine.api.utils.SystemProperty.Environment.Value.Development
+
 CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.fullName
-assert headers.Authorization
+assert app.env.name == Development || headers.Authorization
 
 final json = new JsonSlurper().parse(request.inputStream)
 assert json.autoUpdate instanceof Boolean
 
-final github = new GitHub(Authorization: headers.Authorization)
-final repo = github.getRepository(params.fullName)
+final gitHub = GitHub.authorizationOrDefault(headers.Authorization)
+
+final repo = gitHub.getRepository(params.fullName)
 
 if (!repo.permissions.admin) {
     response.sendError 404, 'No permission'

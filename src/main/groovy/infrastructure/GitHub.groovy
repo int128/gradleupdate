@@ -18,6 +18,15 @@ class GitHub {
         ] + headers)
     }
 
+    static GitHub authorizationOrDefault(String authorizationHeader) {
+        if (authorizationHeader) {
+            assert authorizationHeader.startsWith('token ')
+            new GitHub(Authorization: authorizationHeader)
+        } else {
+            new GitHub()
+        }
+    }
+
     def getRepository(String repo) {
         client.request(path: "/repos/$repo").data
     }
