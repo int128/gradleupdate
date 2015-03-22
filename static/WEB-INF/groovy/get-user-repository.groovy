@@ -1,9 +1,9 @@
 import groovy.json.JsonBuilder
 import infrastructure.GitHub
 import model.GitHubRepository
-import util.CrossOrigin
+import util.CrossOriginPolicy
 
-CrossOrigin.sendAccessControlAllowOrigin(response, headers)
+CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.fullName
 assert headers.Authorization

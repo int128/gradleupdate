@@ -1,4 +1,4 @@
-import util.CrossOrigin
+import util.CrossOriginPolicy
 
-CrossOrigin.sendAccessControlAllowOrigin(response, headers)
-CrossOrigin.sendAccessControlAllowHeaders(response, 'Content-Type', 'Authorization')
+CrossOriginPolicy.allowOrigin(response, headers)
+CrossOriginPolicy.allowHeaders(response, 'Content-Type', 'Authorization')

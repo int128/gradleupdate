@@ -1,7 +1,7 @@
 import model.CurrentGradleVersion
-import util.CrossOrigin
+import util.CrossOriginPolicy
 
-CrossOrigin.sendAccessControlAllowOriginForAny(response)
+CrossOriginPolicy.allowAnyOrigin(response)
 
 final version = CurrentGradleVersion.get('rc')
 if (version == null) {
