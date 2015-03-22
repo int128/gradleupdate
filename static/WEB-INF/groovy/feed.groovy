@@ -1,14 +1,14 @@
-import infrastructure.GradleVersionService
+import infrastructure.GradleRegistry
 
-final service = new GradleVersionService()
+final registry = new GradleRegistry()
 
 switch (params.filter) {
     case 'stable':
-        feed(versions: service.fetchStableVersionsWithFixedIssues(), title: 'Gradle Releases')
+        feed(versions: registry.getStableReleasesWithFixedIssues(), title: 'Gradle Releases')
         break
 
     case 'rc':
-        feed(versions: service.fetchRcVersionsWithFixedIssues(), title: 'Gradle Releases including Candidates')
+        feed(versions: registry.getReleaseCandidateReleasesWithFixedIssues(), title: 'Gradle Releases including Candidates')
         break
 
     default:

@@ -2,47 +2,43 @@ package infrastructure
 
 import groovyx.net.http.HttpURLClient
 
-class GradleVersionService {
+class GradleRegistry {
 
     private final client = new HttpURLClient(url: 'https://services.gradle.org')
 
-    def fetchCurrentStableVersion() {
+    def getCurrentStableRelease() {
         client.request(path: '/versions/current').data
     }
 
-    def fetchCurrentReleaseCandidateVersion() {
+    def getCurrentReleaseCandidateRelease() {
         client.request(path: '/versions/release-candidate').data
     }
 
-    def fetchCurrentNightlyVersion() {
-        client.request(path: '/versions/nightly').data
-    }
-
-    def fetchAllVersions() {
+    def getReleases() {
         client.request(path: '/versions/all').data as List
     }
 
-    def fetchStableVersions() {
-        fetchAllVersions().findAll { !it.snapshot && !it.rcFor }
+    def getStableReleases() {
+        getReleases().findAll { !it.snapshot && !it.rcFor }
     }
 
-    def fetchRcVersions() {
-        fetchAllVersions().findAll { !it.snapshot }
+    def getReleaseCandidateReleases() {
+        getReleases().findAll { !it.snapshot }
     }
 
-    def fetchStableVersionsWithFixedIssues() {
-        def versions = fetchStableVersions()
+    def getStableReleasesWithFixedIssues() {
+        def versions = getStableReleases()
         versions.take(1).each { version ->
-            version.fixedIssues = fetchIssuesFixedIn(version.version)
+            version.fixedIssues = getIssuesFixedIn(version.version)
         }
         versions
     }
 
-    def fetchRcVersionsWithFixedIssues() {
-        def versions = fetchRcVersions()
+    def getReleaseCandidateReleasesWithFixedIssues() {
+        def versions = getReleaseCandidateReleases()
 
         def rcFor = versions.find { it.rcFor }?.rcFor
-        def fixedIssues = fetchIssuesFixedIn(rcFor)
+        def fixedIssues = getIssuesFixedIn(rcFor)
 
         versions.each { version ->
             if (version.version == rcFor) {
@@ -55,7 +51,7 @@ class GradleVersionService {
         versions
     }
 
-    def fetchIssuesFixedIn(String version) {
+    def getIssuesFixedIn(String version) {
         client.request(path: "/fixed-issues/$version").data as List
     }
 }

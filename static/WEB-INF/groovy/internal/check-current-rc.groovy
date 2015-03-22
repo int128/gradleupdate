@@ -1,12 +1,12 @@
-import infrastructure.GradleVersionService
+import infrastructure.GradleRegistry
 import model.CurrentGradleVersion
 
-final service = new GradleVersionService()
+final registry = new GradleRegistry()
 
 datastore.withTransaction {
     final last = CurrentGradleVersion.get('rc')?.version
 
-    final fetched = service.fetchCurrentReleaseCandidateVersion()?.version
+    final fetched = registry.getCurrentReleaseCandidateRelease()?.version
 
     if (last == fetched) {
         log.info("Current rc version is $fetched")

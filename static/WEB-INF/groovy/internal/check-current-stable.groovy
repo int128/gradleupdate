@@ -1,12 +1,12 @@
 import model.CurrentGradleVersion
-import infrastructure.GradleVersionService
+import infrastructure.GradleRegistry
 
-final service = new GradleVersionService()
+final registry = new GradleRegistry()
 
 datastore.withTransaction {
     final last = CurrentGradleVersion.get('stable')?.version
 
-    final fetched = service.fetchCurrentStableVersion().version
+    final fetched = registry.getCurrentStableRelease().version
 
     if (last == fetched) {
         log.info("Current stable version is $fetched")
