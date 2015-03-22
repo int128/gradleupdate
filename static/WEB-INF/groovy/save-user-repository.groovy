@@ -1,7 +1,6 @@
-import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import infrastructure.GitHub
-import model.GitHubRepository
+import service.GitHubRepositoryService
 import util.CrossOriginPolicy
 
 import static com.google.appengine.api.utils.SystemProperty.Environment.Value.Development
@@ -15,18 +14,10 @@ final json = new JsonSlurper().parse(request.inputStream)
 assert json.autoUpdate instanceof Boolean
 
 final gitHub = GitHub.authorizationOrDefault(headers.Authorization)
+final service = new GitHubRepositoryService(gitHub)
 
-final repo = gitHub.getRepository(params.fullName)
-
-if (!repo.permissions.admin) {
+if (service.saveMetadata(params.fullName, json.autoUpdate)) {
+    response.status = 204
+} else {
     response.sendError 404, 'No permission'
 }
-
-final metadata = new GitHubRepository(fullName: params.fullName, autoUpdate: json.autoUpdate)
-metadata.save()
-
-response.contentType = 'application/json'
-
-println new JsonBuilder({
-    autoUpdate metadata?.autoUpdate ?: false
-})

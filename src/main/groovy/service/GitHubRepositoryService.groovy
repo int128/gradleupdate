@@ -30,6 +30,19 @@ class GitHubRepositoryService {
                 autoUpdate: autoUpdate)
     }
 
+    boolean saveMetadata(String fullName, boolean autoUpdate) {
+        assert fullName
+
+        def repo = gitHub.getRepository(fullName)
+        if (repo.permissions?.admin) {
+            final metadata = new GitHubRepository(fullName: fullName, autoUpdate: autoUpdate)
+            metadata.save()
+            true
+        } else {
+            false
+        }
+    }
+
     boolean checkIfBuildGradleExists(String fullName) {
         try {
             gitHub.getContent(fullName, 'build.gradle')
