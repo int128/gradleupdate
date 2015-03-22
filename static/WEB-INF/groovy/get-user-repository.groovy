@@ -1,24 +1,21 @@
 import groovy.json.JsonBuilder
 import infrastructure.GitHub
-import model.GitHubRepository
+import service.GitHubRepositoryService
 import util.CrossOriginPolicy
 
 CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.fullName
 assert headers.Authorization
+assert headers.Authorization.startsWith('token ')
 
-final github = new GitHub(Authorization: headers.Authorization)
-final repo = github.getRepository(params.fullName)
+final gitHub = new GitHub(Authorization: headers.Authorization)
+final service = new GitHubRepositoryService(gitHub)
+final metadata = service.queryMetadata(params.fullName)
 
-if (!repo.permissions.admin) {
-    response.sendError 404, 'No permission'
+if (metadata == null) {
+    response.sendError(404, 'No Permission')
 }
 
-final metadata = GitHubRepository.get(params.fullName)
-
 response.contentType = 'application/json'
-
-println new JsonBuilder({
-    autoUpdate metadata?.autoUpdate ?: false
-})
+println new JsonBuilder(metadata)

@@ -18,12 +18,12 @@ class GitHub {
         ] + headers)
     }
 
-    def whoAmI() {
-        client.request(path: '/user').data
-    }
-
     def getRepository(String repo) {
         client.request(path: "/repos/$repo").data
+    }
+
+    def getContent(String repo, String path) {
+        client.request(path: "/repos/$repo/contents/$path").data
     }
 
     def createBranch(String repo, String branchName, String from) {
