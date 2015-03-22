@@ -7,5 +7,6 @@ import groovyx.gaelyk.datastore.Key
 @Entity
 class GitHubRepository {
     @Key String fullName
-    @Indexed boolean autoUpdate
+    @Indexed boolean pullRequestOnStableRelease = false
+    @Indexed boolean pullRequestOnRcRelease = false
 }

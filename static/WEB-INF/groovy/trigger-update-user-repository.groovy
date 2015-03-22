@@ -1,6 +1,4 @@
-import groovy.json.JsonBuilder
 import infrastructure.GitHub
-import service.GitHubRepositoryService
 import util.CrossOriginPolicy
 
 import static com.google.appengine.api.utils.SystemProperty.Environment.Value.Development
@@ -11,12 +9,13 @@ assert params.fullName
 assert app.env.name == Development || headers.Authorization
 
 final gitHub = GitHub.authorizationOrDefault(headers.Authorization)
-final service = new GitHubRepositoryService(gitHub)
-final entity = service.query(params.fullName)
+final repo = gitHub.getRepository(params.fullName)
 
-if (entity) {
-    response.contentType = 'application/json'
-    println new JsonBuilder(entity)
+if (repo.permissions?.admin) {
+    log.info("Queue updating Gradle of the user repository: $params.fullName")
+    defaultQueue.add(
+            url: '/internal/update-gradle-of-user-repository.groovy',
+            params: ['repo': params.fullName])
 } else {
     response.sendError(404, 'No Admin Permission')
 }
