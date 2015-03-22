@@ -4,10 +4,10 @@ import javax.servlet.http.HttpServletResponse
 
 class CrossOrigin {
 
-    static sendAccessControlAllowOrigin(HttpServletResponse response, Map headers) {
-        assert headers.Origin
+    static sendAccessControlAllowOrigin(HttpServletResponse response, Map<String, String> headers) {
+        def origin = headers.find { it.key.equalsIgnoreCase('origin') }?.value
         response.headers.'Access-Control-Allow-Origin' =
-            headers.Origin.matches(/http:\/\/localhost(\:\d+)?/) ? headers.Origin : 'https://gradleupdate.github.io'
+            origin?.matches(/http:\/\/localhost(\:\d+)?/) ? origin : 'https://gradleupdate.github.io'
     }
 
     static sendAccessControlAllowOriginForAny(HttpServletResponse response) {
