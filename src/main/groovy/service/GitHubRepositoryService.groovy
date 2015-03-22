@@ -14,20 +14,20 @@ class GitHubRepositoryService {
         assert fullName
 
         def repo = gitHub.getRepository(fullName)
-        if (repo.permissions.admin) {
-            def metadata = GitHubRepository.get(fullName)
+        def gradleProject = checkIfBuildGradleExists(fullName)
+        def gradleVersion = queryGradleWrapperVersion(fullName)
 
-            def gradleProject = checkIfBuildGradleExists(fullName)
-            def gradleVersion = queryGradleWrapperVersion(fullName)
-
-            new GitHubRepositoryMetadata(
-                    fullName: fullName,
-                    gradleProject: gradleProject,
-                    gradleVersion: gradleVersion,
-                    autoUpdate: metadata?.autoUpdate ?: false)
-        } else {
-            null
+        def autoUpdate = null
+        if (repo.permissions?.admin) {
+            autoUpdate = GitHubRepository.get(fullName)?.autoUpdate ?: false
         }
+
+        new GitHubRepositoryMetadata(
+                fullName: fullName,
+                admin: repo.permissions?.admin ?: false,
+                gradleProject: gradleProject,
+                gradleVersion: gradleVersion,
+                autoUpdate: autoUpdate)
     }
 
     boolean checkIfBuildGradleExists(String fullName) {

@@ -5,7 +5,11 @@ import groovy.transform.Immutable
 @Immutable
 class GitHubRepositoryMetadata {
     String fullName
+    boolean admin
+
     boolean gradleProject
     String gradleVersion
-    boolean autoUpdate
+
+    // null if user has no permission
+    Boolean autoUpdate
 }
