@@ -1,6 +1,12 @@
 import infrastructure.GradleUpdateWorker
 
-assert params.repo
+assert params.fullName
+assert params.gradleVersion
 
 final worker = new GradleUpdateWorker()
-worker.bumpUserRepository(params.repo)
+
+if (worker.queryGradleWrapperVersion() == params.gradleVersion) {
+    worker.bumpUserRepository(params.fullName)
+} else {
+    response.sendError(404, "Gradle $params.gradleVersion does not found")
+}
