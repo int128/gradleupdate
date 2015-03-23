@@ -10,5 +10,5 @@ service.performIfNewStableReleaseIsAvailable { current ->
     log.info('Queue updating the Gradle template repository')
     defaultQueue.add(
             url: '/internal/update-gradle-template.groovy',
-            params: ['gradle-version': current])
+            params: [gradleVersion: current])
 }

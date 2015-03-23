@@ -1,6 +1,6 @@
 import infrastructure.GradleUpdateWorker
 
-assert params.'gradle-version'
+assert params.gradleVersion
 
 final worker = new GradleUpdateWorker()
-worker.bumpTemplate(params.'gradle-version')
+worker.bumpTemplate(params.gradleVersion)
