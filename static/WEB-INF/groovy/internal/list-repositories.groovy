@@ -1,12 +1,8 @@
 import groovy.json.JsonBuilder
-import model.GitHubRepository
+import service.GitHubRepositoryService
 
-final entities = datastore.execute {
-    select all from 'GitHubRepository'
-    where pullRequestOnStableRelease == true
-}.collect {
-    it as GitHubRepository
-}
+final service = new GitHubRepositoryService()
+final repositories = service.listPullRequestOnStableRelease()
 
 response.contentType = 'application/json'
-println new JsonBuilder(entities)
+println new JsonBuilder(repositories)

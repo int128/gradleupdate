@@ -11,4 +11,8 @@ service.performIfNewStableReleaseIsAvailable { current ->
     defaultQueue.add(
             url: '/internal/update-gradle-template.groovy',
             params: [gradleVersion: current])
+    defaultQueue.add(
+            url: '/internal/update-gradle-of-repositories.groovy',
+            params: [gradleVersion: current],
+            countdownMillis: 1000 * 60)
 }
