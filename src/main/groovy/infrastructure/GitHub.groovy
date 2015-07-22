@@ -3,6 +3,8 @@ package infrastructure
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseException
 import groovyx.net.http.HttpURLClient
+import model.Credential
+import service.CredentialRepository
 
 import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.POST
@@ -11,9 +13,12 @@ class GitHub {
 
     private final HttpURLClient client
 
+    private final Credential credential
+
     def GitHub(Map headers = [:]) {
+        credential = new CredentialRepository().find('github')
         client = new HttpURLClient(url: 'https://api.github.com', headers: [
-                'Authorization': "token $Credential.githubToken",
+                'Authorization': "token $credential.token",
                 'User-Agent': 'gradleupdate'
         ] + headers)
     }
@@ -70,11 +75,11 @@ class GitHub {
             ], null]).data
     }
 
-    static exchangeOAuthToken(String code) {
+    def exchangeOAuthToken(String code) {
         final client = new HttpURLClient(url: 'https://github.com/login/oauth/access_token')
         client.request(query: [
-                client_id: Credential.githubClientId,
-                client_secret: Credential.githubClientSecret,
+                client_id: credential.clientId,
+                client_secret: credential.clientSecret,
                 code: code
         ]).data
     }

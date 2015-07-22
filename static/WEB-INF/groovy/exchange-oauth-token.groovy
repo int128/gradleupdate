@@ -6,7 +6,8 @@ CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.code, 'code parameter should be given'
 
-final exchanged = GitHub.exchangeOAuthToken(params.code)
+final github = new GitHub()
+final exchanged = github.exchangeOAuthToken(params.code)
 
 assert exchanged
 assert !exchanged.error
