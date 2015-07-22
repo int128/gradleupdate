@@ -34,6 +34,9 @@ dependencies {
     testCompile "com.google.appengine:appengine-testing:$gaeVersion"
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
 war {
     webAppDirName = file('static')
 }
