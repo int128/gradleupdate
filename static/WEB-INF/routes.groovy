@@ -17,4 +17,6 @@ get  '/repos/@user/@repo', forward: '/get-user-repository.groovy?fullName=@user/
 post '/repos/@user/@repo', forward: '/save-user-repository.groovy?fullName=@user/@repo'
 all  '/repos/@user/@repo', forward: '/util/cors-options.groovy'
 
+post '/webhook', forward: '/receive-github-webhook.groovy'
+
 get '/', redirect: 'https://gradleupdate.github.io/'
