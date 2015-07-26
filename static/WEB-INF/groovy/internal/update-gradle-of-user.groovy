@@ -1,9 +1,6 @@
-import service.GitHubRepositoryService
-
 assert params.gradleVersion
 
-final service = new GitHubRepositoryService()
-final repositories = service.listPullRequestOnStableRelease()
+final repositories = null //TODO
 
 repositories.each { repo ->
     log.info("Queue updating the repository: $repo.fullName")

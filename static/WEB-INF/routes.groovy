@@ -13,10 +13,6 @@ post '/repos/@user/@repo/gradle/@version',
     forward: '/trigger-update-user-repository.groovy?fullName=@user/@repo&gradleVersion=@version'
 all  '/repos/@user/@repo/gradle/@version', forward: '/util/cors-options.groovy'
 
-get  '/repos/@user/@repo', forward: '/get-user-repository.groovy?fullName=@user/@repo'
-post '/repos/@user/@repo', forward: '/save-user-repository.groovy?fullName=@user/@repo'
-all  '/repos/@user/@repo', forward: '/util/cors-options.groovy'
-
 post '/webhook', forward: '/receive-github-webhook.groovy'
 
 get '/', redirect: 'https://gradleupdate.github.io/'
