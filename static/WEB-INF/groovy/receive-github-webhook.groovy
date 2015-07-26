@@ -3,12 +3,15 @@ import groovy.json.JsonSlurper
 final eventType = headers.'X-GitHub-Event'
 
 switch (eventType) {
-    case 'WatchEvent':
+    case 'watch':
         final json = new JsonSlurper().parse(request.inputStream)
         assert json instanceof Map
         assert json.action == 'started'
-        // TODO: handle event
-        log.info json.toString()
+        assert json.sender.login
+        log.info("Queue updating repositories of user: ${json.sender.login}")
+        defaultQueue.add(
+                url: '/internal/update-gradle-of-user.groovy',
+                params: [user: json.sender.login])
         break
 
     default:

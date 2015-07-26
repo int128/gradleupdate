@@ -36,6 +36,14 @@ class GitHub {
         client.request(path: "/repos/$repo").data
     }
 
+    def getRepositories(String userName) {
+        client.request(path: "/users/$userName/repos").data
+    }
+
+    def getStargazers(String repo) {
+        client.request(path: "/repos/$repo/stargazers").data
+    }
+
     def getContent(String repo, String path) {
         client.request(path: "/repos/$repo/contents/$path").data
     }
