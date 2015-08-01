@@ -1,4 +1,4 @@
-import infrastructure.GradleUpdateWorker
+import service.GradleUpdateWorker
 
 final worker = new GradleUpdateWorker()
 final stargazers = worker.queryStargazers()

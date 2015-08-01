@@ -1,6 +1,7 @@
-package infrastructure
+package service
 
 import groovyx.net.http.HttpResponseException
+import infrastructure.GitHub
 
 class GradleUpdateWorker {
 

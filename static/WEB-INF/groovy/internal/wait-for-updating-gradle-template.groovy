@@ -1,4 +1,4 @@
-import infrastructure.GradleUpdateWorker
+import service.GradleUpdateWorker
 
 assert params.gradleVersion
 assert params.next

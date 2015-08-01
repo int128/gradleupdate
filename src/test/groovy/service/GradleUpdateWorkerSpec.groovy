@@ -1,5 +1,6 @@
-package infrastructure
+package service
 
+import service.GradleUpdateWorker
 import spock.lang.Specification
 
 class GradleUpdateWorkerSpec extends Specification {
