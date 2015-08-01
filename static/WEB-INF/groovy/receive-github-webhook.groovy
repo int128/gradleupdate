@@ -10,7 +10,7 @@ switch (eventType) {
         assert json.sender.login
         log.info("Queue updating repositories of user: ${json.sender.login}")
         defaultQueue.add(
-                url: '/internal/update-gradle-of-user.groovy',
+                url: '/internal/got-star/',
                 params: [user: json.sender.login])
         break
 

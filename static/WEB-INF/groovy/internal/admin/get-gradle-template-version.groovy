@@ -1,6 +1,8 @@
-import service.GradleUpdateWorker
+import gradle.TemplateRepository
+import infrastructure.GitHub
 
-final worker = new GradleUpdateWorker()
+final gitHub = new GitHub()
+final templateRepository = new TemplateRepository(gitHub)
 
 response.contentType = 'text/plain'
-println worker.queryGradleWrapperVersion()
+println templateRepository.queryGradleWrapperVersion()

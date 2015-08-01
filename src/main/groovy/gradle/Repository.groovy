@@ -1,29 +1,35 @@
-package service
+package gradle
 
 import groovyx.net.http.HttpResponseException
 import infrastructure.GitHub
 
-class GradleUpdateWorker {
+class Repository {
 
-    static final repo = 'int128/gradleupdate-worker'
+    final String fullName
 
-    final gitHub = new GitHub()
+    protected final GitHub gitHub
 
-    def bumpTemplate(String version) {
-        def branch = "update-gradle-template-$version"
-        gitHub.removeBranch(repo, branch)
-        gitHub.createBranch(repo, branch, 'master')
+    def Repository(String fullName, GitHub gitHub) {
+        this.fullName = fullName
+        this.gitHub = gitHub
     }
 
-    def bumpUserRepository(String userRepo) {
-        def branch = "update-gradle-of-$userRepo"
-        gitHub.removeBranch(repo, branch)
-        gitHub.createBranch(repo, branch, 'master')
+    boolean queryIfHasGradleWrapper() {
+        try {
+            gitHub.getContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
+            true
+        } catch (HttpResponseException e) {
+            if (e.statusCode == 404) {
+                false
+            } else {
+                throw e
+            }
+        }
     }
 
     String queryGradleWrapperVersion() {
         try {
-            def file = gitHub.getContent(repo, 'gradle/wrapper/gradle-wrapper.properties')
+            def file = gitHub.getContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
             String base64 = file.content
             String content = new String(base64.decodeBase64())
             parseVersionFromGradleWrapperProperties(content)

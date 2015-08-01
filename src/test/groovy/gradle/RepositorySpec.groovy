@@ -1,9 +1,8 @@
-package service
+package gradle
 
-import service.GradleUpdateWorker
 import spock.lang.Specification
 
-class GradleUpdateWorkerSpec extends Specification {
+class RepositorySpec extends Specification {
 
     def "parse method should return version"() {
         given:
@@ -15,7 +14,7 @@ zipStorePath=wrapper/dists
 distributionUrl=https://services.gradle.org/distributions/gradle-2.2.1-bin.zip"""
 
         when:
-        def version = GradleUpdateWorker.parseVersionFromGradleWrapperProperties(content)
+        def version = Repository.parseVersionFromGradleWrapperProperties(content)
 
         then:
         version == '2.2.1'
@@ -26,7 +25,7 @@ distributionUrl=https://services.gradle.org/distributions/gradle-2.2.1-bin.zip""
         def content = """invalid content"""
 
         when:
-        def version = GradleUpdateWorker.parseVersionFromGradleWrapperProperties(content)
+        def version = Repository.parseVersionFromGradleWrapperProperties(content)
 
         then:
         version == null

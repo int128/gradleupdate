@@ -2,7 +2,8 @@ import infrastructure.GitHub
 import service.Stargazers
 
 final gitHub = new GitHub()
-final stargazers = new Stargazers().fetch()
+final stargazers = new Stargazers(gitHub).fetch()
+
 final repositories = stargazers.collect { stargazer ->
     [
         name: stargazer.login,

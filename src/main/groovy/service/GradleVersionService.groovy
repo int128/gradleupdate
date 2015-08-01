@@ -11,6 +11,15 @@ class GradleVersionService {
 
     private final registry = new GradleRegistry()
 
+    def queryStableVersion() {
+        def cached = CurrentGradleVersion.get('stable')?.version
+        if (cached) {
+            cached
+        } else {
+            registry.getCurrentStableRelease().version
+        }
+    }
+
     def stableReleasesWithFixedIssues() {
         def versions = registry.getStableReleases()
 

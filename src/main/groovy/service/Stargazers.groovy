@@ -6,7 +6,11 @@ class Stargazers {
 
     static final repo = 'int128/gradleupdate-api'
 
-    final gitHub = new GitHub()
+    private final gitHub
+
+    def Stargazers(GitHub gitHub) {
+        this.gitHub = gitHub
+    }
 
     List fetch() {
         gitHub.getStargazers(repo) as List

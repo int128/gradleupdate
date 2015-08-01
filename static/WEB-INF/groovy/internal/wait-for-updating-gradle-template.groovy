@@ -1,10 +1,12 @@
-import service.GradleUpdateWorker
+import gradle.TemplateRepository
+import infrastructure.GitHub
 
 assert params.gradleVersion
 assert params.next
 
-final worker = new GradleUpdateWorker()
-final current = worker.queryGradleWrapperVersion()
+final gitHub = new GitHub()
+final templateRepository = new TemplateRepository(gitHub)
+final current = templateRepository.queryGradleWrapperVersion()
 
 log.info("Current Gradle version of the template: $current")
 log.info("Expected Gradle version: ${params.gradleVersion}")
