@@ -1,7 +1,6 @@
-import service.GradleUpdateWorker
+import service.Stargazers
 
-final worker = new GradleUpdateWorker()
-final stargazers = worker.queryStargazers()
+final stargazers = new Stargazers().fetch()
 
 stargazers.each { stargazer ->
     log.info("Queue updating repositories of user: ${stargazer.login}")
