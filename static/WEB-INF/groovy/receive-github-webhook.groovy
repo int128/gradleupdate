@@ -8,10 +8,10 @@ switch (eventType) {
         assert json instanceof Map
         assert json.action == 'started'
         assert json.sender.login
-        log.info("Queue updating repositories of user: ${json.sender.login}")
+        log.info("Queue updating repositories of stargazer ${json.sender.login}")
         defaultQueue.add(
                 url: '/internal/got-star/',
-                params: [user: json.sender.login])
+                params: [stargazer: json.sender.login])
         break
 
     default:
