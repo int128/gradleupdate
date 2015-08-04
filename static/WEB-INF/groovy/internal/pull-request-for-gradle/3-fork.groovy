@@ -14,5 +14,10 @@ assert fork.full_name
 log.info("Queue creating a branch on ${fork.full_name}")
 defaultQueue.add(
         url: relativePath(request, '4-branch.groovy'),
-        params: [full_name: fullName,fork_name: fork.full_name, fork_owner: fork.owner.login],
+        params: [
+                full_name: fullName,
+                into_branch: fork.default_branch,
+                fork_name: fork.full_name,
+                fork_owner: fork.owner.login
+        ],
         countdownMillis: 1000)

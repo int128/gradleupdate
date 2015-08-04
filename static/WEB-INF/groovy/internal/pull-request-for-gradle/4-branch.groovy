@@ -9,6 +9,9 @@ assert fullName instanceof String
 final forkName = params.fork_name
 assert forkName instanceof String
 
+final intoBranch = params.into_branch
+assert intoBranch instanceof String
+
 final forkOwner = params.fork_owner
 assert forkOwner instanceof String
 
@@ -18,14 +21,19 @@ final templateRepository = new TemplateRepository(gitHub)
 log.info("Creating a tree on $forkName")
 final tree = templateRepository.createTreeWithGradleWrapper(forkName)
 final gradleVersion = templateRepository.queryGradleWrapperVersion()
-final branchName = "gradle-$gradleVersion"
+final gradleBranch = "gradle-$gradleVersion"
 
-log.info("Creating a branch $branchName on $forkName")
-gitHub.createBranch(forkName, branchName, 'master', "Gradle $gradleVersion", tree)
+log.info("Creating a branch $gradleBranch on $forkName")
+gitHub.createBranch(forkName, gradleBranch, intoBranch, "Gradle $gradleVersion", tree)
 
-final from = "$forkOwner:$branchName"
-log.info("Queue sending a pull request from $from into $fullName")
+final from = "$forkOwner:$gradleBranch"
+log.info("Queue sending a pull request from $from into $fullName:$intoBranch")
 defaultQueue.add(
         url: relativePath(request, '5-pull-request.groovy'),
-        params: [full_name: fullName, from: from, gradle_version: gradleVersion],
+        params: [
+                full_name: fullName,
+                into_branch: intoBranch,
+                from: from,
+                gradle_version: gradleVersion
+        ],
         countdownMillis: 1000)
