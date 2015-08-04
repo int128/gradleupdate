@@ -28,4 +28,4 @@ log.info("$fullName has obsolete Gradle wrapper $gradleWrapperVersion " +
         "while latest is $gradleVersion, so queue updating")
 defaultQueue.add(
         url: relativePath(request, '1-fork.groovy'),
-        params: [full_name: fullName])
+        params: [full_name: fullName, gradle_version: gradleVersion])

@@ -15,12 +15,14 @@ assert intoBranch instanceof String
 final forkOwner = params.fork_owner
 assert forkOwner instanceof String
 
+final gradleVersion = params.gradle_version
+assert gradleVersion instanceof String
+
 final gitHub = new GitHub()
 final templateRepository = new TemplateRepository(gitHub)
 
 log.info("Creating a tree on $forkName")
 final tree = templateRepository.createTreeWithGradleWrapper(forkName)
-final gradleVersion = templateRepository.queryGradleWrapperVersion()
 final gradleBranch = "gradle-$gradleVersion"
 
 log.info("Creating a branch $gradleBranch on $forkName")
