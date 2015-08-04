@@ -93,6 +93,10 @@ class GitHub {
         }
     }
 
+    def getPullRequests(Map filter, String repo) {
+        client.request(path: "/repos/$repo/pulls", query: filter).data
+    }
+
     def createPullRequest(String repo, String into, String from, String title, String body) {
         requestJson(path: "/repos/$repo/pulls", method: POST, body: [
                 head: from, base: into, title: title, body: body
