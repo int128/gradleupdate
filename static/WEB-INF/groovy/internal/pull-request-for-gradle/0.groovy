@@ -4,9 +4,8 @@ import infrastructure.GitHub
 import static util.RequestUtil.relativePath
 
 final fullName = params.full_name
-assert fullName instanceof String
-
 final gradleVersion = params.gradle_version
+assert fullName instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
@@ -28,4 +27,7 @@ log.info("$fullName has obsolete Gradle wrapper $gradleWrapperVersion " +
         "while latest is $gradleVersion, so queue updating")
 defaultQueue.add(
         url: relativePath(request, '1-fork.groovy'),
-        params: [full_name: fullName, gradle_version: gradleVersion])
+        params: [
+                into_repo: fullName,
+                gradle_version: gradleVersion
+        ])

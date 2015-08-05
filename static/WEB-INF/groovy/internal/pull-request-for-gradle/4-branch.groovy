@@ -3,39 +3,36 @@ import infrastructure.GitHub
 
 import static util.RequestUtil.relativePath
 
-final fullName = params.full_name
-assert fullName instanceof String
-
-final forkName = params.fork_name
-assert forkName instanceof String
-
+final fromUser = params.from_user
+final fromRepo = params.from_repo
+final fromBranch = params.from_branch
+final intoRepo = params.into_repo
 final intoBranch = params.into_branch
-assert intoBranch instanceof String
-
-final forkOwner = params.fork_owner
-assert forkOwner instanceof String
-
 final gradleVersion = params.gradle_version
+assert fromUser instanceof String
+assert fromRepo instanceof String
+assert fromBranch instanceof String
+assert intoRepo instanceof String
+assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
 final templateRepository = new TemplateRepository(gitHub)
 
-log.info("Creating a tree on $forkName")
-final tree = templateRepository.createTreeWithGradleWrapper(forkName)
-final gradleBranch = "gradle-$gradleVersion"
+log.info("Creating a tree on $fromRepo")
+final tree = templateRepository.createTreeWithGradleWrapper(fromRepo)
 
-log.info("Creating a branch $gradleBranch on $forkName")
-gitHub.createBranch(forkName, gradleBranch, intoBranch, "Gradle $gradleVersion", tree)
+log.info("Creating a branch $fromBranch on $fromRepo")
+gitHub.createBranch(fromRepo, fromBranch, intoBranch, "Gradle $gradleVersion", tree)
 
-final from = "$forkOwner:$gradleBranch"
-log.info("Queue sending a pull request from $from into $fullName:$intoBranch")
+log.info("Queue sending a pull request from $fromBranch into $intoRepo:$intoBranch")
 defaultQueue.add(
         url: relativePath(request, '5-pull-request.groovy'),
         params: [
-                full_name: fullName,
+                from_user: fromUser,
+                from_branch: fromBranch,
+                into_repo: intoRepo,
                 into_branch: intoBranch,
-                from: from,
-                gradle_version: gradleVersion
+                gradle_version: gradleVersion,
         ],
         countdownMillis: 1000)
