@@ -4,7 +4,7 @@ import infrastructure.GitHub
 
 class Stargazers {
 
-    static final repo = 'int128/gradleupdate-api'
+    static final repo = 'int128/gradleupdate'
 
     private final gitHub
 
