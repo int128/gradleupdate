@@ -6,7 +6,7 @@ import infrastructure.GitHub
 @Log
 class TemplateRepository extends Repository {
 
-    static final repo = 'int128/gradleupdate-worker'
+    static final repo = 'int128/latest-gradle-wrapper'
 
     static final files = [
             [path: 'gradlew', mode: '100755'],
