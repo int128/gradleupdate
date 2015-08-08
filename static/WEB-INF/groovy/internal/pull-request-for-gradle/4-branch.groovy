@@ -1,3 +1,4 @@
+import gradle.Repository
 import gradle.TemplateRepository
 import infrastructure.GitHub
 
@@ -17,10 +18,17 @@ assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
-final templateRepository = new TemplateRepository(gitHub)
 
-log.info("Creating a tree on $fromRepo")
-final tree = templateRepository.createTreeWithGradleWrapper(fromRepo)
+final templateRepository = new TemplateRepository(gitHub)
+final fromRepository = new Repository(fromRepo, gitHub)
+
+log.info("Creating a tree with the latest Gradle wrapper on $fromRepo")
+final treeForGradleWrapper = fromRepository.createTreeForGradleWrapper(templateRepository)
+
+log.info("Creating a tree with build.gradle for $gradleVersion on $fromRepo")
+final treeForBuildGradle = fromRepository.createTreeForBuildGradle(gradleVersion)
+
+final tree = treeForGradleWrapper + treeForBuildGradle
 
 log.info("Creating a branch $fromBranch on $fromRepo")
 gitHub.createBranch(fromRepo, fromBranch, intoBranch, "Gradle $gradleVersion", tree)

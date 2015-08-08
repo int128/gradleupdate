@@ -29,6 +29,36 @@ class Repository {
         }
     }
 
+    def createTreeForGradleWrapper(TemplateRepository templateRepository) {
+        templateRepository.fetchGradleWrapperFiles().collect { file ->
+            log.info("Creating a blob ${file.path} on $fullName")
+            def blob = gitHub.createBlob(fullName, file.content).sha
+            assert blob instanceof String
+
+            log.info("Created ${file.path} as $blob on $fullName")
+            [path: file.path, mode: file.mode, type: 'blob', sha: blob]
+        }
+    }
+
+    def createTreeForBuildGradle(String gradleVersion) {
+        final path = 'build.gradle'
+
+        log.info("Fetching $path of $fullName")
+        def content = gitHub.getContent(fullName, path).content
+        assert content instanceof String
+
+        def contentWithNewVersion = replaceGradleVersionString(
+                new String(content.decodeBase64()), gradleVersion
+        ).bytes.encodeBase64().toString()
+
+        log.info("Creating a blob $path on $fullName")
+        def blob = gitHub.createBlob(fullName, contentWithNewVersion).sha
+        assert blob instanceof String
+
+        log.info("Created $path as $blob on $fullName")
+        [[path: path, mode: '100644', type: 'blob', sha: blob]]
+    }
+
     static parseVersionFromGradleWrapperProperties(String content) {
         try {
             def matcher = content =~ /distributionUrl=.+?\/gradle-(.+?)-.+?\.zip/
