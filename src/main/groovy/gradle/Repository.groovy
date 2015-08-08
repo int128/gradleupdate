@@ -14,19 +14,6 @@ class Repository {
         this.gitHub = gitHub
     }
 
-    boolean queryIfHasGradleWrapper() {
-        try {
-            gitHub.getContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
-            true
-        } catch (HttpResponseException e) {
-            if (e.statusCode == 404) {
-                false
-            } else {
-                throw e
-            }
-        }
-    }
-
     String queryGradleWrapperVersion() {
         try {
             def file = gitHub.getContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
@@ -54,7 +41,7 @@ class Repository {
         }
     }
 
-    static updateVersionInBuildGradle(String content, String newVersion) {
+    static replaceGradleVersionString(String content, String newVersion) {
         assert content
         content.replaceAll(~/(gradleVersion *= *['\"])[0-9a-z.-]+(['\"])/) {
             "${it[1]}$newVersion${it[2]}"
