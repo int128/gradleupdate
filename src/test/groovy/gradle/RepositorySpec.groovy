@@ -31,4 +31,40 @@ distributionUrl=https://services.gradle.org/distributions/gradle-2.2.1-bin.zip""
         version == null
     }
 
+    def "updateVersionInBuildGradle should replace version string to new"() {
+        given:
+        def content = """apply plugin: 'groovy'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
+"""
+
+        when:
+        def replaced = Repository.updateVersionInBuildGradle(content, '2.6')
+
+        then:
+        replaced == """apply plugin: 'groovy'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
+}
+"""
+    }
+
+    def "updateVersionInBuildGradle should return as-is if no version syntax exists"() {
+        given:
+        def content = """apply plugin: 'groovy'
+
+task wrapper(type: Wrapper) {
+}
+"""
+
+        when:
+        def replaced = Repository.updateVersionInBuildGradle(content, '2.6')
+
+        then:
+        replaced == content
+    }
+
 }

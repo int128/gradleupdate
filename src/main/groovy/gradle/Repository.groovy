@@ -54,4 +54,11 @@ class Repository {
         }
     }
 
+    static updateVersionInBuildGradle(String content, String newVersion) {
+        assert content
+        content.replaceAll(~/(gradleVersion *= *['\"])[0-9a-z.-]+(['\"])/) {
+            "${it[1]}$newVersion${it[2]}"
+        }
+    }
+
 }
