@@ -8,6 +8,10 @@ class Stargazers {
 
     private final gitHub
 
+    static getHtmlUrl() {
+        "https://github.com/$repo"
+    }
+
     def Stargazers(GitHub gitHub) {
         this.gitHub = gitHub
     }

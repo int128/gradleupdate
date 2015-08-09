@@ -1,4 +1,5 @@
 import infrastructure.GitHub
+import service.Stargazers
 
 final fromUser = params.from_user
 final fromBranch = params.from_branch
@@ -18,7 +19,9 @@ final body = """
 [Gradle $gradleVersion](https://gradle.org/docs/$gradleVersion/release-notes) is available now.
 
 This pull request updates Gradle wrapper and build.gradle in the repository.
-Please merge this if all tests are passed with the latest Gradle.
+Merge it if all tests passed with the latest Gradle.
+
+Automatic pull request can be turned off by unstar [gradleupdate repository](${Stargazers.htmlUrl}).
 """
 
 log.info("Creating a pull request from $fromBranch into $intoRepo:$intoBranch")
