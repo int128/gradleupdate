@@ -10,7 +10,7 @@ final gitHub = new GitHub()
 final templateRepository = new TemplateRepository(gitHub)
 
 log.info("Requesting bump Gradle version of the template")
-templateRepository.bumpTemplate(gradleVersion)
+templateRepository.bumpVersion(gradleVersion)
 
 log.info("Queue updating the template repository to $gradleVersion")
 defaultQueue.add(

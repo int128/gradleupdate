@@ -6,8 +6,6 @@ import infrastructure.GitHub
 @Log
 class TemplateRepository extends Repository {
 
-    static final repo = 'int128/latest-gradle-wrapper'
-
     static final gradleWrapperFiles = [
             [path: 'gradlew', mode: '100755'],
             [path: 'gradlew.bat', mode: '100644'],
@@ -16,13 +14,13 @@ class TemplateRepository extends Repository {
     ]
 
     def TemplateRepository(GitHub gitHub) {
-        super(repo, gitHub)
+        super('int128/latest-gradle-wrapper', gitHub)
     }
 
-    def bumpTemplate(String version) {
+    def bumpVersion(String version) {
         def branch = "update-gradle-template-$version"
-        gitHub.removeBranch(repo, branch)
-        gitHub.createBranch(repo, branch, 'master')
+        gitHub.removeBranch(fullName, branch)
+        gitHub.createBranch(fullName, branch, 'master')
     }
 
     def fetchGradleWrapperFiles() {
