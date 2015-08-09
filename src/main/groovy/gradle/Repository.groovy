@@ -1,7 +1,6 @@
 package gradle
 
 import groovy.util.logging.Log
-import groovyx.net.http.HttpResponseException
 import infrastructure.GitHub
 
 @Log
@@ -22,17 +21,15 @@ class Repository {
 
     String fetchGradleWrapperVersion() {
         final path = 'gradle/wrapper/gradle-wrapper.properties'
-        try {
-            log.info("Fetching $path from repository $fullName")
-            String content = gitHub.fetchContent(fullName, path).content
+        log.info("Fetching $path from repository $fullName")
+        def file = gitHub.fetchContent(fullName, path)
+        if (file == null) {
+            log.info("Repository $fullName does not contain $path, maybe not Gradle project")
+            null
+        } else {
+            def content = file.content
             assert content instanceof String
             parseVersionFromGradleWrapperProperties(new String(content.decodeBase64()))
-        } catch (HttpResponseException e) {
-            if (e.statusCode == 404) {
-                null
-            } else {
-                throw e
-            }
         }
     }
 
@@ -49,21 +46,25 @@ class Repository {
 
     def createTreeForBuildGradle(String gradleVersion) {
         final path = 'build.gradle'
-
         log.info("Fetching $path from repository $fullName")
-        def content = gitHub.fetchContent(fullName, path).content
-        assert content instanceof String
+        def file = gitHub.fetchContent(fullName, path)
+        if (file == null) {
+            log.info("Repository $fullName does not contain $path, no update needed")
+            []
+        } else {
+            def content = file.content
+            assert content instanceof String
+            def contentWithNewVersion = replaceGradleVersionString(
+                    new String(content.decodeBase64()), gradleVersion
+            ).bytes.encodeBase64().toString()
 
-        def contentWithNewVersion = replaceGradleVersionString(
-                new String(content.decodeBase64()), gradleVersion
-        ).bytes.encodeBase64().toString()
+            log.info("Creating a blob $path on repository $fullName")
+            def blob = gitHub.createBlob(fullName, contentWithNewVersion).sha
+            assert blob instanceof String
 
-        log.info("Creating a blob $path on repository $fullName")
-        def blob = gitHub.createBlob(fullName, contentWithNewVersion).sha
-        assert blob instanceof String
-
-        log.info("Created $path as $blob on repository $fullName")
-        [[path: path, mode: '100644', type: 'blob', sha: blob]]
+            log.info("Created $path as $blob on repository $fullName")
+            [[path: path, mode: '100644', type: 'blob', sha: blob]]
+        }
     }
 
     static parseVersionFromGradleWrapperProperties(String content) {
