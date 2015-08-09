@@ -14,7 +14,8 @@ assert gradleVersion instanceof String
 final gitHub = new GitHub()
 
 log.info("Removing the fork $fromRepo")
-gitHub.deleteRepository(fromRepo)
+final removed = gitHub.removeRepository(fromRepo)
+assert removed, "Fork $fromRepo not found, retrying"
 
 log.info("Queue forking $intoRepo")
 defaultQueue.add(
