@@ -1,7 +1,7 @@
-import service.GradleVersionService
+import gradle.VersionWatcher
 
-final service = new GradleVersionService()
+final watcher = new VersionWatcher()
 
-service.performIfNewRcReleaseIsAvailable {
+watcher.performIfNewRcReleaseIsAvailable {
     memcache.clearCacheForUri('/rc/feed')
 }

@@ -1,11 +1,11 @@
+import gradle.VersionWatcher
 import infrastructure.GitHub
-import service.GradleVersionService
 
 final stargazer = params.stargazer
 assert stargazer instanceof String
 
 log.info("Fetching version of the latest Gradle")
-final gradleVersion = new GradleVersionService().queryStableVersion()
+final gradleVersion = new VersionWatcher().fetchStableVersion()
 
 log.info("Fetching repositories of stargazer $stargazer")
 final gitHub = new GitHub()

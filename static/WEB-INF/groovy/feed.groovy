@@ -1,15 +1,15 @@
-import service.GradleVersionService
+import gradle.VersionWatcher
 
-final service = new GradleVersionService()
+final watcher = new VersionWatcher()
 
 switch (params.filter) {
     case 'stable':
-        feed versions: service.stableReleasesWithFixedIssues(),
+        feed versions: watcher.stableReleasesWithFixedIssues(),
              title: 'Gradle Releases'
         break
 
     case 'rc':
-        feed versions: service.rcReleasesWithFixedIssues(),
+        feed versions: watcher.rcReleasesWithFixedIssues(),
              title: 'Gradle Releases including Candidates'
         break
 

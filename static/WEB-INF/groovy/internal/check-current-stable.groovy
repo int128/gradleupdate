@@ -1,8 +1,8 @@
-import service.GradleVersionService
+import gradle.VersionWatcher
 
-final service = new GradleVersionService()
+final watcher = new VersionWatcher()
 
-service.performIfNewStableReleaseIsAvailable { gradleVersion ->
+watcher.performIfNewStableReleaseIsAvailable { gradleVersion ->
     memcache.clearCacheForUri('/stable/feed')
     defaultQueue.add(url: '/internal/found-new-gradle/', params: [gradle_version: gradleVersion])
 }

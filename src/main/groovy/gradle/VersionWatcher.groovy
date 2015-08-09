@@ -1,4 +1,4 @@
-package service
+package gradle
 
 import groovy.util.logging.Log
 import groovyx.gaelyk.GaelykBindings
@@ -7,11 +7,11 @@ import model.CurrentGradleVersion
 
 @Log
 @GaelykBindings
-class GradleVersionService {
+class VersionWatcher {
 
     private final registry = new GradleRegistry()
 
-    def queryStableVersion() {
+    def fetchStableVersion() {
         def cached = CurrentGradleVersion.get('stable')?.version
         if (cached) {
             cached
