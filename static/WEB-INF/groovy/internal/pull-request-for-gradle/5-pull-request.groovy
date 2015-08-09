@@ -1,5 +1,5 @@
+import gradle.Stargazers
 import infrastructure.GitHub
-import service.Stargazers
 
 final fromUser = params.from_user
 final fromBranch = params.from_branch

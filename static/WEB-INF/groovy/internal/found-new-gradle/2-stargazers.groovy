@@ -1,5 +1,5 @@
+import gradle.Stargazers
 import infrastructure.GitHub
-import service.Stargazers
 
 import static util.RequestUtil.relativePath
 

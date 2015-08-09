@@ -1,4 +1,4 @@
-package service
+package gradle
 
 import infrastructure.GitHub
 

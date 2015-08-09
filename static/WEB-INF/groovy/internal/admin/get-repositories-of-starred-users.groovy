@@ -1,5 +1,5 @@
+import gradle.Stargazers
 import infrastructure.GitHub
-import service.Stargazers
 
 final gitHub = new GitHub()
 final stargazers = new Stargazers(gitHub).fetch()
