@@ -13,6 +13,7 @@ assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
+final stargazers = new Stargazers(gitHub)
 
 final title = "Gradle $gradleVersion"
 final body = """
@@ -21,7 +22,7 @@ final body = """
 This pull request updates Gradle wrapper and build.gradle in the repository.
 Merge it if all tests passed with the latest Gradle.
 
-Automatic pull request can be turned off by unstar [gradleupdate repository](${Stargazers.htmlUrl}).
+Automatic pull request can be turned off by unstar [gradleupdate repository](${stargazers.htmlUrl}).
 """
 
 log.info("Creating a pull request from $fromBranch into $intoRepo:$intoBranch")

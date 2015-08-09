@@ -14,6 +14,10 @@ class Repository {
         this.gitHub = gitHub
     }
 
+    def getHtmlUrl() {
+        "https://github.com/$fullName"
+    }
+
     String fetchGradleWrapperVersion() {
         try {
             def file = gitHub.fetchContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')

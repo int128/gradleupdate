@@ -2,22 +2,14 @@ package gradle
 
 import infrastructure.GitHub
 
-class Stargazers {
-
-    static final repo = 'int128/gradleupdate'
-
-    private final gitHub
-
-    static getHtmlUrl() {
-        "https://github.com/$repo"
-    }
+class Stargazers extends Repository {
 
     def Stargazers(GitHub gitHub) {
-        this.gitHub = gitHub
+        super('int128/gradleupdate', gitHub)
     }
 
     List fetch() {
-        gitHub.fetchStargazers(repo) as List
+        gitHub.fetchStargazers(fullName) as List
     }
 
 }
