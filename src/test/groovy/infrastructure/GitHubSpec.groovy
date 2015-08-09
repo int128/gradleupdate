@@ -9,7 +9,7 @@ class GitHubSpec extends Specification {
         def repository = new GitHub()
 
         when:
-        def ref = repository.getReference('gradleupdate/Spoon-Knife', 'master')
+        def ref = repository.fetchReference('gradleupdate/Spoon-Knife', 'master')
 
         then:
         ref.ref == 'refs/heads/master'

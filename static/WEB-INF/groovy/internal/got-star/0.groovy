@@ -9,7 +9,7 @@ final gradleVersion = new VersionWatcher().fetchStableVersion()
 
 log.info("Fetching repositories of stargazer $stargazer")
 final gitHub = new GitHub()
-final repositories = gitHub.getRepositories(stargazer)
+final repositories = gitHub.fetchRepositories(stargazer)
 
 repositories.each { repo ->
     log.info("Queue updating the repository $repo.full_name")

@@ -34,28 +34,28 @@ class GitHub {
         client.request(path: "/repos/$repo/forks", method: POST).data
     }
 
-    def getRepositories(String userName) {
+    def fetchRepositories(String userName) {
         client.request(path: "/users/$userName/repos").data
     }
 
-    def getStargazers(String repo) {
+    def fetchStargazers(String repo) {
         client.request(path: "/repos/$repo/stargazers").data
     }
 
-    def getContent(String repo, String path) {
+    def fetchContent(String repo, String path) {
         client.request(path: "/repos/$repo/contents/$path").data
     }
 
     def createBranch(String repo, String branchName, String from) {
-        def sha = getReference(repo, from).object.sha
+        def sha = fetchReference(repo, from).object.sha
         assert sha
         createReference(repo, branchName, sha)
     }
 
     def createBranch(String repo, String branchName, String from, String message, List<Map> contents) {
-        def ref = getReference(repo, from).object.sha
+        def ref = fetchReference(repo, from).object.sha
         assert ref instanceof String
-        def tree = getCommit(repo, ref).tree.sha
+        def tree = fetchCommit(repo, ref).tree.sha
         assert tree instanceof String
         def newTree = createTree(repo, tree, contents).sha
         assert newTree instanceof String
@@ -80,7 +80,7 @@ class GitHub {
         }
     }
 
-    def getPullRequests(Map filter, String repo) {
+    def fetchPullRequests(Map filter, String repo) {
         client.request(path: "/repos/$repo/pulls", query: filter).data
     }
 
@@ -90,7 +90,7 @@ class GitHub {
         ]).data
     }
 
-    def getReference(String repo, String branchName) {
+    def fetchReference(String repo, String branchName) {
         client.request(path: "/repos/$repo/git/refs/heads/$branchName").data
     }
 
@@ -100,7 +100,7 @@ class GitHub {
         ]).data
     }
 
-    def getCommit(String repo, String sha) {
+    def fetchCommit(String repo, String sha) {
         client.request(path: "/repos/$repo/git/commits/$sha").data
     }
 

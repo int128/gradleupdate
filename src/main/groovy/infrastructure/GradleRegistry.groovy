@@ -6,27 +6,27 @@ class GradleRegistry {
 
     private final client = new HttpURLClient(url: 'https://services.gradle.org')
 
-    def getCurrentStableRelease() {
+    def fetchCurrentStableRelease() {
         client.request(path: '/versions/current').data
     }
 
-    def getCurrentReleaseCandidateRelease() {
+    def fetchCurrentReleaseCandidateRelease() {
         client.request(path: '/versions/release-candidate').data
     }
 
-    def getReleases() {
+    def fetchReleases() {
         client.request(path: '/versions/all').data as List
     }
 
-    def getStableReleases() {
-        getReleases().findAll { !it.snapshot && !it.rcFor }
+    def fetchStableReleases() {
+        fetchReleases().findAll { !it.snapshot && !it.rcFor }
     }
 
-    def getReleaseCandidateReleases() {
-        getReleases().findAll { !it.snapshot }
+    def fetchReleaseCandidateReleases() {
+        fetchReleases().findAll { !it.snapshot }
     }
 
-    def getIssuesFixedIn(String version) {
+    def fetchIssuesFixedIn(String version) {
         client.request(path: "/fixed-issues/$version").data as List
     }
 }

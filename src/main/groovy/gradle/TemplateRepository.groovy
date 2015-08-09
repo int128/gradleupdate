@@ -28,7 +28,7 @@ class TemplateRepository extends Repository {
     def fetchGradleWrapperFiles() {
         gradleWrapperFiles.collect { file ->
             log.info("Fetching ${file.path} of $fullName")
-            def content = gitHub.getContent(fullName, file.path).content
+            def content = gitHub.fetchContent(fullName, file.path).content
             assert content instanceof String
 
             [path: file.path, mode: file.mode, content: content]

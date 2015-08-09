@@ -12,7 +12,7 @@ final gitHub = new GitHub()
 final repository = new Repository(fullName, gitHub)
 
 log.info("Checking Gradle version of repository $fullName")
-final gradleWrapperVersion = repository.queryGradleWrapperVersion()
+final gradleWrapperVersion = repository.fetchGradleWrapperVersion()
 
 if (gradleWrapperVersion == null) {
     log.info("$fullName does not have Gradle wrapper")

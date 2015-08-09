@@ -7,7 +7,7 @@ final stargazers = new Stargazers(gitHub).fetch()
 final repositories = stargazers.collect { stargazer ->
     [
         name: stargazer.login,
-        repos: gitHub.getRepositories(stargazer.login)*.full_name
+        repos: gitHub.fetchRepositories(stargazer.login)*.full_name
     ]
 }
 

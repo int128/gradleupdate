@@ -9,7 +9,7 @@ class GradleRegistrySpec extends Specification {
         def service = new GradleRegistry()
 
         when:
-        def version = service.getCurrentStableRelease()
+        def version = service.fetchCurrentStableRelease()
 
         then:
         version.current
@@ -21,7 +21,7 @@ class GradleRegistrySpec extends Specification {
         def service = new GradleRegistry()
 
         when:
-        def versions = service.getReleases()
+        def versions = service.fetchReleases()
 
         then:
         versions instanceof List

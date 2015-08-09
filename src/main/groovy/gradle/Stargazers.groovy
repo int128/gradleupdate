@@ -17,7 +17,7 @@ class Stargazers {
     }
 
     List fetch() {
-        gitHub.getStargazers(repo) as List
+        gitHub.fetchStargazers(repo) as List
     }
 
 }

@@ -21,7 +21,7 @@ assert fromRepo instanceof String
 final head = "$fromUser:$fromBranch"
 
 log.info("Checking if any pull request exists from $head into $intoRepo")
-final pullRequests = gitHub.getPullRequests(intoRepo, head: head, state: 'all')
+final pullRequests = gitHub.fetchPullRequests(intoRepo, head: head, state: 'all')
 assert pullRequests instanceof List
 if (pullRequests) {
     log.info("Already sent pull requests ${pullRequests*.html_url}, skip")

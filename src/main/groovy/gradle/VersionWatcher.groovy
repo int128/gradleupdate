@@ -16,25 +16,25 @@ class VersionWatcher {
         if (cached) {
             cached
         } else {
-            registry.getCurrentStableRelease().version
+            registry.fetchCurrentStableRelease().version
         }
     }
 
     def stableReleasesWithFixedIssues() {
-        def versions = registry.getStableReleases()
+        def versions = registry.fetchStableReleases()
 
         versions.take(1).each { version ->
-            version.fixedIssues = registry.getIssuesFixedIn(version.version)
+            version.fixedIssues = registry.fetchIssuesFixedIn(version.version)
         }
 
         versions
     }
 
     def rcReleasesWithFixedIssues() {
-        def versions = registry.getReleaseCandidateReleases()
+        def versions = registry.fetchReleaseCandidateReleases()
 
         def rcFor = versions.find { it.rcFor }?.rcFor
-        def fixedIssues = registry.getIssuesFixedIn(rcFor)
+        def fixedIssues = registry.fetchIssuesFixedIn(rcFor)
 
         versions.each { version ->
             if (version.version == rcFor) {
@@ -50,7 +50,7 @@ class VersionWatcher {
     def performIfNewRcReleaseIsAvailable(Closure closure) {
         datastore.withTransaction {
             final last = CurrentGradleVersion.get('rc')?.version
-            final current = registry.getCurrentReleaseCandidateRelease()?.version
+            final current = registry.fetchCurrentReleaseCandidateRelease()?.version
 
             if (last == current) {
                 log.info("Current rc release is $current")
@@ -68,7 +68,7 @@ class VersionWatcher {
     def performIfNewStableReleaseIsAvailable(Closure closure) {
         datastore.withTransaction {
             final last = CurrentGradleVersion.get('stable')?.version
-            final current = registry.getCurrentStableRelease().version
+            final current = registry.fetchCurrentStableRelease().version
 
             if (last == current) {
                 log.info("Current stable version is $current")

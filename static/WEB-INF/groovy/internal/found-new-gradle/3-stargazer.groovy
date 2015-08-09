@@ -9,7 +9,7 @@ assert stargazer instanceof String
 final gitHub = new GitHub()
 
 log.info("Fetching repositories of stargazer $stargazer")
-final repositories = gitHub.getRepositories(stargazer)
+final repositories = gitHub.fetchRepositories(stargazer)
 
 repositories.each { repo ->
     log.info("Queue updating the repository $repo.full_name")

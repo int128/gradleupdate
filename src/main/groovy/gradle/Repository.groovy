@@ -14,9 +14,9 @@ class Repository {
         this.gitHub = gitHub
     }
 
-    String queryGradleWrapperVersion() {
+    String fetchGradleWrapperVersion() {
         try {
-            def file = gitHub.getContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
+            def file = gitHub.fetchContent(fullName, 'gradle/wrapper/gradle-wrapper.properties')
             String base64 = file.content
             String content = new String(base64.decodeBase64())
             parseVersionFromGradleWrapperProperties(content)
@@ -44,7 +44,7 @@ class Repository {
         final path = 'build.gradle'
 
         log.info("Fetching $path of $fullName")
-        def content = gitHub.getContent(fullName, path).content
+        def content = gitHub.fetchContent(fullName, path).content
         assert content instanceof String
 
         def contentWithNewVersion = replaceGradleVersionString(
