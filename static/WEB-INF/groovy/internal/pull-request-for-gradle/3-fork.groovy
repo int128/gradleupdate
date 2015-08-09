@@ -26,6 +26,7 @@ defaultQueue.add(
         url: relativePath(request, '4-branch.groovy'),
         params: [
                 from_user: fromUser,
+                from_repo: fromRepo,
                 from_branch: fromBranch,
                 into_repo: intoRepo,
                 into_branch: intoBranch,
