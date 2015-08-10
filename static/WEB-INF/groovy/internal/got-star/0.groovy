@@ -14,6 +14,6 @@ final repositories = gitHub.fetchRepositories(stargazer)
 repositories.each { repo ->
     log.info("Queue updating the repository $repo.full_name")
     defaultQueue.add(
-            url: '/internal/pull-request-for-gradle/',
+            url: '/internal/pull-request-for-gradle/0.groovy',
             params: [full_name: repo.full_name, gradle_version: gradleVersion])
 }

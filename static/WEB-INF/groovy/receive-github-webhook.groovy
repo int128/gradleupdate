@@ -10,7 +10,7 @@ switch (eventType) {
         assert json.sender.login
         log.info("Queue updating repositories of stargazer ${json.sender.login}")
         defaultQueue.add(
-                url: '/internal/got-star/',
+                url: '/internal/got-star/0.groovy',
                 params: [stargazer: json.sender.login])
         break
 

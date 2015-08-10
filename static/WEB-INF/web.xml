@@ -48,8 +48,4 @@
         <exception-type>groovyx.net.http.HttpResponseException</exception-type>
         <location>/util/logging-http-exception.groovy</location>
     </error-page>
-
-    <welcome-file-list>
-        <welcome-file>0.groovy</welcome-file>
-    </welcome-file-list>
 </web-app>
