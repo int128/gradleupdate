@@ -10,7 +10,7 @@ if (request.method == 'POST') {
         body {
             p { a href: '/_ah/admin/datastore', '/_ah/admin/datastore' }
             form(method: 'POST') {
-                ['service', 'clientId', 'clientSecret', 'token'].each { key ->
+                ['service', 'secret'].each { key ->
                     label(key) {
                         input type: 'text', name: key
                     }

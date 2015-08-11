@@ -5,17 +5,14 @@ import model.Credential
 
 class GitHubOAuth {
 
-    private final Credential credential
-
-    def GitHubOAuth() {
-        credential = Credential.getOrCreate('github')
-    }
+    final client = new HttpURLClient(url: 'https://github.com/login/oauth/access_token')
 
     def exchangeCodeAndToken(String code) {
-        final client = new HttpURLClient(url: 'https://github.com/login/oauth/access_token')
+        def clientId = Credential.getOrCreate('github-client-id')
+        def clientKey = Credential.getOrCreate('github-client-key')
         client.request(query: [
-                client_id: credential.clientId,
-                client_secret: credential.clientSecret,
+                client_id: clientId.secret,
+                client_secret: clientKey.secret,
                 code: code
         ]).data
     }

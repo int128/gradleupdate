@@ -8,9 +8,7 @@ import groovyx.gaelyk.datastore.Unindexed
 class Credential {
 
     @Key String service
-    @Unindexed String token
-    @Unindexed String clientId
-    @Unindexed String clientSecret
+    @Unindexed String secret
 
     static Credential getOrCreate(String serviceName) {
         def credential = Credential.get(serviceName)

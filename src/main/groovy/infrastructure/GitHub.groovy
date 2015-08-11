@@ -14,12 +14,10 @@ class GitHub {
 
     private final HttpURLClient client
 
-    private final Credential credential
-
     def GitHub(Map headers = [:]) {
-        credential = Credential.getOrCreate('github')
+        def token = Credential.getOrCreate('github-token')
         client = new HttpURLClient(url: 'https://api.github.com', headers: [
-                'Authorization': "token $credential.token",
+                'Authorization': "token $token.secret",
                 'User-Agent': 'gradleupdate'
         ] + headers)
     }
