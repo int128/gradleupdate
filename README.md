@@ -1,21 +1,21 @@
 # Gradle Update
 
-Gradle Update automatically deliver the new Gradle Wrapper to your repositories by pull requests when a new version of Gradle is released.
+Gradle Update automatically delivers the new Gradle Wrapper to your repositories by pull requests when a new version of Gradle is released.
 
 The latest build system brings much benefit such as performance and bug fixes.
 
 
-## How to use
+## Getting started
 
-Star [this repository](https://github.com/int128/gradleupdate) to enable Gradle Update.
+**Step 1:** Star [this repository](https://github.com/int128/gradleupdate) to enable Gradle Update.
 
 <img src="https://cloud.githubusercontent.com/assets/321266/9202088/176d83d6-408b-11e5-96dd-c138322fde60.png">
 
-You will receive pull requests soon if you have any repositories which contain Gradle Wrapper.
+**Step 2:** You will receive pull requests soon if you have any repositories which contain Gradle Wrapper.
 
 <img src="https://cloud.githubusercontent.com/assets/321266/9202273/0e94da60-408c-11e5-83e9-594c9fbdcd42.png">
 
-Open a pull request and check the content of new Gradle Wrapper.
+**Step 3:** Open a pull request and check the content of new Gradle Wrapper.
 
 <img src="https://cloud.githubusercontent.com/assets/321266/9202364/70fd5a6a-408c-11e5-9cc6-4a7a8f9ccfa8.png">
 
@@ -41,6 +41,10 @@ Gradle Update is an open source software licensed under the Apache License Versi
 * Groovy 2.4
 * Gaelyk
 * Google App Engine (JavaVM)
+
+Git operations are performed via GitHub API. It requires no filesystem or git command.
+
+All operations are designed to be transactional and idempotence. Any exception such as HTTP error may occur during an operation but will be recovered by retry of the task queue.
 
 
 ### Design
