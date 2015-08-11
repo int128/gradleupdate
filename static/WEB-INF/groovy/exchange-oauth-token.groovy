@@ -1,13 +1,13 @@
 import groovy.json.JsonBuilder
-import infrastructure.GitHub
+import infrastructure.GitHubOAuth
 import util.CrossOriginPolicy
 
 CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.code, 'code parameter should be given'
 
-final github = new GitHub()
-final exchanged = github.exchangeOAuthToken(params.code)
+final oauth = new GitHubOAuth()
+final exchanged = oauth.exchangeCodeAndToken(params.code)
 
 assert exchanged
 assert !exchanged.error
