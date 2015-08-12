@@ -33,6 +33,20 @@ class Repository {
         }
     }
 
+    GradleWrapperState checkIfGradleWrapperIsLatest() {
+        def thisVersion = fetchGradleWrapperVersion()
+        if (thisVersion) {
+            def latestVersion = new VersionWatcher().fetchStableVersion()
+            if (thisVersion == latestVersion) {
+                GradleWrapperState.UP_TO_DATE.for(thisVersion)
+            } else {
+                GradleWrapperState.OUT_OF_DATE.for(thisVersion)
+            }
+        } else {
+            GradleWrapperState.NOT_FOUND
+        }
+    }
+
     def createTreeForGradleWrapper(TemplateRepository templateRepository) {
         templateRepository.fetchGradleWrapperFiles().collect { file ->
             log.info("Creating a blob ${file.path} on repository $fullName")
@@ -64,6 +78,18 @@ class Repository {
 
             log.info("Created $path as $blob on repository $fullName")
             [[path: path, mode: '100644', type: 'blob', sha: blob]]
+        }
+    }
+
+    static enum GradleWrapperState {
+        UP_TO_DATE,
+        OUT_OF_DATE,
+        NOT_FOUND,
+
+        def String currentVersion
+        private def 'for'(String version) {
+            currentVersion = version
+            this
         }
     }
 

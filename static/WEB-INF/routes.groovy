@@ -4,3 +4,7 @@ post '/authorize', forward: '/exchange-oauth-token.groovy'
 
 post '/webhook', forward: '/receive-github-webhook.groovy'
 post '/webhook_test', forward: '/logging-github-webhook.groovy'
+
+get '/@owner/@repo/status', forward: '/status.groovy?full_name=@owner/@repo'
+
+get '/@owner/@repo/status.svg', forward: '/badge.groovy?full_name=@owner/@repo'
