@@ -18,7 +18,7 @@ class TemplateRepository extends Repository {
     }
 
     def bumpVersion(String version) {
-        def branch = "update-gradle-template-$version"
+        def branch = "bump-to-$version"
         log.info("Recreating branch $branch on repository $fullName")
         gitHub.removeBranch(fullName, branch)
         gitHub.createBranch(fullName, branch, 'master')
