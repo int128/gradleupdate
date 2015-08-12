@@ -146,7 +146,7 @@ class GitHub {
             def statusCode = e.response.status
             if (statusCodeMap.containsKey(statusCode)) {
                 def value = statusCodeMap[statusCode]
-                log.warning("Got error response $statusCode and returning $value")
+                log.info("Got status $statusCode from API but ignored as $value")
                 value
             } else {
                 throw e
