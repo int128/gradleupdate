@@ -20,20 +20,6 @@ class Repository {
         "https://github.com/$fullName"
     }
 
-    String fetchGradleWrapperVersionOnDefaultBranch() {
-        final path = 'gradle/wrapper/gradle-wrapper.properties'
-        log.info("Fetching $path from repository $fullName")
-        def file = gitHub.fetchContent(fullName, path)
-        if (file == null) {
-            log.info("Repository $fullName does not contain $path, maybe not Gradle project")
-            null
-        } else {
-            def content = file.content
-            assert content instanceof String
-            parseVersionFromGradleWrapperProperties(new String(content.decodeBase64()))
-        }
-    }
-
     String fetchGradleWrapperVersion(String branch) {
         final path = 'gradle/wrapper/gradle-wrapper.properties'
         log.info("Fetching $path from repository $fullName")

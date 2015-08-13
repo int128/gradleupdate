@@ -3,8 +3,10 @@ import infrastructure.GitHub
 import static util.RequestUtil.relativePath
 
 final intoRepo = params.into_repo
+final intoBranch = params.into_branch
 final gradleVersion = params.gradle_version
 assert intoRepo instanceof String
+assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
@@ -34,6 +36,7 @@ defaultQueue.add(
                 from_repo: fromRepo,
                 from_branch: fromBranch,
                 into_repo: intoRepo,
+                into_branch: intoBranch,
                 gradle_version: gradleVersion,
         ],
         countdownMillis: 1000)

@@ -15,5 +15,9 @@ repositories.each { repo ->
     log.info("Queue updating the repository $repo.full_name")
     defaultQueue.add(
             url: '/internal/pull-request-for-gradle/0.groovy',
-            params: [full_name: repo.full_name, gradle_version: gradleVersion])
+            params: [
+                    full_name: repo.full_name,
+                    branch: repo.default_branch,
+                    gradle_version: gradleVersion,
+            ])
 }

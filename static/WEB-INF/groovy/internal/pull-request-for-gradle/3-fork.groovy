@@ -4,9 +4,11 @@ import static util.RequestUtil.relativePath
 
 final fromBranch = params.from_branch
 final intoRepo = params.into_repo
+final intoBranch = params.into_branch
 final gradleVersion = params.gradle_version
 assert fromBranch instanceof String
 assert intoRepo instanceof String
+assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
 final gitHub = new GitHub()
@@ -16,10 +18,8 @@ final fork = gitHub.fork(intoRepo)
 
 final fromUser = fork.owner.login
 final fromRepo = fork.full_name
-final intoBranch = fork.default_branch
 assert fromUser instanceof String
 assert fromRepo instanceof String
-assert intoBranch instanceof String
 
 log.info("Queue creating a branch $fromBranch on $fromRepo")
 defaultQueue.add(
