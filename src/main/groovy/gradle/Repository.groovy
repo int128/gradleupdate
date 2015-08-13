@@ -2,6 +2,7 @@ package gradle
 
 import groovy.util.logging.Log
 import infrastructure.GitHub
+import infrastructure.GitHubUserContent
 
 @Log
 class Repository {
@@ -19,7 +20,7 @@ class Repository {
         "https://github.com/$fullName"
     }
 
-    String fetchGradleWrapperVersion() {
+    String fetchGradleWrapperVersionOnDefaultBranch() {
         final path = 'gradle/wrapper/gradle-wrapper.properties'
         log.info("Fetching $path from repository $fullName")
         def file = gitHub.fetchContent(fullName, path)
@@ -33,8 +34,21 @@ class Repository {
         }
     }
 
-    GradleWrapperState checkIfGradleWrapperIsLatest() {
-        def thisVersion = fetchGradleWrapperVersion()
+    String fetchGradleWrapperVersion(String branch) {
+        final path = 'gradle/wrapper/gradle-wrapper.properties'
+        log.info("Fetching $path from repository $fullName")
+        def content = new GitHubUserContent().fetch(fullName, branch, path)
+        if (content == null) {
+            log.info("Repository $fullName does not contain $path, maybe not Gradle project")
+            null
+        } else {
+            assert content instanceof byte[]
+            parseVersionFromGradleWrapperProperties(new String(content))
+        }
+    }
+
+    GradleWrapperState checkIfGradleWrapperIsLatest(String branch) {
+        def thisVersion = fetchGradleWrapperVersion(branch)
         if (thisVersion) {
             def latestVersion = new VersionWatcher().fetchStableVersion()
             if (thisVersion == latestVersion) {

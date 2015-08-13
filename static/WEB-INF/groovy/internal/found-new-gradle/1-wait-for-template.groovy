@@ -10,7 +10,7 @@ final gitHub = new GitHub()
 final templateRepository = new TemplateRepository(gitHub)
 
 log.info("Fetching Gradle version of the template")
-final current = templateRepository.fetchGradleWrapperVersion()
+final current = templateRepository.fetchGradleWrapperVersionOnDefaultBranch()
 
 if (current == gradleVersion) {
     log.info("The template is up-to-date $current, so queue updating stargazers")

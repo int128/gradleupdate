@@ -1,16 +1,15 @@
 package infrastructure
 
 import groovy.util.logging.Log
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpResponseException
 import groovyx.net.http.HttpURLClient
 import model.Credential
+import util.HttpURLClientExtension
 
 import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.POST
 
 @Log
-class GitHub {
+class GitHub implements HttpURLClientExtension {
 
     private final HttpURLClient client
 
@@ -137,34 +136,6 @@ class GitHub {
         handleHttpResponseException(404: null) {
             requestJson(path: "/repos/$repo/git/blobs", method: POST, body: [content: content, encoding: encoding]).data
         }
-    }
-
-    private static handleHttpResponseException(Map statusCodeMap, Closure closure) {
-        try {
-            closure()
-        } catch (HttpResponseException e) {
-            def statusCode = e.response.status
-            if (statusCodeMap.containsKey(statusCode)) {
-                def value = statusCodeMap[statusCode]
-                log.info("Got status $statusCode from API but ignored as $value")
-                value
-            } else {
-                throw e
-            }
-        }
-    }
-
-    private static handle204NoContentWorkaround(Object value, Closure closure) {
-        try {
-            closure()
-        } catch (NullPointerException e) {
-            log.info("204 No Content caused NPE but ignored: $e.localizedMessage")
-            value
-        }
-    }
-
-    private requestJson(Map request) {
-        client.request(request + [requestContentType: ContentType.JSON, body: [request.body, null]])
     }
 
 }

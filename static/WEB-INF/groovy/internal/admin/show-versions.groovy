@@ -23,6 +23,6 @@ html.html {
 
         h2('Template Repository')
         p { a(href: templateRepository.htmlUrl, templateRepository.fullName) }
-        p(templateRepository.fetchGradleWrapperVersion())
+        p(templateRepository.fetchGradleWrapperVersionOnDefaultBranch())
     }
 }
