@@ -26,7 +26,7 @@ log.info("Creating a tree with the latest Gradle wrapper on $fromRepo")
 final treeForGradleWrapper = fromRepository.createTreeForGradleWrapper(templateRepository)
 
 log.info("Creating a tree with build.gradle for $gradleVersion on $fromRepo")
-final treeForBuildGradle = fromRepository.createTreeForBuildGradle(gradleVersion)
+final treeForBuildGradle = fromRepository.createTreeForBuildGradle(intoBranch, gradleVersion)
 
 final tree = treeForGradleWrapper + treeForBuildGradle
 

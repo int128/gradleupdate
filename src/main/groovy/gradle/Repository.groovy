@@ -11,6 +11,8 @@ class Repository {
 
     protected final GitHub gitHub
 
+    protected final GitHubUserContent gitHubUserContent = new GitHubUserContent()
+
     def Repository(String fullName, GitHub gitHub) {
         this.fullName = fullName
         this.gitHub = gitHub
@@ -23,7 +25,7 @@ class Repository {
     String fetchGradleWrapperVersion(String branch) {
         final path = 'gradle/wrapper/gradle-wrapper.properties'
         log.info("Fetching $path from repository $fullName")
-        def content = new GitHubUserContent().fetch(fullName, branch, path)
+        def content = gitHubUserContent.fetch(fullName, branch, path)
         if (content == null) {
             log.info("Repository $fullName does not contain $path, maybe not Gradle project")
             null
@@ -58,22 +60,21 @@ class Repository {
         }
     }
 
-    def createTreeForBuildGradle(String gradleVersion) {
+    def createTreeForBuildGradle(String branch, String gradleVersion) {
         final path = 'build.gradle'
         log.info("Fetching $path from repository $fullName")
-        def file = gitHub.fetchContent(fullName, path)
-        if (file == null) {
+        def buildGradle = gitHubUserContent.fetch(fullName, branch, path)
+        if (buildGradle == null) {
             log.info("Repository $fullName does not contain $path, no update needed")
             []
         } else {
-            def content = file.content
-            assert content instanceof String
-            def contentWithNewVersion = replaceGradleVersionString(
-                    new String(content.decodeBase64()), gradleVersion
+            assert buildGradle instanceof byte[]
+            def buildGradleWithNewVersion = replaceGradleVersionString(
+                    new String(buildGradle), gradleVersion
             ).bytes.encodeBase64().toString()
 
             log.info("Creating a blob $path on repository $fullName")
-            def blob = gitHub.createBlob(fullName, contentWithNewVersion).sha
+            def blob = gitHub.createBlob(fullName, buildGradleWithNewVersion).sha
             assert blob instanceof String
 
             log.info("Created $path as $blob on repository $fullName")
