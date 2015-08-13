@@ -1,13 +1,11 @@
 import gradle.TemplateRepository
-import infrastructure.GitHub
 
 import static util.RequestUtil.relativePath
 
 final gradleVersion = params.gradle_version
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-final templateRepository = new TemplateRepository(gitHub)
+final templateRepository = new TemplateRepository()
 
 log.info("Requesting bump Gradle version of the template")
 templateRepository.bumpVersion(gradleVersion)

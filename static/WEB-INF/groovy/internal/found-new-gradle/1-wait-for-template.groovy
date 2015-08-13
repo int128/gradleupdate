@@ -1,15 +1,11 @@
 import gradle.TemplateRepository
-import infrastructure.GitHub
 
 import static util.RequestUtil.relativePath
 
 final gradleVersion = params.gradle_version
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-final templateRepository = new TemplateRepository(gitHub)
-
-log.info("Fetching Gradle version of the template")
+final templateRepository = new TemplateRepository()
 final current = templateRepository.fetchGradleWrapperVersion('master')
 
 if (current == gradleVersion) {

@@ -1,18 +1,19 @@
 package gradle
 
 import groovy.util.logging.Log
-import infrastructure.GitHub
 
 @Log
 class Stargazers extends Repository {
 
-    def Stargazers(GitHub gitHub) {
-        super('int128/gradleupdate', gitHub)
+    def Stargazers() {
+        super('int128/gradleupdate')
     }
 
-    List fetch() {
+    def fetch() {
         log.info("Fetching stargazers from repository $fullName")
-        gitHub.fetchStargazers(fullName) as List
+        def stargazers = gitHub.fetchStargazers(fullName)
+        assert stargazers instanceof List
+        stargazers
     }
 
 }

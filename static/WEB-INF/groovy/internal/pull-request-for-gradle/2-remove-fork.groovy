@@ -1,4 +1,4 @@
-import infrastructure.GitHub
+import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
@@ -13,13 +13,10 @@ assert intoRepo instanceof String
 assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-
-log.info("Removing the fork $fromRepo")
-final removed = gitHub.removeRepository(fromRepo)
+final removed = new Repository(fromRepo).remove()
 assert removed, "Fork $fromRepo not found, retrying"
 
-log.info("Queue forking $intoRepo")
+log.info("Queue recreating a fork of $intoRepo")
 defaultQueue.add(
         url: relativePath(request, '3-fork.groovy'),
         params: [

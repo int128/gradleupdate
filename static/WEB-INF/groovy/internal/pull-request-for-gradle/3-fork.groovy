@@ -1,4 +1,4 @@
-import infrastructure.GitHub
+import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
@@ -11,11 +11,7 @@ assert intoRepo instanceof String
 assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-
-log.info("Creating a fork of $intoRepo")
-final fork = gitHub.fork(intoRepo)
-
+final fork = new Repository(intoRepo).fork()
 final fromUser = fork.owner.login
 final fromRepo = fork.full_name
 assert fromUser instanceof String

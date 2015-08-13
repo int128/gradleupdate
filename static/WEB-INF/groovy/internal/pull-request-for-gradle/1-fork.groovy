@@ -1,4 +1,4 @@
-import infrastructure.GitHub
+import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
@@ -9,27 +9,24 @@ assert intoRepo instanceof String
 assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
+final intoRepository = new Repository(intoRepo)
 
-log.info("Creating a fork of $intoRepo")
-final fork = gitHub.fork(intoRepo)
-
+final fork = intoRepository.fork()
 final fromUser = fork.owner.login
 final fromRepo = fork.full_name
-final fromBranch = "gradle-$gradleVersion"
 assert fromUser instanceof String
 assert fromRepo instanceof String
 
+final fromBranch = "gradle-$gradleVersion"
 final head = "$fromUser:$fromBranch"
 
-log.info("Checking if any pull request exists from $head into $intoRepo")
-final pullRequests = gitHub.fetchPullRequests(intoRepo, head: head, state: 'all')
-assert pullRequests instanceof List
+final pullRequests = intoRepository.fetchPullRequests(head: head, state: 'all')
 if (pullRequests) {
     log.info("Already sent pull requests ${pullRequests*.html_url}, skip")
     return
 }
 
+log.info("No pull request found on repository $intoRepo, queue recreating a fork")
 defaultQueue.add(
         url: relativePath(request, '2-remove-fork.groovy'),
         params: [
@@ -40,4 +37,3 @@ defaultQueue.add(
                 gradle_version: gradleVersion,
         ],
         countdownMillis: 1000)
-log.info("Queue removing the fork: $fromRepo")

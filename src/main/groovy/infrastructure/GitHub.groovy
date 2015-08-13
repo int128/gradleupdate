@@ -62,18 +62,6 @@ class GitHub implements HttpURLClientExtension {
         }
     }
 
-    def createBranch(String repo, String branchName, String from, String message, List<Map> contents) {
-        def ref = fetchReference(repo, from).object.sha
-        assert ref instanceof String
-        def tree = fetchCommit(repo, ref).tree.sha
-        assert tree instanceof String
-        def newTree = createTree(repo, tree, contents).sha
-        assert newTree instanceof String
-        def newCommit = createCommit(repo, [ref], newTree, message).sha
-        assert newCommit instanceof String
-        createReference(repo, branchName, newCommit)
-    }
-
     boolean removeBranch(String repo, String branchName) {
         // API returns 422 if branch does not exist
         handleHttpResponseException(422: false) {
@@ -90,10 +78,10 @@ class GitHub implements HttpURLClientExtension {
         }
     }
 
-    def createPullRequest(String repo, String into, String from, String title, String body) {
+    def createPullRequest(String repo, String base, String head, String title, String body) {
         handleHttpResponseException(404: null) {
             requestJson(path: "/repos/$repo/pulls", method: POST, body: [
-                    head: from, base: into, title: title, body: body
+                    head: head, base: base, title: title, body: body
             ]).data
         }
     }

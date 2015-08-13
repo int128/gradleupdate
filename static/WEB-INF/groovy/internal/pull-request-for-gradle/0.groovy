@@ -1,5 +1,4 @@
 import gradle.Repository
-import infrastructure.GitHub
 
 import static util.RequestUtil.relativePath
 
@@ -10,10 +9,7 @@ assert fullName instanceof String
 assert branch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-final repository = new Repository(fullName, gitHub)
-
-log.info("Checking Gradle version of repository $fullName")
+final repository = new Repository(fullName)
 final gradleWrapperVersion = repository.fetchGradleWrapperVersion(branch)
 
 if (gradleWrapperVersion == null) {

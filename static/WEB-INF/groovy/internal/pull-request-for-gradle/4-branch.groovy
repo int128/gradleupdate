@@ -1,6 +1,5 @@
 import gradle.Repository
 import gradle.TemplateRepository
-import infrastructure.GitHub
 
 import static util.RequestUtil.relativePath
 
@@ -17,10 +16,8 @@ assert intoRepo instanceof String
 assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-
-final templateRepository = new TemplateRepository(gitHub)
-final fromRepository = new Repository(fromRepo, gitHub)
+final templateRepository = new TemplateRepository()
+final fromRepository = new Repository(fromRepo)
 
 log.info("Creating a tree with the latest Gradle wrapper on $fromRepo")
 final treeForGradleWrapper = fromRepository.createTreeForGradleWrapper(templateRepository)
@@ -30,10 +27,9 @@ final treeForBuildGradle = fromRepository.createTreeForBuildGradle(intoBranch, g
 
 final tree = treeForGradleWrapper + treeForBuildGradle
 
-log.info("Creating a branch $fromBranch on $fromRepo")
-gitHub.createBranch(fromRepo, fromBranch, intoBranch, "Gradle $gradleVersion", tree)
+fromRepository.createBranch(fromBranch, intoBranch, "Gradle $gradleVersion", tree)
 
-log.info("Queue sending a pull request from $fromBranch into $intoRepo:$intoBranch")
+log.info("Queue sending a pull request into $intoRepo:$intoBranch from $fromUser:$fromBranch")
 defaultQueue.add(
         url: relativePath(request, '5-pull-request.groovy'),
         params: [

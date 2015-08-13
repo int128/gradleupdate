@@ -1,12 +1,10 @@
 import gradle.TemplateRepository
-import infrastructure.GitHub
 import infrastructure.GradleRegistry
 import model.CurrentGradleVersion
 
 final gradleRegistry = new GradleRegistry()
 
-final gitHub = new GitHub()
-final templateRepository = new TemplateRepository(gitHub)
+final templateRepository = new TemplateRepository()
 
 html.html {
     body {

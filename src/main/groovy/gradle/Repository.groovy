@@ -1,30 +1,26 @@
 package gradle
 
 import groovy.util.logging.Log
-import infrastructure.GitHub
-import infrastructure.GitHubUserContent
+import infrastructure.Locator
+import infrastructure.Locator.WithGitHub
+import infrastructure.Locator.WithGitHubUserContent
 
 @Log
-class Repository {
+class Repository implements WithGitHub, WithGitHubUserContent {
 
     final String fullName
 
-    protected final GitHub gitHub
-
-    protected final GitHubUserContent gitHubUserContent = new GitHubUserContent()
-
-    def Repository(String fullName, GitHub gitHub) {
+    def Repository(String fullName) {
         this.fullName = fullName
-        this.gitHub = gitHub
     }
 
     def getHtmlUrl() {
         "https://github.com/$fullName"
     }
 
-    String fetchGradleWrapperVersion(String branch) {
+    def fetchGradleWrapperVersion(String branch) {
+        log.info("Fetching Gradle wrapper version of repository $fullName:$branch")
         final path = 'gradle/wrapper/gradle-wrapper.properties'
-        log.info("Fetching $path from repository $fullName")
         def content = gitHubUserContent.fetch(fullName, branch, path)
         if (content == null) {
             log.info("Repository $fullName does not contain $path, maybe not Gradle project")
@@ -35,7 +31,8 @@ class Repository {
         }
     }
 
-    GradleWrapperState checkIfGradleWrapperIsLatest(String branch) {
+    def checkIfGradleWrapperIsLatest(String branch) {
+        log.info("Checking if repository $fullName has the latest Gradle wrapper")
         def thisVersion = fetchGradleWrapperVersion(branch)
         if (thisVersion) {
             def latestVersion = new VersionWatcher().fetchStableVersion()
@@ -82,6 +79,52 @@ class Repository {
         }
     }
 
+    def fork() {
+        log.info("Creating a fork of repository $fullName")
+        def fork = gitHub.fork(fullName)
+        assert fork
+        fork
+    }
+
+    def fetchPullRequests(Map filter) {
+        log.info("Fetching pull requests for repository $fullName filtered by $filter")
+        def pullRequests = gitHub.fetchPullRequests(filter, fullName)
+        assert pullRequests instanceof List
+        pullRequests
+    }
+
+    def createPullRequest(String base, String user, String branch, String title, String body) {
+        log.info("Creating a pull request into $fullName:$base from $user:$branch")
+        def pullRequest = gitHub.createPullRequest(fullName, base, "$user:$branch", title, body)
+        assert pullRequest
+        pullRequest
+    }
+
+    def remove() {
+        log.info("Removing fork $fullName")
+        gitHub.removeRepository(fullName)
+    }
+
+    def createBranch(String branch, String base, String commitMessage, List<Map> contents) {
+        log.info("Creating a branch $branch from $base on repository $fullName")
+        def baseRef = gitHub.fetchReference(fullName, base).object.sha
+        assert baseRef instanceof String
+        def tree = gitHub.fetchCommit(fullName, baseRef).tree.sha
+        assert tree instanceof String
+        def newTree = gitHub.createTree(fullName, tree, contents).sha
+        assert newTree instanceof String
+        def newCommit = gitHub.createCommit(fullName, [baseRef], newTree, commitMessage).sha
+        assert newCommit instanceof String
+        def newRef = gitHub.createReference(fullName, branch, newCommit).object.sha
+        assert newRef instanceof String
+        newRef
+    }
+
+    def removeBranch(String branch) {
+        log.info("Removing branch $fullName:$branch")
+        gitHub.removeBranch(fullName, branch)
+    }
+
     static enum GradleWrapperState {
         UP_TO_DATE,
         OUT_OF_DATE,
@@ -94,20 +137,30 @@ class Repository {
         }
     }
 
-    static parseVersionFromGradleWrapperProperties(String content) {
+    static fetchRepositories(String owner) {
+        log.info("Fetching repositories of owner $owner")
+        def repositories = Locator.gitHub.fetchRepositories(owner)
+        assert repositories instanceof List
+        repositories
+    }
+
+    static String parseVersionFromGradleWrapperProperties(String content) {
+        assert content
         try {
-            def matcher = content =~ /distributionUrl=.+?\/gradle-(.+?)-.+?\.zip/
-            assert matcher
-            assert matcher[0] instanceof List
-            assert matcher[0].size() == 2
-            matcher[0].get(1)
+            def m = content =~ /distributionUrl=.+?\/gradle-(.+?)-.+?\.zip/
+            assert m
+            def m0 = m[0]
+            assert m0 instanceof List
+            assert m0.size() == 2
+            m0[1]
         } catch (AssertionError ignore) {
             null
         }
     }
 
-    static replaceGradleVersionString(String content, String newVersion) {
+    static String replaceGradleVersionString(String content, String newVersion) {
         assert content
+        assert newVersion
         content.replaceAll(~/(gradleVersion *= *['\"])[0-9a-z.-]+(['\"])/) {
             "${it[1]}$newVersion${it[2]}"
         }

@@ -1,7 +1,6 @@
 package gradle
 
 import groovy.util.logging.Log
-import infrastructure.GitHub
 
 @Log
 class TemplateRepository extends Repository {
@@ -13,8 +12,8 @@ class TemplateRepository extends Repository {
             [path: 'gradle/wrapper/gradle-wrapper.jar', mode: '100644'],
     ]
 
-    def TemplateRepository(GitHub gitHub) {
-        super('int128/latest-gradle-wrapper', gitHub)
+    def TemplateRepository() {
+        super('int128/latest-gradle-wrapper')
     }
 
     def bumpVersion(String version) {

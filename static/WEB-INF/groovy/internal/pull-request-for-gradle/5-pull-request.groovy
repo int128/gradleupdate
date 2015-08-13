@@ -1,5 +1,5 @@
+import gradle.Repository
 import gradle.Stargazers
-import infrastructure.GitHub
 
 final fromUser = params.from_user
 final fromBranch = params.from_branch
@@ -12,8 +12,7 @@ assert intoRepo instanceof String
 assert intoBranch instanceof String
 assert gradleVersion instanceof String
 
-final gitHub = new GitHub()
-final stargazers = new Stargazers(gitHub)
+final stargazers = new Stargazers()
 
 final title = "Gradle $gradleVersion"
 final body = """
@@ -25,8 +24,6 @@ Merge it if all tests passed with the latest Gradle.
 Automatic pull request can be turned off by unstar [gradleupdate repository](${stargazers.htmlUrl}).
 """
 
-log.info("Creating a pull request from $fromBranch into $intoRepo:$intoBranch")
-final pullRequest = gitHub.createPullRequest(intoRepo, intoBranch, "$fromUser:$fromBranch", title, body)
-assert pullRequest
+final pullRequest = new Repository(intoRepo).createPullRequest(intoBranch, fromUser, fromBranch, title, body)
 
 log.info("Pull request #${pullRequest.number} has been created on ${pullRequest.html_url}")
