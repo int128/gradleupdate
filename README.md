@@ -1,4 +1,4 @@
-# Gradle Update ![Gradle Status](https://gradleupdate.appspot.com/int128/gradleupdate/gradle.svg?branch=master)
+# Gradle Update [![Gradle Status](https://gradleupdate.appspot.com/int128/gradleupdate/status.svg?branch=master)](https://gradleupdate.appspot.com/int128/gradleupdate/status)
 
 Gradle Update automatically delivers the new Gradle Wrapper to your repositories by pull requests when a new version of Gradle is released.
 
