@@ -1,4 +1,4 @@
-get '/rss', forward: '/rss.groovy', cache: (7 * 24).hours
+all '/rss', forward: '/rss.groovy', cache: (7 * 24).hours
 
 post '/authorize', forward: '/exchange-oauth-token.groovy'
 
