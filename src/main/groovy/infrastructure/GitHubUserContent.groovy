@@ -6,11 +6,10 @@ import groovy.util.logging.Log
 import groovyx.gaelyk.GaelykBindings
 import groovyx.net.http.ContentType
 import groovyx.net.http.HttpURLClient
-import util.HttpURLClientExtension
 
 @Log
 @GaelykBindings
-class GitHubUserContent implements HttpURLClientExtension {
+class GitHubUserContent implements ErrorStatusHandler {
 
     private final HttpURLClient client = new HttpURLClient(url: 'https://raw.githubusercontent.com')
 

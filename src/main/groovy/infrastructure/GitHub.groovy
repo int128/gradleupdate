@@ -1,15 +1,15 @@
 package infrastructure
 
 import groovy.util.logging.Log
+import groovyx.net.http.ContentType
 import groovyx.net.http.HttpURLClient
 import model.Credential
-import util.HttpURLClientExtension
 
 import static groovyx.net.http.Method.DELETE
 import static groovyx.net.http.Method.POST
 
 @Log
-class GitHub implements HttpURLClientExtension {
+class GitHub implements ErrorStatusHandler, Status204Workaround {
 
     private final HttpURLClient client
 
@@ -126,6 +126,10 @@ class GitHub implements HttpURLClientExtension {
         handleHttpResponseException(404: null) {
             requestJson(path: "/repos/$repo/git/blobs", method: POST, body: [content: content, encoding: encoding]).data
         }
+    }
+
+    private requestJson(Map request) {
+        client.request(request + [requestContentType: ContentType.JSON, body: [request.body, null]])
     }
 
 }

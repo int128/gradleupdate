@@ -1,9 +1,8 @@
-package util
+package infrastructure
 
-import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseException
 
-trait HttpURLClientExtension {
+trait ErrorStatusHandler {
 
     def handleHttpResponseException(Map statusCodeMap, Closure closure) {
         try {
@@ -18,19 +17,6 @@ trait HttpURLClientExtension {
                 throw e
             }
         }
-    }
-
-    def handle204NoContentWorkaround(Object value, Closure closure) {
-        try {
-            closure()
-        } catch (NullPointerException e) {
-            log.info("204 No Content caused NPE but ignored: $e.localizedMessage")
-            value
-        }
-    }
-
-    def requestJson(Map request) {
-        client.request(request + [requestContentType: ContentType.JSON, body: [request.body, null]])
     }
 
 }
