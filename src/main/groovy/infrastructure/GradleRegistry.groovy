@@ -1,21 +1,23 @@
 package infrastructure
 
-import groovyx.net.http.HttpURLClient
+import wslite.rest.RESTClient
 
 class GradleRegistry {
 
-    private final client = new HttpURLClient(url: 'https://services.gradle.org')
+    private final client = new RESTClient('https://services.gradle.org')
 
     def fetchCurrentStableRelease() {
-        client.request(path: '/versions/current').data
+        client.get(path: '/versions/current').json
     }
 
     def fetchCurrentReleaseCandidateRelease() {
-        client.request(path: '/versions/release-candidate').data
+        client.get(path: '/versions/release-candidate').json
     }
 
     def fetchReleases() {
-        client.request(path: '/versions/all').data as List
+        def releases = client.get(path: '/versions/all').json
+        assert releases instanceof List
+        releases
     }
 
     def fetchStableReleases() {
@@ -27,6 +29,8 @@ class GradleRegistry {
     }
 
     def fetchIssuesFixedIn(String version) {
-        client.request(path: "/fixed-issues/$version").data as List
+        def issues = client.get(path: "/fixed-issues/$version").json
+        assert issues instanceof List
+        issues
     }
 }

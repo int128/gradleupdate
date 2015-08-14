@@ -1,17 +1,16 @@
 package infrastructure
 
-import groovyx.net.http.HttpResponseException
+import wslite.http.HTTPClientException
 
 trait ErrorStatusHandler {
 
     def handleHttpResponseException(Map statusCodeMap, Closure closure) {
         try {
             closure()
-        } catch (HttpResponseException e) {
-            def statusCode = e.response.status
-            if (statusCodeMap.containsKey(statusCode)) {
-                def value = statusCodeMap[statusCode]
-                log.info("Got status $statusCode from API but ignored as $value")
+        } catch (HTTPClientException e) {
+            if (e.response && statusCodeMap.containsKey(e.response.statusCode)) {
+                def value = statusCodeMap[e.response.statusCode]
+                log.info("Got status $e.response.statusCode from API but ignored as $value")
                 value
             } else {
                 throw e

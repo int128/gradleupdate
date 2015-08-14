@@ -4,6 +4,29 @@ import spock.lang.Specification
 
 class GitHubSpec extends Specification {
 
+    def "fetchRepositories() should return a list"() {
+        given:
+        def gitHub = new GitHub(null)
+
+        when:
+        def repos = gitHub.fetchRepositories('octocat')
+
+        then:
+        repos instanceof List
+        repos.size() > 0
+    }
+
+    def "fetchRepositories(non-existent user) should return null"() {
+        given:
+        def gitHub = new GitHub(null)
+
+        when:
+        def repos = gitHub.fetchRepositories('0zCDPKcfjl1BWA6J')
+
+        then:
+        repos == null
+    }
+
     def "fetchReference() should return refs and sha"() {
         given:
         def gitHub = new GitHub(null)

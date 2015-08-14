@@ -4,14 +4,13 @@ import com.google.appengine.api.memcache.MemcacheService
 import groovy.transform.Canonical
 import groovy.util.logging.Log
 import groovyx.gaelyk.GaelykBindings
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpURLClient
+import wslite.rest.RESTClient
 
 @Log
 @GaelykBindings
 class GitHubUserContent implements ErrorStatusHandler {
 
-    private final HttpURLClient client = new HttpURLClient(url: 'https://raw.githubusercontent.com')
+    final client = new RESTClient('https://raw.githubusercontent.com')
 
     def fetch(String fullName, String branch, String path) {
         fetch("/$fullName/$branch/$path")
@@ -20,21 +19,20 @@ class GitHubUserContent implements ErrorStatusHandler {
     def fetch(String fullPath) {
         assert memcache instanceof MemcacheService
         def cache = memcache.get(fullPath)
-        assert cache == null || cache instanceof ContentCache
+        def headers = [:]
+        if (cache instanceof ContentCache) {
+            headers += ['If-None-Match': cache.eTag]
+        }
 
         handleHttpResponseException(404: null) {
-            def response = client.request(
-                    path: fullPath,
-                    contentType: ContentType.BINARY,
-                    headers: cache ? ['If-None-Match': cache.eTag] : [:])
-            if (response.status == 304) {
+            def response = client.get(path: fullPath, headers: headers)
+            if (response.statusCode == 304) {
                 log.info("Got 304, serving GitHub content from memcache: $fullPath")
+                assert cache instanceof ContentCache
                 cache.data
             } else {
-                log.info("Got $response.status, serving GitHub content from response: $fullPath")
-                def stream = response.data
-                assert stream instanceof ByteArrayInputStream
-                def data = stream.bytes
+                log.info("Got $response.statusCode, serving GitHub content from response: $fullPath")
+                def data = response.data
                 def eTag = response.headers.etag
                 if (eTag instanceof String) {
                     log.info("Updating cache for GitHub content: $fullPath")

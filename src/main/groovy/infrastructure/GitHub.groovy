@@ -1,17 +1,14 @@
 package infrastructure
 
 import groovy.util.logging.Log
-import groovyx.net.http.ContentType
-import groovyx.net.http.HttpURLClient
 import model.Credential
-
-import static groovyx.net.http.Method.DELETE
-import static groovyx.net.http.Method.POST
+import wslite.rest.ContentType
+import wslite.rest.RESTClient
 
 @Log
-class GitHub implements ErrorStatusHandler, Status204Workaround {
+class GitHub implements ErrorStatusHandler {
 
-    private final HttpURLClient client
+    private final RESTClient client
 
     def GitHub() {
         this(Credential.getOrCreate('github-token'))
@@ -22,45 +19,45 @@ class GitHub implements ErrorStatusHandler, Status204Workaround {
         if (credential) {
             headers += [Authorization: "token $credential.secret"]
         }
-        client = new HttpURLClient(url: 'https://api.github.com', headers: headers)
+        client = new RESTClient('https://api.github.com')
+        client.httpClient.defaultHeaders += headers
     }
 
     boolean removeRepository(String repo) {
         handleHttpResponseException(404: false) {
-            handle204NoContentWorkaround(true) {
-                // 204 No Content causes NPE due to the bug of HttpURLClient
-                client.request(path: "/repos/$repo", method: DELETE).data
-            }
+            client.delete(path: "/repos/$repo")
+            true
         }
     }
 
     def fork(String repo) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/forks", method: POST).data
+            client.post(path: "/repos/$repo/forks").json
         }
     }
 
     def fetchRepositories(Map filter = [:], String userName) {
         handleHttpResponseException(404: null) {
             // TODO: fetch from more pages
-            client.request(path: "/users/$userName/repos", query: [per_page: 100] + filter).data
+            client.get(path: "/users/$userName/repos", query: [per_page: 100] + filter).json
         }
     }
 
     def fetchStargazers(String repo) {
         handleHttpResponseException(404: null) {
             // TODO: fetch from more pages
-            client.request(path: "/repos/$repo/stargazers", query: [per_page: 100]).data
+            client.get(path: "/repos/$repo/stargazers", query: [per_page: 100]).json
         }
     }
 
     def fetchContent(String repo, String path) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/contents/$path").data
+            client.get(path: "/repos/$repo/contents/$path").json
         }
     }
 
     def createBranch(String repo, String branchName, String from) {
+        // TODO: should move to domain class
         handleHttpResponseException(404: null) {
             def sha = fetchReference(repo, from).object.sha
             assert sha instanceof String
@@ -71,69 +68,72 @@ class GitHub implements ErrorStatusHandler, Status204Workaround {
     boolean removeBranch(String repo, String branchName) {
         // API returns 422 if branch does not exist
         handleHttpResponseException(422: false) {
-            // 204 No Content causes NPE due to the bug of HttpURLClient
-            handle204NoContentWorkaround(true) {
-                client.request(path: "/repos/$repo/git/refs/heads/$branchName", method: DELETE).success
-            }
+            client.delete(path: "/repos/$repo/git/refs/heads/$branchName")
+            true
         }
     }
 
     def fetchPullRequests(Map filter, String repo) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/pulls", query: filter).data
+            client.get(path: "/repos/$repo/pulls", query: filter).json
         }
     }
 
     def createPullRequest(String repo, String base, String head, String title, String body) {
         handleHttpResponseException(404: null) {
-            requestJson(path: "/repos/$repo/pulls", method: POST, body: [
-                    head: head, base: base, title: title, body: body
-            ]).data
+            client.post(path: "/repos/$repo/pulls") {
+                type ContentType.JSON
+                json head: head, base: base, title: title, body: body
+            }.json
         }
     }
 
     def fetchReference(String repo, String branchName) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/git/refs/heads/$branchName").data
+            client.get(path: "/repos/$repo/git/refs/heads/$branchName").json
         }
     }
 
     def createReference(String repo, String branchName, String shaRef) {
         handleHttpResponseException(404: null) {
-            requestJson(path: "/repos/$repo/git/refs", method: POST, body: [
-                    ref: "refs/heads/$branchName".toString(), sha: "$shaRef".toString()
-            ]).data
+            client.post(path: "/repos/$repo/git/refs") {
+                type ContentType.JSON
+                json ref: "refs/heads/$branchName", sha: shaRef
+            }.json
         }
     }
 
     def fetchCommit(String repo, String sha) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/git/commits/$sha").data
+            client.get(path: "/repos/$repo/git/commits/$sha").json
         }
     }
 
     def createCommit(String repo, List<String> parents, String tree, String message) {
         handleHttpResponseException(404: null) {
-            requestJson(path: "/repos/$repo/git/commits", method: POST, body: [
-                    parents: parents, tree: tree, message: message
-            ]).data
+            client.post(path: "/repos/$repo/git/commits") {
+                type ContentType.JSON
+                json parents: parents, tree: tree, message: message
+            }.json
         }
     }
 
     def createTree(String repo, String baseSha, List<Map> contents) {
         handleHttpResponseException(404: null) {
-            requestJson(path: "/repos/$repo/git/trees", method: POST, body: [base_tree: baseSha, tree: contents]).data
+            client.post(path: "/repos/$repo/git/trees") {
+                type ContentType.JSON
+                json base_tree: baseSha, tree: contents
+            }.json
         }
     }
 
     def createBlob(String repo, String content, String encoding = 'base64') {
         handleHttpResponseException(404: null) {
-            requestJson(path: "/repos/$repo/git/blobs", method: POST, body: [content: content, encoding: encoding]).data
+            client.post(path: "/repos/$repo/git/blobs") {
+                type ContentType.JSON
+                json content: content, encoding: encoding
+            }.json
         }
-    }
-
-    private requestJson(Map request) {
-        client.request(request + [requestContentType: ContentType.JSON, body: [request.body, null]])
     }
 
 }
