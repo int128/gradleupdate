@@ -120,6 +120,15 @@ class Repository implements WithGitHub, WithGitHubUserContent {
         newRef
     }
 
+    def cloneBranch(String from, String into) {
+        log.info("Cloning branch from $from into $into on repository $fullName")
+        def sha = gitHub.fetchReference(fullName, from).object.sha
+        assert sha instanceof String
+        def ref = gitHub.createReference(fullName, into, sha).object.sha
+        assert ref instanceof String
+        ref
+    }
+
     def removeBranch(String branch) {
         log.info("Removing branch $fullName:$branch")
         gitHub.removeBranch(fullName, branch)

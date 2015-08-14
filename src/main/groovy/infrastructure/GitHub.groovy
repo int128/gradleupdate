@@ -56,15 +56,6 @@ class GitHub implements ErrorStatusHandler {
         }
     }
 
-    def createBranch(String repo, String branchName, String from) {
-        // TODO: should move to domain class
-        handleHttpResponseException(404: null) {
-            def sha = fetchReference(repo, from).object.sha
-            assert sha instanceof String
-            createReference(repo, branchName, sha)
-        }
-    }
-
     boolean removeBranch(String repo, String branchName) {
         // API returns 422 if branch does not exist
         handleHttpResponseException(422: false) {
