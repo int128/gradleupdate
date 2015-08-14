@@ -1,7 +1,6 @@
 package gradle
 
 import groovy.util.logging.Log
-import infrastructure.Locator
 import infrastructure.Locator.WithGitHub
 import infrastructure.Locator.WithGitHubUserContent
 
@@ -144,13 +143,6 @@ class Repository implements WithGitHub, WithGitHubUserContent {
             currentVersion = version
             this
         }
-    }
-
-    static fetchRepositories(String owner) {
-        log.info("Fetching repositories of owner $owner")
-        def repositories = Locator.gitHub.fetchRepositories(owner, sort: 'updated')
-        assert repositories instanceof List
-        repositories
     }
 
     static String parseVersionFromGradleWrapperProperties(String content) {

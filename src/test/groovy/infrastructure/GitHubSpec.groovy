@@ -4,27 +4,68 @@ import spock.lang.Specification
 
 class GitHubSpec extends Specification {
 
-    def "fetchRepositories() should return a list"() {
+    def "fetch stargazers should return a paged result"() {
         given:
         def gitHub = new GitHub(null)
 
         when:
-        def repos = gitHub.fetchRepositories('octocat')
+        def first = gitHub.fetchStargazersOfFirstPage('octocat/Spoon-Knife')
 
         then:
-        repos instanceof List
-        repos.size() > 0
+        first.current.size() > 0
+        first.rel.next instanceof String
+        first.rel.next.startsWith('https://api.github.com')
+
+        when:
+        def second = gitHub.fetchNextPage(first.rel.next)
+
+        then:
+        second.current.size() > 0
+        second.rel.next instanceof String
+        second.rel.next.startsWith('https://api.github.com')
+
+        when:
+        def third = gitHub.fetchNextPage(first.rel.next)
+
+        then:
+        third.current.size() > 0
+        third.rel.next instanceof String
+        third.rel.next.startsWith('https://api.github.com')
     }
 
-    def "fetchRepositories(non-existent user) should return null"() {
+    def "fetch stargazers for non-existent user should return null"() {
         given:
         def gitHub = new GitHub(null)
 
         when:
-        def repos = gitHub.fetchRepositories('0zCDPKcfjl1BWA6J')
+        def page = gitHub.fetchStargazersOfFirstPage('0zCDPKcfjl1BWA6J/0zCDPKcfjl1BWA6J')
 
         then:
-        repos == null
+        page == null
+    }
+
+    def "fetch repositories should return a paged result"() {
+        given:
+        def gitHub = new GitHub(null)
+
+        when:
+        def page = gitHub.fetchRepositoriesOfFirstPage('octocat')
+
+        then:
+        page.rel.next == null
+        page.current instanceof List
+        page.current.size() > 0
+    }
+
+    def "fetch repositories for non-existent user should return null"() {
+        given:
+        def gitHub = new GitHub(null)
+
+        when:
+        def page = gitHub.fetchRepositoriesOfFirstPage('0zCDPKcfjl1BWA6J')
+
+        then:
+        page == null
     }
 
     def "fetchReference() should return refs and sha"() {

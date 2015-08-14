@@ -36,18 +36,25 @@ class GitHub implements ErrorStatusHandler {
         }
     }
 
-    def fetchRepositories(Map filter = [:], String userName) {
+    def fetchRepositoriesOfFirstPage(Map filter = [:], String userName) {
         handleHttpResponseException(404: null) {
-            // TODO: fetch from more pages
-            client.get(path: "/users/$userName/repos", query: [per_page: 100] + filter).json
-        }
+            new Page(client.get(path: "/users/$userName/repos", query: filter))
+        } as Page
     }
 
-    def fetchStargazers(String repo) {
+    def fetchStargazersOfFirstPage(String repo) {
         handleHttpResponseException(404: null) {
-            // TODO: fetch from more pages
-            client.get(path: "/repos/$repo/stargazers", query: [per_page: 100]).json
-        }
+            new Page(client.get(path: "/repos/$repo/stargazers"))
+        } as Page
+    }
+
+    def fetchNextPage(String relation) {
+        assert relation.startsWith(client.url)
+        def path = relation.substring(client.url.length())
+        assert path.startsWith('/')
+        handleHttpResponseException(404: null) {
+            new Page(client.get(path: path))
+        } as Page
     }
 
     def fetchContent(String repo, String path) {

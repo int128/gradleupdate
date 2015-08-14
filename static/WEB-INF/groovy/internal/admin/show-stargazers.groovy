@@ -1,7 +1,7 @@
-import gradle.Repository
+import gradle.Repositories
 import gradle.Stargazers
 
-final stargazers = new Stargazers().fetch()
+final stargazers = new Stargazers().fetchFirst().current
 
 html.html {
     body {
@@ -9,8 +9,8 @@ html.html {
         ul {
             stargazers.each { stargazer ->
                 li {
-                    final repositories = Repository.fetchRepositories(stargazer.login)
-                    a(href: stargazer.html_url, "$stargazer.login (${repositories.size()})")
+                    final repositories = new Repositories(stargazer.login as String).fetchFirst().current
+                    a(href: stargazer.html_url, "$stargazer.login ($stargazer.id) (${repositories.size()})")
                     ul {
                         repositories.each { repository ->
                             li {
