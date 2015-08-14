@@ -13,12 +13,16 @@ class GitHub implements ErrorStatusHandler, Status204Workaround {
 
     private final HttpURLClient client
 
-    def GitHub(Map headers = [:]) {
-        def token = Credential.getOrCreate('github-token')
-        client = new HttpURLClient(url: 'https://api.github.com', headers: [
-                'Authorization': "token $token.secret",
-                'User-Agent': 'gradleupdate'
-        ] + headers)
+    def GitHub() {
+        this(Credential.getOrCreate('github-token'))
+    }
+
+    def GitHub(Credential credential) {
+        def headers = ['User-Agent': 'gradleupdate']
+        if (credential) {
+            headers += [Authorization: "token $credential.secret"]
+        }
+        client = new HttpURLClient(url: 'https://api.github.com', headers: headers)
     }
 
     boolean removeRepository(String repo) {
