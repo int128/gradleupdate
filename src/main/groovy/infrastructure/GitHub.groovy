@@ -36,15 +36,17 @@ class GitHub implements HttpURLClientExtension {
         }
     }
 
-    def fetchRepositories(String userName) {
+    def fetchRepositories(Map filter = [:], String userName) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/users/$userName/repos").data
+            // TODO: fetch from more pages
+            client.request(path: "/users/$userName/repos", query: [per_page: 100] + filter).data
         }
     }
 
     def fetchStargazers(String repo) {
         handleHttpResponseException(404: null) {
-            client.request(path: "/repos/$repo/stargazers").data
+            // TODO: fetch from more pages
+            client.request(path: "/repos/$repo/stargazers", query: [per_page: 100]).data
         }
     }
 

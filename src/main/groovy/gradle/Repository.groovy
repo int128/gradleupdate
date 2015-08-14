@@ -139,7 +139,7 @@ class Repository implements WithGitHub, WithGitHubUserContent {
 
     static fetchRepositories(String owner) {
         log.info("Fetching repositories of owner $owner")
-        def repositories = Locator.gitHub.fetchRepositories(owner)
+        def repositories = Locator.gitHub.fetchRepositories(owner, sort: 'updated')
         assert repositories instanceof List
         repositories
     }
