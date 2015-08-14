@@ -26,13 +26,11 @@ Gradle Update checks version of Gradle Wrapper in your public repositories. It m
 Once starred, you will receive pull requests when a new version of Gradle is released.
 
 
-### Add a badge
-
-Gradle Update provides a badge to indicate the build system is up-to-date.
+**Step 4:** Add a badge to indicate the build system is up-to-date.
 
 [![Gradle Status](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status.svg?branch=master)](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status)
 
-Add following line into `README.md` in the repository. Replace `USER` and `REPO` with proper name.
+Add following line into `README.md` in your repository. Replace `USER` and `REPO` with proper one.
 
 ```markdown
 [![Gradle Status](https://gradleupdate.appspot.com/USER/REPO/status.svg?branch=master)](https://gradleupdate.appspot.com/USER/REPO/status)
@@ -47,7 +45,7 @@ When a user starred this repository,
 2. In a task for _user_,
   1. Get a list of repositories of _user_.
   2. Queue tasks for each _repositories_.
-3. In a task for _repository_
+3. In a task for _repository_,
   1. Check version of Gradle Wrapper in the _repository_.
   2. If it is out-of-date, queue a task for updating the _repository_.
   3. If it is up-to-date or has no Gradle Wrapper, do nothing.
@@ -75,7 +73,7 @@ When a new version of Gradle is found,
 
 Git operations are performed via GitHub API. It requires no filesystem or git command.
 
-All operations are designed to be transactional and idempotence. Any exception such as HTTP error may occur during an operation but will be recovered by retry of the task queue.
+All operations are designated to be transactional and idempotence. Any exception such as HTTP error may occur during an operation but will be recovered by retry of the task queue.
 
 
 ## Contribution
