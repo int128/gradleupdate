@@ -1,5 +1,6 @@
-import gradle.Repositories
 import gradle.VersionWatcher
+
+import static util.RequestUtil.relativePath
 
 final stargazer = params.stargazer
 assert stargazer instanceof String
@@ -7,33 +8,7 @@ assert stargazer instanceof String
 log.info("Fetching version of the latest Gradle")
 final gradleVersion = new VersionWatcher().fetchStableVersion()
 
-final repositories = new Repositories(stargazer)
-
-final page
-final next = params.next
-if (next instanceof String) {
-    page = repositories.fetchNext(next)
-} else {
-    page = repositories.fetchFirst()
-}
-
-final nextPage = page.rel.next
-if (nextPage) {
-    log.info("Queue next page of $repositories: $nextPage")
-    defaultQueue.add(
-            url: request.requestURI,
-            params: params + [next: nextPage])
-} else {
-    log.info("Now last page of $repositories")
-}
-
-page.current.each { repo ->
-    log.info("Queue updating the repository $repo.full_name")
-    defaultQueue.add(
-            url: '/internal/pull-request-for-gradle/0.groovy',
-            params: [
-                    full_name: repo.full_name,
-                    branch: repo.default_branch,
-                    gradle_version: gradleVersion,
-            ])
-}
+log.info("Queue updating stargazer $stargazer")
+defaultQueue.add(
+        url: relativePath(request, '1-stargazer.groovy'),
+        params: params + [gradle_version: gradleVersion])
