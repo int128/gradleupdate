@@ -1,7 +1,7 @@
 import gradle.Repository
 
 final fullName = params.full_name
-final branch = params.branch
+final branch = params.branch ?: 'master'
 assert fullName instanceof String
 assert branch instanceof String
 
