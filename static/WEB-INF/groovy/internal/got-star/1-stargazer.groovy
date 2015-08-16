@@ -1,12 +1,9 @@
 import gradle.Repositories
 
-final gradleVersion = params.gradle_version
-assert gradleVersion instanceof String
+assert params.gradle_version
+assert params.stargazer
 
-final stargazer = params.stargazer
-assert stargazer instanceof String
-
-final repositories = new Repositories(stargazer)
+final repositories = new Repositories(params.stargazer)
 
 final page
 final next = params.next
@@ -33,6 +30,6 @@ page.current.each { repo ->
             params: [
                     full_name: repo.full_name,
                     branch: repo.default_branch,
-                    gradle_version: gradleVersion,
+                    gradle_version: params.gradle_version,
             ])
 }

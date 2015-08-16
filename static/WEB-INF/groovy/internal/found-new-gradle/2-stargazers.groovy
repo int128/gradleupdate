@@ -1,7 +1,6 @@
 import gradle.Stargazers
 
-final gradleVersion = params.gradle_version
-assert gradleVersion instanceof String
+assert params.gradle_version
 
 final stargazers = new Stargazers()
 
@@ -27,5 +26,5 @@ page.current.each { stargazer ->
     log.info("Queue updating stargazer ${stargazer.login}")
     defaultQueue.add(
             url: '/internal/got-star/1-stargazer.groovy',
-            params: [stargazer: stargazer.login, gradle_version: gradleVersion])
+            params: [stargazer: stargazer.login, gradle_version: params.gradle_version])
 }

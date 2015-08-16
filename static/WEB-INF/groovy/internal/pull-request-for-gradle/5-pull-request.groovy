@@ -3,22 +3,17 @@ import gradle.Stargazers
 
 import static util.RequestUtil.relativePath
 
-final fromUser = params.from_user
-final fromBranch = params.from_branch
-final intoRepo = params.into_repo
-final intoBranch = params.into_branch
-final gradleVersion = params.gradle_version
-assert fromUser instanceof String
-assert fromBranch instanceof String
-assert intoRepo instanceof String
-assert intoBranch instanceof String
-assert gradleVersion instanceof String
+assert params.from_user
+assert params.from_branch
+assert params.into_repo
+assert params.into_branch
+assert params.gradle_version
 
 final stargazers = new Stargazers()
 
-final title = "Gradle $gradleVersion"
+final title = "Gradle $params.gradle_version"
 final body = """
-[Gradle $gradleVersion](https://gradle.org/docs/$gradleVersion/release-notes) is available now.
+[Gradle $params.gradle_version](https://gradle.org/docs/$params.gradle_version/release-notes) is available now.
 
 This pull request updates Gradle wrapper and build.gradle in the repository.
 Merge it if all tests passed with the latest Gradle.
@@ -26,13 +21,13 @@ Merge it if all tests passed with the latest Gradle.
 Automatic pull request can be turned off by unstar [gradleupdate repository](${stargazers.htmlUrl}).
 """
 
-final pullRequest = new Repository(intoRepo).createPullRequest(intoBranch, fromUser, fromBranch, title, body)
+final pullRequest = new Repository(params.into_repo).createPullRequest(params.into_branch, params.from_user, params.from_branch, title, body)
 
 log.info("Pull request #${pullRequest.number} has been created on ${pullRequest.html_url}")
 defaultQueue.add(
         url: relativePath(request, '6-done.groovy'),
         params: [
-                gradleVersion: gradleVersion,
+                gradleVersion: params.gradle_version,
                 url: pullRequest.url,
                 htmlUrl: pullRequest.html_url,
                 createdAt: pullRequest.created_at,

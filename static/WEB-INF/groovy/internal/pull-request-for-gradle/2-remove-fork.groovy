@@ -2,27 +2,22 @@ import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
-final fromRepo = params.from_repo
-final fromBranch = params.from_branch
-final intoRepo = params.into_repo
-final intoBranch = params.into_branch
-final gradleVersion = params.gradle_version
-assert fromRepo instanceof String
-assert fromBranch instanceof String
-assert intoRepo instanceof String
-assert intoBranch instanceof String
-assert gradleVersion instanceof String
+assert params.from_repo
+assert params.from_branch
+assert params.into_repo
+assert params.into_branch
+assert params.gradle_version
 
-final removed = new Repository(fromRepo).remove()
-assert removed, "Fork $fromRepo not found, retrying"
+final removed = new Repository(params.from_repo).remove()
+assert removed, "Fork $params.from_repo not found, retrying"
 
-log.info("Queue recreating a fork of $intoRepo")
+log.info("Queue recreating a fork of $params.into_repo")
 defaultQueue.add(
         url: relativePath(request, '3-fork.groovy'),
         params: [
-                from_branch: fromBranch,
-                into_repo: intoRepo,
-                into_branch: intoBranch,
-                gradle_version: gradleVersion,
+                from_branch: params.from_branch,
+                into_repo: params.into_repo,
+                into_branch: params.into_branch,
+                gradle_version: params.gradle_version,
         ],
         countdownMillis: 1000)

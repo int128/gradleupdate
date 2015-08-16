@@ -5,9 +5,9 @@ final eventType = headers.'X-GitHub-Event'
 final delivery = headers.'X-GitHub-Delivery'
 final signature = headers.'X-Hub-Signature'
 final payload = request.inputStream.bytes
-assert eventType instanceof String
-assert delivery instanceof String
-assert signature instanceof String
+assert eventType
+assert delivery
+assert signature
 assert payload
 
 assert new GitHubWebhook().validate(signature, payload)

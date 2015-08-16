@@ -2,30 +2,26 @@ import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
-final fromBranch = params.from_branch
-final intoRepo = params.into_repo
-final intoBranch = params.into_branch
-final gradleVersion = params.gradle_version
-assert fromBranch instanceof String
-assert intoRepo instanceof String
-assert intoBranch instanceof String
-assert gradleVersion instanceof String
+assert params.from_branch
+assert params.into_repo
+assert params.into_branch
+assert params.gradle_version
 
-final fork = new Repository(intoRepo).fork()
+final fork = new Repository(params.into_repo).fork()
 final fromUser = fork.owner.login
 final fromRepo = fork.full_name
 assert fromUser instanceof String
 assert fromRepo instanceof String
 
-log.info("Queue creating a branch $fromBranch on $fromRepo")
+log.info("Queue creating a branch $params.from_branch on $fromRepo")
 defaultQueue.add(
         url: relativePath(request, '4-branch.groovy'),
         params: [
                 from_user: fromUser,
                 from_repo: fromRepo,
-                from_branch: fromBranch,
-                into_repo: intoRepo,
-                into_branch: intoBranch,
-                gradle_version: gradleVersion,
+                from_branch: params.from_branch,
+                into_repo: params.into_repo,
+                into_branch: params.into_branch,
+                gradle_version: params.gradle_version,
         ],
         countdownMillis: 1000)

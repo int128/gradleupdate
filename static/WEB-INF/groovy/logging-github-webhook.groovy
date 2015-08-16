@@ -2,8 +2,8 @@ import infrastructure.GitHubWebhook
 
 final eventType = headers.'X-GitHub-Event'
 final signature = headers.'X-Hub-Signature'
-assert eventType instanceof String
-assert signature instanceof String
+assert eventType
+assert signature
 
 final payload = request.inputStream.bytes
 assert payload

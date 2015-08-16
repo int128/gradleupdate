@@ -1,12 +1,9 @@
 import gradle.Repository
 
-final fullName = params.full_name
-final branch = params.branch ?: 'master'
-assert fullName instanceof String
-assert branch instanceof String
+assert params.full_name
 
-final repository = new Repository(fullName)
-final state = repository.checkIfGradleWrapperIsLatest(branch)
+final repository = new Repository(params.full_name)
+final state = repository.checkIfGradleWrapperIsLatest(params.branch ?: 'master')
 switch (state) {
     case Repository.GradleWrapperState.UP_TO_DATE:
         forward("/util/svg-badge.groovy?fill=#4c1&message=${state.currentVersion}")

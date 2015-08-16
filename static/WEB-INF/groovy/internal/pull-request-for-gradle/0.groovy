@@ -2,31 +2,28 @@ import gradle.Repository
 
 import static util.RequestUtil.relativePath
 
-final fullName = params.full_name
-final branch = params.branch
-final gradleVersion = params.gradle_version
-assert fullName instanceof String
-assert branch instanceof String
-assert gradleVersion instanceof String
+assert params.full_name
+assert params.branch
+assert params.gradle_version
 
-final repository = new Repository(fullName)
-final gradleWrapperVersion = repository.fetchGradleWrapperVersion(branch)
+final repository = new Repository(params.full_name)
+final gradleWrapperVersion = repository.fetchGradleWrapperVersion(params.branch)
 
 if (gradleWrapperVersion == null) {
-    log.info("$fullName does not have Gradle wrapper")
+    log.info("$params.full_name does not have Gradle wrapper")
     return
 }
-if (gradleWrapperVersion == gradleVersion) {
-    log.info("$fullName has the latest Gradle wrapper $gradleVersion")
+if (gradleWrapperVersion == params.gradle_version) {
+    log.info("$params.full_name has the latest Gradle wrapper $params.gradle_version")
     return
 }
 
-log.info("$fullName has obsolete Gradle wrapper $gradleWrapperVersion " +
-        "while latest is $gradleVersion, so queue updating")
+log.info("$params.full_name has obsolete Gradle wrapper $gradleWrapperVersion " +
+        "while latest is $params.gradle_version, so queue updating")
 defaultQueue.add(
         url: relativePath(request, '1-fork.groovy'),
         params: [
-                into_repo: fullName,
-                into_branch: branch,
-                gradle_version: gradleVersion
+                into_repo: params.full_name,
+                into_branch: params.branch,
+                gradle_version: params.gradle_version
         ])
