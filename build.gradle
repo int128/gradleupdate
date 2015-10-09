@@ -65,7 +65,3 @@ idea {
         testOutputDir = sourceSets.test.output.classesDir
     }
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.7'
-}
