@@ -21,7 +21,10 @@ final treeForBuildGradle = fromRepository.createTreeForBuildGradle(params.into_b
 
 final tree = treeForGradleWrapper + treeForBuildGradle
 
-fromRepository.createBranch(params.from_branch, params.into_branch, "Gradle $params.gradle_version", tree)
+final created = fromRepository.createBranch(params.from_branch, params.into_branch, "Gradle $params.gradle_version", tree)
+if (!created) {
+    log.info("Already up-to-date version $params.gradle_version, skip")
+}
 
 log.info("Queue sending a pull request into $params.into_repo:$params.into_branch from $params.from_user:$params.from_branch")
 defaultQueue.add(

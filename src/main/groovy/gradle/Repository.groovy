@@ -120,8 +120,13 @@ class Repository implements WithGitHub, WithGitHubUserContent {
         assert newCommit.sha instanceof String
 
         def newRef = gitHub.createReference(fullName, branch, newCommit.sha)
-        assert newRef.object.sha instanceof String
-        newRef.object.sha
+        if (newRef.object) {
+            assert newRef.object.sha instanceof String
+            newRef.object.sha
+        } else {
+            // create branch API will return null if base and new commit are same
+            null
+        }
     }
 
     def cloneBranch(String from, String into) {
