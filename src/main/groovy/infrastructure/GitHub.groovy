@@ -49,6 +49,7 @@ class GitHub implements ErrorStatusHandler {
     }
 
     def fetchNextPage(String relation) {
+        assert relation
         assert relation.startsWith(client.url)
         def path = relation.substring(client.url.length())
         assert path.startsWith('/')

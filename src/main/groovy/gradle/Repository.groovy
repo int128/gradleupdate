@@ -49,7 +49,7 @@ class Repository implements WithGitHub, WithGitHubUserContent {
         templateRepository.fetchGradleWrapperFiles().collect { file ->
             log.info("Creating a blob ${file.path} on repository $fullName")
             def blob = gitHub.createBlob(fullName, file.content)
-            assert blob.sha instanceof String
+            assert blob?.sha instanceof String
 
             log.info("Created $file.path as $blob.sha on repository $fullName")
             [path: file.path, mode: file.mode, type: 'blob', sha: blob.sha]
@@ -71,7 +71,7 @@ class Repository implements WithGitHub, WithGitHubUserContent {
 
             log.info("Creating a blob $path on repository $fullName")
             def blob = gitHub.createBlob(fullName, buildGradleWithNewVersion)
-            assert blob.sha instanceof String
+            assert blob?.sha instanceof String
 
             log.info("Created $path as $blob.sha on repository $fullName")
             [[path: path, mode: '100644', type: 'blob', sha: blob.sha]]
@@ -107,17 +107,17 @@ class Repository implements WithGitHub, WithGitHubUserContent {
     def createBranch(String branch, String base, String commitMessage, List<Map> contents) {
         log.info("Creating a branch $branch from $base on repository $fullName")
         def baseRef = gitHub.fetchReference(fullName, base)
-        assert baseRef.object.sha instanceof String
+        assert baseRef?.object?.sha instanceof String
         def baseRefSha = baseRef.object.sha
 
         def baseTree = gitHub.fetchCommit(fullName, baseRefSha).tree
-        assert baseTree.sha instanceof String
+        assert baseTree?.sha instanceof String
 
         def newTree = gitHub.createTree(fullName, baseTree.sha, contents)
-        assert newTree.sha instanceof String
+        assert newTree?.sha instanceof String
 
         def newCommit = gitHub.createCommit(fullName, [baseRefSha], newTree.sha, commitMessage)
-        assert newCommit.sha instanceof String
+        assert newCommit?.sha instanceof String
 
         def newRef = gitHub.createReference(fullName, branch, newCommit.sha)
         if (newRef.object) {
@@ -132,10 +132,10 @@ class Repository implements WithGitHub, WithGitHubUserContent {
     def cloneBranch(String from, String into) {
         log.info("Cloning branch from $from into $into on repository $fullName")
         def baseRef = gitHub.fetchReference(fullName, from)
-        assert baseRef.object.sha instanceof String
+        assert baseRef?.object?.sha instanceof String
 
         def newRef = gitHub.createReference(fullName, into, baseRef.object.sha)
-        assert newRef.object.sha instanceof String
+        assert newRef?.object?.sha instanceof String
         newRef.object.sha
     }
 
