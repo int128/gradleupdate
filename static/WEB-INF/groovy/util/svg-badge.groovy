@@ -12,6 +12,8 @@ final width = left + right
 final rightCentral = width - right / 2 - 1
 
 response.contentType = 'image/svg+xml'
+response.addHeader('Cache-Control', 'no-cache')
+response.addHeader('Expires', '-1')
 
 html.svg(xmlns: 'http://www.w3.org/2000/svg', width: width, height: 20) {
     linearGradient(id: 'a', x2: 0, y2: '100%') {
