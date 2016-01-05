@@ -23,7 +23,14 @@ if (nextPage) {
     log.info("Now last page of $repositories")
 }
 
-page.current.each { repo ->
+assert page.current instanceof List
+page.current.findAll { repo ->
+    if (repo.fork) {
+        log.info("Repository $repo.full_name is a fork, skip")
+        false
+    }
+    true
+}.each { repo ->
     log.info("Queue updating the repository $repo.full_name")
     defaultQueue.add(
             url: '/internal/pull-request-for-gradle/0.groovy',
