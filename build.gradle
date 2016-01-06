@@ -11,7 +11,6 @@ buildscript {
 plugins {
     id 'groovy'
     id 'war'
-    id 'idea'
 }
 apply plugin: 'appengine'
 
@@ -38,12 +37,12 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
 war {
-    webAppDirName = file('static')
+    webAppDirName = file('build/assets')
 }
 
 appengine {
     disableUpdateCheck = true
-    warDir = file('static')
+    warDir = file('build/assets')
     jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
     appcfg {
         oauth2 = true
@@ -57,11 +56,3 @@ task syncDependencies(type: Sync) {
     into "${appengine.warDir}/WEB-INF/lib"
 }
 tasks.appengineRun.dependsOn(tasks.syncDependencies)
-
-idea {
-    module {
-        inheritOutputDirs = false
-        outputDir = sourceSets.main.output.classesDir
-        testOutputDir = sourceSets.test.output.classesDir
-    }
-}

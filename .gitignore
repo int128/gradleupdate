@@ -1,11 +1,11 @@
 build/
 .gradle/
 
-credential.properties
+static/WEB-INF/lib/
+static/WEB-INF/classes/
+static/WEB-INF/appengine-generated/
 
-/static/WEB-INF/lib/
-/static/WEB-INF/classes/
-/static/WEB-INF/appengine-generated/
+node_modules/
 
 # IDEA
 .idea
