@@ -2,8 +2,11 @@ package infrastructure
 
 import groovy.util.logging.Log
 import model.Credential
+
 import wslite.rest.ContentType
 import wslite.rest.RESTClient
+
+import static model.Credential.CredentialKey.GitHubToken
 
 @Log
 class GitHub implements ErrorStatusHandler {
@@ -11,7 +14,7 @@ class GitHub implements ErrorStatusHandler {
     private final RESTClient client
 
     def GitHub() {
-        this(Credential.getOrCreate('github-token'))
+        this(Credential.get(GitHubToken))
     }
 
     def GitHub(Credential credential) {

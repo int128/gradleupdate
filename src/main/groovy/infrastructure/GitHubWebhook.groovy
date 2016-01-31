@@ -5,12 +5,14 @@ import model.Credential
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
+import static model.Credential.CredentialKey.GitHubWebHookSecret
+
 class GitHubWebhook {
 
     private final byte[] secret
 
     def GitHubWebhook() {
-        secret = Credential.getOrCreate('github-webhook').secret?.bytes
+        secret = Credential.get(GitHubWebHookSecret).secret?.bytes
     }
 
     def GitHubWebhook(byte[] secret) {

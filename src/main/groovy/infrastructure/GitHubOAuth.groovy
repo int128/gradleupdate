@@ -3,6 +3,9 @@ package infrastructure
 import model.Credential
 import wslite.rest.RESTClient
 
+import static model.Credential.CredentialKey.GitHubClientId
+import static model.Credential.CredentialKey.GitHubClientKey
+
 class GitHubOAuth {
 
     final client
@@ -13,8 +16,8 @@ class GitHubOAuth {
     }
 
     def exchangeCodeAndToken(String code) {
-        def clientId = Credential.getOrCreate('github-client-id')
-        def clientKey = Credential.getOrCreate('github-client-key')
+        def clientId = Credential.get(GitHubClientId)
+        def clientKey = Credential.get(GitHubClientKey)
         client.get(query: [
                 client_id: clientId.secret,
                 client_secret: clientKey.secret,

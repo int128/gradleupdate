@@ -10,14 +10,20 @@ class Credential {
     @Key String service
     @Unindexed String secret
 
-    static Credential getOrCreate(String serviceName) {
-        def credential = Credential.get(serviceName)
-        if (credential == null) {
-            credential = new Credential()
-            credential.service = serviceName
-            credential.save()
+    static enum CredentialKey {
+        GitHubToken,
+        GitHubClientId,
+        GitHubClientKey,
+        GitHubWebHookSecret,
+    }
+
+    static Credential get(CredentialKey key) {
+        final credential = Credential.get(key.name())
+        if (credential) {
+            credential
+        } else {
+            throw new IllegalStateException("Credential should be set by initial setup: ${key.name()}")
         }
-        credential
     }
 
 }
