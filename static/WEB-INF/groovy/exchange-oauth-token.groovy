@@ -1,8 +1,5 @@
 import groovy.json.JsonBuilder
 import infrastructure.GitHubOAuth
-import util.CrossOriginPolicy
-
-CrossOriginPolicy.allowOrigin(response, headers)
 
 assert params.code, 'code parameter should be given'
 
