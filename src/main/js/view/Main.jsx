@@ -43,9 +43,14 @@ export default class extends React.Component {
   onGotError(e) {
     this.setState({oauth: {state: 'GotError', error: e}});
   }
+  onUnauthorize() {
+    sessionStorage.removeItem('oauthToken');
+    this.setState({oauth: {state: null}});
+  }
   render() {
     if (this.state.oauth.state == 'Authorized') {
-      return (<Authorized token={this.state.oauth.token}/>);
+      return (<Authorized token={this.state.oauth.token}
+        onUnauthorize={this.onUnauthorize.bind(this)}/>);
     } else if (this.state.oauth.state == 'GotCode') {
       return (<GotCode code={this.state.oauth.code}
         onGotToken={this.onGotToken.bind(this)}
@@ -114,9 +119,15 @@ class GotError extends React.Component {
 }
 
 class Authorized extends React.Component {
+  onClick() {
+    this.props.onUnauthorize();
+  }
   render() {
     return (
       <div className="container">
+        <button className="btn btn-default" onClick={this.onClick.bind(this)}>
+          Sign Out
+        </button>
         <h2>User</h2>
         <User token={this.props.token}/>
         {this.props.token}
