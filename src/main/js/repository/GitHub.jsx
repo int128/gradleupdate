@@ -11,4 +11,10 @@ export default class {
       cache: true,  // prevent Cache-Control for CORS
     });
   }
+  findRepositories(query = {}) {
+    return qwest.get(`${this._endpoint}/user/repos`, query, {
+      headers: {Authorization: `token ${this._token}`},
+      cache: true,  // prevent Cache-Control for CORS
+    });
+  }
 }

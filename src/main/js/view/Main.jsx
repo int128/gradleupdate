@@ -4,6 +4,7 @@ import Constants from '../Constants.jsx';
 
 import User from './User.jsx';
 import Footer from './Footer.jsx';
+import Projects from './Projects.jsx';
 
 import qwest from 'qwest';
 import queryString from 'query-string';
@@ -130,7 +131,7 @@ class Authorized extends React.Component {
         </button>
         <h2>User</h2>
         <User token={this.props.token}/>
-        {this.props.token}
+        <Projects token={this.props.token}/>
         <Footer/>
       </div>
     );
