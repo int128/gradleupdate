@@ -1,10 +1,13 @@
 import React from 'react';
 
+import Footer from './Footer.jsx';
+
 export default class extends React.Component {
   render() {
     return (
-      <div className="footer text-center">
-        &copy; Hidetake Iwata, 2015-2016.
+      <div>
+        <h2>hoge</h2>
+        <Footer/>
       </div>
     );
   }
