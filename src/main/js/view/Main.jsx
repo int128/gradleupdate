@@ -2,12 +2,11 @@ import React from 'react';
 
 import Constants from '../Constants.jsx';
 
-import User from './User.jsx';
-import Footer from './Footer.jsx';
-import Projects from './Projects.jsx';
-
 import qwest from 'qwest';
 import queryString from 'query-string';
+
+import Authorized from './Authorized.jsx';
+import Unauthorized from './Unauthorized.jsx';
 
 export default class extends React.Component {
   constructor(props) {
@@ -84,30 +83,6 @@ export default class extends React.Component {
   }
 }
 
-class Unauthorized extends React.Component {
-  onClick() {
-    this.props.onAuthorize();
-  }
-  render() {
-    return (
-      <div>
-        <div className="jumbotron">
-          <div className="container text-center">
-            <h1>Gradle Update</h1>
-            <p>keeps the latest Gradle wrapper on your GitHub repositories</p>
-          </div>
-        </div>
-        <div className="container text-center">
-          <button className="btn btn-default" onClick={this.onClick.bind(this)}>
-            Sign in with GitHub Account
-          </button>
-        </div>
-        <Footer/>
-      </div>
-    );
-  }
-}
-
 class GotCode extends React.Component {
   componentDidMount() {
     qwest.post('/authorize', {code: this.props.code})
@@ -128,25 +103,6 @@ class GotError extends React.Component {
     return (
       <div className="container">
         {this.props.oauthError}
-      </div>
-    );
-  }
-}
-
-class Authorized extends React.Component {
-  onClick() {
-    this.props.onUnauthorize();
-  }
-  render() {
-    return (
-      <div className="container">
-        <button className="btn btn-default" onClick={this.onClick.bind(this)}>
-          Sign Out
-        </button>
-        <h2>User</h2>
-        <User token={this.props.token}/>
-        <Projects token={this.props.token}/>
-        <Footer/>
       </div>
     );
   }
