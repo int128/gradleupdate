@@ -8,7 +8,7 @@ import ContentPane from './ContentPane.jsx';
 export default class extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: null, repos: null};
+    this.state = {user: null, repos: null, selectedRepo: null};
   }
   componentDidMount() {
     const github = new GitHub(this.props.token);
@@ -17,16 +17,21 @@ export default class extends React.Component {
     github.findRepositories({sort: 'updated'})
       .then((xhr, repos) => this.setState({repos: repos}));
   }
+  onSelectRepo(repo) {
+    this.setState({selectedRepo: repo});
+  }
   render() {
     return (
       <div className="row">
         <div className="col-lg-3 col-md-3 col-sm-3 gu-menu-pane">
-          <MenuPane onSignOut={this.props.onUnauthorize.bind(this)}
+          <MenuPane
+            onSignOut={this.props.onUnauthorize.bind(this)}
+            onSelectRepo={this.onSelectRepo.bind(this)}
             user={this.state.user}
             repos={this.state.repos}/>
         </div>
         <div className="col-lg-9 col-md-9 col-sm-9 gu-content-pane">
-          <ContentPane/>
+          <ContentPane repo={this.state.selectedRepo}/>
         </div>
       </div>
     );

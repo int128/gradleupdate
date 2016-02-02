@@ -1,6 +1,10 @@
 import React from 'react';
 
 export default class extends React.Component {
+  onClickRepo(repo, e) {
+    this.props.onSelectRepo(repo);
+    e.preventDefault();
+  }
   render() {
     return (
       <div>
@@ -19,7 +23,11 @@ export default class extends React.Component {
 
         {this.props.repos ? (
           <ul>
-            {this.props.repos.map((repo) => (<li>{repo.full_name}</li>))}
+            {this.props.repos.map((repo) => (
+              <a href={`/${repo.full_name}`} onClick={this.onClickRepo.bind(this, repo)}>
+                <li>{repo.full_name}</li>
+              </a>
+            ))}
           </ul>
         ) : null}
       </div>
