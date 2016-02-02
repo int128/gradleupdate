@@ -8,6 +8,7 @@ export default class extends React.Component {
       return (
         <div>
           <h2>{this.props.repo.full_name}</h2>
+          <p><img src={`/${this.props.repo.full_name}/status.svg`}/></p>
           <p>{this.props.repo.description}</p>
           <Footer/>
         </div>
