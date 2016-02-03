@@ -25,11 +25,11 @@ export default class extends React.Component {
           this.setState({oauth: {state: 'GotCode', code: params.code}});
           history.replaceState(null, null, '/');
         } else {
-          this.setState({oauth: {state: 'GotError', error: 'OAuth state parameter did not match'}});
+          this.setState({oauth: {state: 'Unauthorized', error: 'OAuth state parameter did not match'}});
           history.replaceState(null, null, '/');
         }
       } else if (params.error_description) {
-        this.setState({oauth: {state: 'GotError', error: params.error_description}});
+        this.setState({oauth: {state: 'Unauthorized', error: params.error_description}});
         history.replaceState(null, null, '/');
       } else {
         this.setState({oauth: {state: 'Unauthorized'}});
@@ -44,15 +44,13 @@ export default class extends React.Component {
     return renderer ? renderer.apply(this) : null;
   }
   renderUnauthorized() {
-    return (<Unauthorized onAuthorize={this.authorize.bind(this)}/>);
+    return (<Unauthorized error={this.state.oauth.error}
+      onAuthorize={this.authorize.bind(this)}/>);
   }
   renderGotCode() {
     return (<GotCode code={this.state.oauth.code}
       onGotToken={this.onGotToken.bind(this)}
       onGotError={this.onGotError.bind(this)}/>);
-  }
-  renderGotError() {
-    return (<GotError error={this.state.oauth.error}/>);
   }
   renderAuthorized() {
     return (<Authorized token={this.state.oauth.token}
@@ -79,7 +77,7 @@ export default class extends React.Component {
     this.setState({oauth: {state: 'Authorized', token: token}});
   }
   onGotError(e) {
-    this.setState({oauth: {state: 'GotError', error: e}});
+    this.setState({oauth: {state: 'Unauthorized', error: e}});
   }
 }
 
@@ -93,16 +91,6 @@ class GotCode extends React.Component {
     return (
       <div className="container">
         <h2>Authorization in Progress</h2>
-      </div>
-    );
-  }
-}
-
-class GotError extends React.Component {
-  render() {
-    return (
-      <div className="container">
-        {this.props.oauthError}
       </div>
     );
   }
