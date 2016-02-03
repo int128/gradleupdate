@@ -8,27 +8,30 @@ export default class extends React.Component {
   render() {
     return (
       <div>
-        <button className="btn btn-default" onClick={this.props.onSignOut.bind(this)}>
-          Sign Out
-        </button>
-
-        {this.props.user ? (
-          <div>
-            <a href={this.props.user.html_url}>
-              <img src={this.props.user.avatar_url} width="32" height="32"/>
-              {this.props.user.name}
-            </a>
+        <nav className="navbar navbar-default">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <a className="navbar-brand" href="/">Gradle Update</a>
+            </div>
           </div>
-        ) : null}
+        </nav>
 
         {this.props.repos ? (
-          <ul>
+          <div className="list-group">
+            {this.props.user ? (
+              <a href={this.props.user.html_url} className="list-group-item">
+                <img src={this.props.user.avatar_url} width="32" height="32"/>
+                {this.props.user.login}
+              </a>
+            ) : null}
+
             {this.props.repos.map((repo) => (
-              <a href={`/${repo.full_name}`} onClick={this.onClickRepo.bind(this, repo)}>
-                <li>{repo.full_name}</li>
+              <a href={`/${repo.full_name}`} className="list-group-item"
+                onClick={this.onClickRepo.bind(this, repo)}>
+                {repo.full_name}
               </a>
             ))}
-          </ul>
+          </div>
         ) : null}
       </div>
     );
