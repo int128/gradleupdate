@@ -20,6 +20,8 @@ export default class extends React.Component {
 
         <div className="container text-center">
           <button className="btn btn-default" onClick={this.onClick.bind(this)}>
+            <span className="glyphicon glyphicon-off"></span>
+            &nbsp;
             Sign in with GitHub Account
           </button>
         </div>

@@ -29,11 +29,16 @@ gulp.task('webpack', () =>
     .pipe(uglify())
     .pipe(gulp.dest('build/assets')));
 
-gulp.task('vendor', () =>
+gulp.task('vendor', ['vendor-fonts'], () =>
   gulp.src([
       'node_modules/react/dist/react.min.js',
       'node_modules/bootswatch/cosmo/bootstrap.min.css',
     ]).pipe(gulp.dest('build/assets')));
+
+gulp.task('vendor-fonts', () =>
+  gulp.src([
+      'node_modules/bootswatch/fonts/**',
+    ]).pipe(gulp.dest('build/assets/fonts')));
 
 gulp.task('static', () =>
   gulp.src('static/**/*').pipe(gulp.dest('build/assets')));
