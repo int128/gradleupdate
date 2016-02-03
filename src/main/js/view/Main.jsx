@@ -89,7 +89,12 @@ class GotCode extends React.Component {
   render() {
     return (
       <div className="container">
-        <h2>Authorization in Progress</h2>
+        <div className="jumbotron">
+          <p className="text-center">Authorizing...</p>
+          <div className="progress">
+            <div className="progress-bar progress-bar-striped active" style={{width: '50%'}}></div>
+          </div>
+        </div>
       </div>
     );
   }
