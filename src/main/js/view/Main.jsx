@@ -62,7 +62,6 @@ export default class extends React.Component {
     const url = 'https://github.com/login/oauth/authorize'
       + `?client_id=${Constants.oauthClientId}`
       + `&scope=${Constants.oauthScope}`
-      + `&redirect_uri=${location.origin}`
       + `&state=${key}`;
     sessionStorage.setItem('oauthKey', key);
     location.replace(url);
