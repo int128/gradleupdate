@@ -1,19 +1,4 @@
 build/
 .gradle/
-
-/static/WEB-INF/lib/
-/static/WEB-INF/classes/
-/static/WEB-INF/appengine-generated/
-
-# IDEA
-.idea
-out/
+.idea/
 *.iml
-*.ipr
-*.iws
-
-# Eclipse
-bin/
-.settings/
-.classpath
-.project

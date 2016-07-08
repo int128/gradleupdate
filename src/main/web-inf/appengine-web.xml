@@ -1,6 +1,6 @@
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-    <application>example</application>
-    
+    <application>gaelyk-react-starter</application>
+
     <version>1</version>
 
     <!-- Enable concurrent requests by default to serve requests in parallel -->
@@ -28,7 +28,9 @@
     <!-- as per the release of SDK 1.2.8, -->
     <!-- this should speed up cold startups of applications by 10% -->
     <precompilation-enabled>true</precompilation-enabled>
-    
+
     <static-files>
+        <exclude path="/WEB-INF/**.groovy" />
+        <exclude path="**.gtpl" />
     </static-files>
 </appengine-web-app>

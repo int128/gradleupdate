@@ -1,0 +1,30 @@
+machine:
+  java:
+    version: openjdk7
+  node:
+    version: 6
+
+  environment:
+    TERM: dumb
+    GRADLE_OPTS: -Xmx1g -Xms1g
+
+dependencies:
+  override:
+    - npm install
+    - ./gradlew testClasses appengineDownloadSdk
+
+test:
+  override:
+    - npm run build
+    - ./gradlew build
+  post:
+    # - cp -a build/test-results/*.xml $CIRCLE_TEST_REPORTS/
+    # - rsync -aR build/reports $CIRCLE_ARTIFACTS/
+    - find build/assets -type f
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - echo "$APPENGINE_KEY" | base64 --decode > build/appengine-key.json
+      - ./gradlew appengineUpdate

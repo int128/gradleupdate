@@ -1,5 +1,5 @@
 buildscript {
-    ext.gaeVersion = '1.9.17'
+    ext.gaeVersion = '1.9.38'
     repositories {
         jcenter()
     }
@@ -8,57 +8,55 @@ buildscript {
     }
 }
 
-plugins {
-    id 'groovy'
-    id 'war'
-    id 'idea'
-}
+apply plugin: 'groovy'
+apply plugin: 'war'
 apply plugin: 'appengine'
 
 repositories {
     jcenter()
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.9'
+    compile 'org.codehaus.groovy:groovy-all:2.4.6'
+    compile 'org.gaelyk:gaelyk:2.1.2'
 
     compile "com.google.appengine:appengine-api-1.0-sdk:$gaeVersion"
     compile "com.google.appengine:appengine-api-labs:$gaeVersion"
     compile 'javax.servlet:servlet-api:2.5'
 
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'org.gaelyk:gaelyk-spock:0.4'
     testCompile "com.google.appengine:appengine-api-stubs:$gaeVersion"
     testCompile "com.google.appengine:appengine-testing:$gaeVersion"
-}
 
-war {
-    webAppDirName = file('static')
+    appengineSdk "com.google.appengine:appengine-java-sdk:$gaeVersion"
 }
 
 appengine {
-    disableUpdateCheck = true
-    warDir = file('static')
+    warDir = file("$buildDir/assets")
     jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
+    downloadSdk = true
+    disableUpdateCheck = true
     appcfg {
         oauth2 = true
+        if (file('build/appengine-key.json').exists()) {
+            extraOptions << '--service_account_json_key_file=build/appengine-key.json'
+        }
     }
 }
 
+war {
+    webAppDirName = appengine.warDir
+}
+
+task appengineWebApp(type: Sync) {
+    into("${appengine.warDir}/WEB-INF")
+    from 'src/main/web-inf'
+    into('lib') { from configurations.runtime }
+}
+
+tasks.withType(AbstractCompile) { it.dependsOn appengineWebApp }
 sourceSets.main.output.classesDir = "${appengine.warDir}/WEB-INF/classes"
-
-task syncDependencies(type: Sync) {
-    from configurations.runtime
-    into "${appengine.warDir}/WEB-INF/lib"
-}
-tasks.appengineRun.dependsOn(tasks.syncDependencies)
-
-idea {
-    module {
-        inheritOutputDirs = false
-        outputDir = sourceSets.main.output.classesDir
-        testOutputDir = sourceSets.test.output.classesDir
-    }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
-}

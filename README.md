@@ -1,57 +1,55 @@
-App Engine Groovy Template [![Build Status](https://travis-ci.org/int128/gradle-appengine-blank.svg)](https://travis-ci.org/int128/gradle-appengine-blank)
-==========================
+Gaelyk + React on App Engine [![CircleCI](https://circleci.com/gh/int128/gaelyk-react-starter.svg?style=svg)](https://circleci.com/gh/int128/gaelyk-react-starter) [![Gradle Status](https://gradleupdate.appspot.com/int128/gaelyk-react-starter/status.svg?branch=master)](https://gradleupdate.appspot.com/int128/gaelyk-react-starter/status)
+============================
 
-A template project with Groovy on Google App Engine.
+A template project with Gaelyk and React on App Engine.
 
-
-* Groovy
+* React
+* Gaelyk
+* App Engine
+* Spock
+* Webpack
+* Babel
 * Gradle
-  * App Engine support with [gradle-appengine-plugin](https://github.com/GoogleCloudPlatform/gradle-appengine-plugin)
-  * Groovy lang support
-  * IntelliJ IDEA support
 
+How to Run
+----------
 
-Prepare
--------
-
-Java 7 or later is required.
-
-Install App Engine SDK.
-
-```sh
-gcloud components update gae-java
-```
-
-Set environment variables in `.bashrc` or `.zshrc`.
-
-```sh
-export APPENGINE_HOME=$HOME/Library/google-cloud-sdk/platform/appengine-java-sdk
-```
-
-Run
----
-
-Run the development server.
+Build and run App Engine development server.
 
 ```bash
+npm install
+npm run build
 ./gradlew appengineRun
-
-./gradlew appengineStop
 ```
 
-Deploy
-------
-
-Deploy the application to the production platform.
+We can run Webpack development server instead.
 
 ```bash
-./gradlew appengineUpdate
+npm start
+```
+
+How to Deploy
+-------------
+
+Push the master branch and Circle CI will deploy the app to App Engine.
+
+A service account key should be provided during CI.
+Open [Google Cloud Platform Console](https://console.cloud.google.com/iam-admin/serviceaccounts) and create a service account.
+Then, encode the JSON key as follows and store it into the environment variable `APPENGINE_KEY` on Circle CI.
+
+```bash
+base64 -b0 appengine-key.json
 ```
 
 Structure
 ---------
 
-* `src/main/groovy/` - Groovy sources of the product
-* `src/test/groovy/` - Groovy sources of the test
-* `static/` - Static files
-* `build.gradle` - Build settings
+* Frontend
+  * `/src/main/js` - JSX and Less code
+  * `/static` - Static files
+* Backend
+  * `/src/main/groovy` - Product code
+  * `/src/main/web-inf` - Configuration files
+  * `/src/test/groovy` - Test code
+
+Compiled assets, classes and libraries go to `/build/assets`.
