@@ -19,7 +19,8 @@ Build and run App Engine development server.
 ```bash
 npm install
 npm run build
-./gradlew appengineRun
+./gradlew --daemon appengineRun
+./gradlew appengineStop
 ```
 
 We can run Webpack development server instead.
@@ -41,15 +42,28 @@ Then, encode the JSON key as follows and store it into the environment variable 
 base64 -b0 appengine-key.json
 ```
 
-Structure
----------
+Build system
+------------
+
+Sources:
 
 * Frontend
   * `/src/main/js` - JSX and Less code
   * `/static` - Static files
 * Backend
-  * `/src/main/groovy` - Product code
-  * `/src/main/web-inf` - Configuration files
+  * `/src/main/groovy` - Production code
+  * `/src/main/groovlet` - Production code (Groovlet)
+  * `/src/main/config` - Configuration files
   * `/src/test/groovy` - Test code
 
-Compiled assets, classes and libraries go to `/build/assets`.
+Artifacts:
+
+Destination                             | Source                                | Builder
+----------------------------------------|---------------------------------------|---------
+`/build/exploded-app`                   | `/static`                             | Webpack
+`/build/exploded-app/react.min.js`      | dependencies                          | Webpack
+`/build/exploded-app/app.js`            | `/src/main/js` and dependencies       | Webpack
+`/build/exploded-app/WEB-INF`           | `/src/main/config`                    | Gradle
+`/build/exploded-app/WEB-INF/lib`       | `/src/main/groovy` and dependencies   | Gradle
+`/build/exploded-app/WEB-INF/groovy`    | `/src/main/groovlet`                  | Gradle and Webpack
+`/build/local_db.bin`                   | -                                     | App Engine Dev Server

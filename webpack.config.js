@@ -6,7 +6,7 @@ module.exports = {
     app: './src/main/js/main.jsx'
   },
   output: {
-    path: './build/assets',
+    path: './build/exploded-app',
     filename: '[name].js'
   },
   externals: {
@@ -34,6 +34,7 @@ module.exports = {
     new CopyWebpackPlugin([
       {from: './static'},
       {from: './node_modules/react/dist/react.min.js'},
+      {from: './src/main/groovlet', to: 'WEB-INF/groovy'}
     ])
   ]
 };

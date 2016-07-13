@@ -35,28 +35,37 @@ dependencies {
     appengineSdk "com.google.appengine:appengine-java-sdk:$gaeVersion"
 }
 
+war {
+    webAppDirName = "$buildDir/exploded-app"
+}
+
 appengine {
-    warDir = file("$buildDir/assets")
-    jvmFlags = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890']
+    jvmFlags << '-Xdebug'
+    jvmFlags << '-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8890'
+    jvmFlags << "-Ddatastore.backing_store=$buildDir/local_db.bin"
     downloadSdk = true
     disableUpdateCheck = true
+    daemon = true
     appcfg {
         oauth2 = true
-        if (file('build/appengine-key.json').exists()) {
-            extraOptions << '--service_account_json_key_file=build/appengine-key.json'
+        if (file("$buildDir/appengine-key.json").exists()) {
+            extraOptions << "--service_account_json_key_file=$buildDir/appengine-key.json"
         }
     }
 }
 
-war {
-    webAppDirName = appengine.warDir
+task appengineWebApp(type: Sync, dependsOn: jar) {
+    into "$buildDir/exploded-app/WEB-INF"
+    from 'src/main/config'
+    filesMatching('appengine-web.xml') {
+        filter { line ->
+            line.replace('@VERSION@', System.getenv('CIRCLE_BRANCH') ?: 'default')
+        }
+    }
+    into('lib') { from configurations.runtime, jar.archivePath }
+    into('groovy') { from 'src/main/groovlet' }
 }
 
-task appengineWebApp(type: Sync) {
-    into("${appengine.warDir}/WEB-INF")
-    from 'src/main/web-inf'
-    into('lib') { from configurations.runtime }
-}
-
-tasks.withType(AbstractCompile) { it.dependsOn appengineWebApp }
-sourceSets.main.output.classesDir = "${appengine.warDir}/WEB-INF/classes"
+tasks.war.enabled = false
+tasks.appengineExplodeApp.enabled = false
+tasks.appengineExplodeApp.dependsOn appengineWebApp
