@@ -1,2 +1,10 @@
 <queue-entries>
+    <queue>
+        <name>default</name>
+        <rate>2/s</rate>
+        <retry-parameters>
+            <task-age-limit>7d</task-age-limit>
+            <min-backoff-seconds>60</min-backoff-seconds>
+        </retry-parameters>
+    </queue>
 </queue-entries>

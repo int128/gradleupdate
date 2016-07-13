@@ -1,4 +1,4 @@
-package com.example
+package model
 
 import groovy.transform.Canonical
 import groovyx.gaelyk.datastore.Entity
@@ -6,10 +6,7 @@ import groovyx.gaelyk.datastore.Key
 
 @Entity
 @Canonical
-class Item {
-
-    @Key String id
-
-    String name
-
+class CurrentGradleVersion {
+    @Key String label
+    String version
 }

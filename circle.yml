@@ -18,8 +18,8 @@ test:
     - npm run build
     - ./gradlew build
   post:
-    # - cp -a build/test-results/*.xml $CIRCLE_TEST_REPORTS/
-    # - rsync -aR build/reports $CIRCLE_ARTIFACTS/
+    - cp -a build/test-results/*.xml $CIRCLE_TEST_REPORTS/
+    - rsync -aR build/reports $CIRCLE_ARTIFACTS/
     - find build/exploded-app -type f
 
 deployment:
