@@ -4,7 +4,7 @@ import wslite.rest.RESTClient
 
 class GradleRegistry {
 
-    private final client = new RESTClient('https://services.gradle.org')
+    private final client = new RESTClient('https://services.gradle.org', new CacheAwareHTTPClient())
 
     def fetchCurrentStableRelease() {
         client.get(path: '/versions/current').json
