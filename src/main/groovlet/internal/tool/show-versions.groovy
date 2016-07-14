@@ -1,6 +1,6 @@
-import gradle.TemplateRepository
+import domain.TemplateRepository
+import entity.CurrentGradleVersion
 import infrastructure.GradleRegistry
-import model.CurrentGradleVersion
 
 final gradleRegistry = new GradleRegistry()
 

@@ -1,4 +1,4 @@
-import gradle.TemplateRepository
+import domain.TemplateRepository
 
 import static util.RequestUtil.relativePath
 
@@ -11,6 +11,6 @@ templateRepository.bumpVersion(params.gradle_version)
 
 log.info("Queue updating the template repository to $params.gradle_version")
 defaultQueue.add(
-        url: relativePath(request, '1-wait-for-template.groovy'),
+        url: relativePath(request, '1-wait-for-template.task.groovy'),
         params: [gradle_version: params.gradle_version],
         countdownMillis: 3 * 60 * 1000)

@@ -1,5 +1,4 @@
-import gradle.Repository
-import gradle.Stargazers
+import domain.GHRepository
 
 import static util.RequestUtil.relativePath
 
@@ -9,8 +8,6 @@ assert params.into_repo
 assert params.into_branch
 assert params.gradle_version
 
-final stargazers = new Stargazers()
-
 final title = "Gradle $params.gradle_version"
 final body = """
 [Gradle $params.gradle_version](https://gradle.org/docs/$params.gradle_version/release-notes) is available now.
@@ -18,10 +15,10 @@ final body = """
 This pull request updates Gradle wrapper and build.gradle in the repository.
 Merge it if all tests passed with the latest Gradle.
 
-Automatic pull request can be turned off by unstar [gradleupdate repository](${stargazers.htmlUrl}).
+Automatic pull request can be turned off on [Gradle Update](https://gradleupdate.appspot.com).
 """
 
-final pullRequest = new Repository(params.into_repo).createPullRequest(params.into_branch, params.from_user, params.from_branch, title, body)
+final pullRequest = new GHRepository(params.into_repo).createPullRequest(params.into_branch, params.from_user, params.from_branch, title, body)
 
 log.info("Pull request #${pullRequest.number} has been created on ${pullRequest.html_url}")
 defaultQueue.add(

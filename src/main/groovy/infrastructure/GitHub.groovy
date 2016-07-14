@@ -1,11 +1,11 @@
 package infrastructure
 
+import entity.Credential
 import groovy.util.logging.Log
-import model.Credential
 import wslite.rest.ContentType
 import wslite.rest.RESTClient
 
-import static model.Credential.CredentialKey.GitHubToken
+import static entity.Credential.CredentialKey.GitHubToken
 
 @Log
 class GitHub implements ErrorStatusHandler {

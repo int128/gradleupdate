@@ -1,9 +1,9 @@
-package gradle
+package domain
 
 import groovy.util.logging.Log
 
 @Log
-class TemplateRepository extends Repository {
+class TemplateRepository extends GHRepository {
 
     static final gradleWrapperFiles = [
             [path: 'gradlew', mode: '100755'],

@@ -1,4 +1,4 @@
-package model
+package entity
 
 import groovy.transform.Canonical
 import groovyx.gaelyk.datastore.Entity

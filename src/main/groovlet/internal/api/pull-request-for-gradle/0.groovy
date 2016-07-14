@@ -1,10 +1,10 @@
-import gradle.Repository
+import domain.GHRepository
 
 assert params.full_name
 assert params.branch
 assert params.gradle_version
 
-final origin = new Repository(params.full_name)
+final origin = new GHRepository(params.full_name)
 final originGradleWrapperVersion = origin.fetchGradleWrapperVersion(params.branch)
 
 if (originGradleWrapperVersion == null) {

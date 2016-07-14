@@ -1,5 +1,5 @@
-import gradle.Repository
-import gradle.TemplateRepository
+import domain.GHRepository
+import domain.TemplateRepository
 
 import static util.RequestUtil.relativePath
 
@@ -11,7 +11,7 @@ assert params.into_branch
 assert params.gradle_version
 
 final templateRepository = new TemplateRepository()
-final fromRepository = new Repository(params.from_repo)
+final fromRepository = new GHRepository(params.from_repo)
 
 log.info("Creating a tree with the latest Gradle wrapper on $params.from_repo")
 final treeForGradleWrapper = fromRepository.createTreeForGradleWrapper(templateRepository)

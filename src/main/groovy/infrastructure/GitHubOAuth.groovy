@@ -1,10 +1,10 @@
 package infrastructure
 
-import model.Credential
+import entity.Credential
 import wslite.rest.RESTClient
 
-import static model.Credential.CredentialKey.GitHubClientId
-import static model.Credential.CredentialKey.GitHubClientKey
+import static entity.Credential.CredentialKey.GitHubClientId
+import static entity.Credential.CredentialKey.GitHubClientKey
 
 class GitHubOAuth {
 

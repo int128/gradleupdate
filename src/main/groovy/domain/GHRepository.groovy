@@ -1,15 +1,15 @@
-package gradle
+package domain
 
 import groovy.util.logging.Log
 import infrastructure.Locator.WithGitHub
 import infrastructure.Locator.WithGitHubUserContent
 
 @Log
-class Repository implements WithGitHub, WithGitHubUserContent {
+class GHRepository implements WithGitHub, WithGitHubUserContent {
 
     final String fullName
 
-    def Repository(String fullName) {
+    def GHRepository(String fullName) {
         this.fullName = fullName
     }
 
@@ -39,7 +39,7 @@ class Repository implements WithGitHub, WithGitHubUserContent {
         log.info("Checking if repository $fullName has the latest Gradle wrapper")
         def thisVersion = fetchGradleWrapperVersion(branch)
         if (thisVersion) {
-            def latestVersion = new VersionWatcher().fetchStableVersion()
+            def latestVersion = new GradleVersionWatcher().fetchStableVersion()
             if (thisVersion == latestVersion) {
                 GradleWrapperState.UP_TO_DATE.for(thisVersion)
             } else {

@@ -1,8 +1,8 @@
-package gradle
+package domain
 
 import spock.lang.Specification
 
-class RepositorySpec extends Specification {
+class GHRepositorySpec extends Specification {
 
     def "parse method should return version"() {
         given:
@@ -14,7 +14,7 @@ zipStorePath=wrapper/dists
 distributionUrl=https://services.gradle.org/distributions/gradle-2.2.1-bin.zip"""
 
         when:
-        def version = Repository.parseVersionFromGradleWrapperProperties(content)
+        def version = GHRepository.parseVersionFromGradleWrapperProperties(content)
 
         then:
         version == '2.2.1'
@@ -25,7 +25,7 @@ distributionUrl=https://services.gradle.org/distributions/gradle-2.2.1-bin.zip""
         def content = """invalid content"""
 
         when:
-        def version = Repository.parseVersionFromGradleWrapperProperties(content)
+        def version = GHRepository.parseVersionFromGradleWrapperProperties(content)
 
         then:
         version == null
@@ -41,7 +41,7 @@ task wrapper(type: Wrapper) {
 """
 
         when:
-        def replaced = Repository.replaceGradleVersionString(content, '2.6')
+        def replaced = GHRepository.replaceGradleVersionString(content, '2.6')
 
         then:
         replaced == """apply plugin: 'groovy'
@@ -61,7 +61,7 @@ task wrapper(type: Wrapper) {
 """
 
         when:
-        def replaced = Repository.replaceGradleVersionString(content, '2.6')
+        def replaced = GHRepository.replaceGradleVersionString(content, '2.6')
 
         then:
         replaced == content

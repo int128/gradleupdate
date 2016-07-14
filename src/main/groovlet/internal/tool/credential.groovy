@@ -1,4 +1,4 @@
-import model.Credential
+import entity.Credential
 
 if (request.method == 'POST') {
     assert params.key

@@ -1,4 +1,4 @@
-import gradle.Repository
+import domain.GHRepository
 
 import static util.RequestUtil.relativePath
 
@@ -6,7 +6,7 @@ assert params.into_repo
 assert params.into_branch
 assert params.gradle_version
 
-final intoRepository = new Repository(params.into_repo)
+final intoRepository = new GHRepository(params.into_repo)
 
 final fork = intoRepository.fork()
 final fromUser = fork.owner.login
