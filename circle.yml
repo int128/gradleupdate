@@ -23,8 +23,8 @@ test:
     - find build/exploded-app -type f
 
 deployment:
-  production:
-    branch: master
+  appengine:
+    branch: /.+/
     commands:
       - echo "$APPENGINE_KEY" | base64 --decode > build/appengine-key.json
       - ./gradlew appengineUpdate
