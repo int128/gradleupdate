@@ -2,7 +2,7 @@ import domain.GHRepository
 
 assert params.full_name
 
-def renderBadge(String message, String fill) {
+final renderBadge = { String message, String fill ->
     final left = 47
     // unknown (7) -> 62
     // x.x.x   (5) -> 42
