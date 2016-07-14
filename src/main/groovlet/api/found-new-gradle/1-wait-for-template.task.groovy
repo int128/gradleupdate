@@ -1,4 +1,4 @@
-import gradle.TemplateRepository
+import domain.TemplateRepository
 
 import static util.RequestUtil.relativePath
 
@@ -10,7 +10,7 @@ final current = templateRepository.fetchGradleWrapperVersion('master')
 if (current == params.gradle_version) {
     log.info("The template is up-to-date $current, so queue updating stargazers")
     defaultQueue.add(
-            url: relativePath(request, '2-repositories.groovy'),
+            url: relativePath(request, '2-repositories.task.groovy'),
             params: [gradle_version: params.gradle_version])
 } else {
     log.info("The template is still old $current while expected $params.gradle_version, retrying")

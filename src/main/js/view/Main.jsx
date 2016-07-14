@@ -79,7 +79,7 @@ export default class extends React.Component {
 
 class GotCode extends React.Component {
   componentDidMount() {
-    qwest.post('/api/authorize', {code: this.props.code})
+    qwest.post('/api/exchange-oauth-token', {code: this.props.code})
       .then((xhr, response) => this.props.onGotToken(response.token))
       .catch((e) => this.props.onGotError(e));
   }

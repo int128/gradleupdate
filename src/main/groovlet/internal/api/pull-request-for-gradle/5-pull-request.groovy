@@ -1,4 +1,4 @@
-import gradle.Repository
+import domain.GHRepository
 
 import static util.RequestUtil.relativePath
 
@@ -18,7 +18,7 @@ Merge it if all tests passed with the latest Gradle.
 Automatic pull request can be turned off on [Gradle Update](https://gradleupdate.appspot.com).
 """
 
-final pullRequest = new Repository(params.into_repo).createPullRequest(params.into_branch, params.from_user, params.from_branch, title, body)
+final pullRequest = new GHRepository(params.into_repo).createPullRequest(params.into_branch, params.from_user, params.from_branch, title, body)
 
 log.info("Pull request #${pullRequest.number} has been created on ${pullRequest.html_url}")
 defaultQueue.add(

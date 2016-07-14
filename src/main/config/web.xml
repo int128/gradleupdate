@@ -37,8 +37,8 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Private URLs such as cron and task queue</web-resource-name>
-            <url-pattern>/internal/api/*</url-pattern>
-            <url-pattern>/internal/tool/*</url-pattern>
+            <url-pattern>/internal/*</url-pattern>
+            <url-pattern>*.task.groovy</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -47,6 +47,6 @@
 
     <error-page>
         <exception-type>java.lang.AssertionError</exception-type>
-        <location>/internal/error/assertion-error.groovy</location>
+        <location>/error/assertion-error.groovy</location>
     </error-page>
 </web-app>

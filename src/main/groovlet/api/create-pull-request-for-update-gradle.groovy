@@ -1,5 +1,5 @@
+import entity.Credential
 import infrastructure.GitHub
-import model.Credential
 
 assert params.full_name
 assert params.gradle_version

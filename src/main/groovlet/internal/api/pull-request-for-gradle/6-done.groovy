@@ -1,4 +1,4 @@
-import model.PullRequest
+import entity.PullRequest
 
 assert params.url
 assert params.createdAt

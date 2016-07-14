@@ -1,4 +1,4 @@
-import gradle.Repository
+import domain.GHRepository
 
 import static util.RequestUtil.relativePath
 
@@ -8,7 +8,7 @@ assert params.into_repo
 assert params.into_branch
 assert params.gradle_version
 
-final removed = new Repository(params.from_repo).remove()
+final removed = new GHRepository(params.from_repo).remove()
 assert removed, "Fork $params.from_repo not found, retrying"
 
 log.info("Queue recreating a fork of $params.into_repo")
