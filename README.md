@@ -4,6 +4,10 @@ Gradle Update keeps the latest Gradle Wrapper by pull requests for your reposito
 
 Visit https://gradleupdate.appspot.com
 
+Note:
+In past adding a star on this repository triggered a new pull request, but it has no effect now.
+Feel free to star this repository!
+
 
 ## How works
 
