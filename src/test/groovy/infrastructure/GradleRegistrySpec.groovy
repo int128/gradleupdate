@@ -1,8 +1,8 @@
 package infrastructure
 
-import spock.lang.Specification
+import groovyx.gaelyk.spock.GaelykUnitSpec
 
-class GradleRegistrySpec extends Specification {
+class GradleRegistrySpec extends GaelykUnitSpec {
 
     def "getCurrentStableRelease() should return metadata of current version"() {
         given:

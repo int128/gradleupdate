@@ -1,8 +1,8 @@
 package infrastructure
 
-import spock.lang.Specification
+import groovyx.gaelyk.spock.GaelykUnitSpec
 
-class GitHubSpec extends Specification {
+class GitHubSpec extends GaelykUnitSpec {
 
     def "fetch stargazers should return a paged result"() {
         given:

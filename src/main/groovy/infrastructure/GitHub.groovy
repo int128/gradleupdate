@@ -21,7 +21,7 @@ class GitHub implements ErrorStatusHandler {
         if (credential) {
             headers += [Authorization: "token $credential.secret"]
         }
-        client = new RESTClient('https://api.github.com')
+        client = new RESTClient('https://api.github.com', new CacheAwareHTTPClient())
         client.httpClient.defaultHeaders += headers
     }
 
