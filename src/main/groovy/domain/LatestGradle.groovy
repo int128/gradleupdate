@@ -7,32 +7,30 @@ import infrastructure.GradleRegistry
 
 @Log
 @GaelykBindings
-class GradleVersionWatcher {
+class LatestGradle {
 
     private final registry = new GradleRegistry()
 
-    def fetchStableVersion() {
-        def cached = CurrentGradleVersion.get('stable')?.version
-        if (cached) {
-            cached
+    @Lazy
+    GradleVersion version = {
+        def saved = CurrentGradleVersion.get('stable')
+        if (saved) {
+            new GradleVersion(saved.version as String)
         } else {
-            log.info("Fetching current stable release from Gradle registry")
-            registry.fetchCurrentStableRelease().version
+            new GradleVersion(registry.fetchCurrentStableRelease().version as String)
         }
-    }
+    }()
 
-    def checkIfNewRcReleaseIsAvailable(Closure action) {
+    void checkIfNewRcVersionIsAvailable(Closure action = null) {
         datastore.withTransaction {
             final last = CurrentGradleVersion.get('rc')?.version
-
-            log.info("Fetching current RC release from Gradle registry")
             final current = registry.fetchCurrentReleaseCandidateRelease()?.version
 
             if (last == current) {
                 log.info("RC version is still $current, do nothing")
             } else if (current) {
                 log.info("Found the new RC $current, calling closure")
-                action(current)
+                action?.call(current)
                 log.info("Saving the new RC $current into the datastore")
                 new CurrentGradleVersion(label: 'rc', version: current).save()
             } else {
@@ -42,7 +40,7 @@ class GradleVersionWatcher {
         }
     }
 
-    def checkIfNewStableReleaseIsAvailable(Closure action) {
+    void checkIfNewStableVersionIsAvailable(Closure action = null) {
         datastore.withTransaction {
             final last = CurrentGradleVersion.get('stable')?.version
 
@@ -53,7 +51,7 @@ class GradleVersionWatcher {
                 log.info("Stable version is still $current, do nothing")
             } else {
                 log.info("Found the new stable $current, calling closure")
-                action(current)
+                action?.call(current)
                 log.info("Saving the new stable $current into the datastore")
                 new CurrentGradleVersion(label: 'stable', version: current).save()
             }

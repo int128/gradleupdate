@@ -13,33 +13,15 @@ Feel free to star this repository!
 
 ### When a _user_ requested update for a _repository_
 
-Gradle Update should do:
-
-Origin          | Fork          | Pull Request  | Behavior
-----------------|---------------|---------------|----------
-Latest Gradle   | -             | -             | Do nothing
-Old Gradle      | Up-to-date    | Exists        | Do nothing
-Old Gradle      | Up-to-date    | None          | Fork, Create a pull request
-Old Gradle      | None          | None          | Fork, Create a pull request
-Old Gradle      | Out-of-date   | None          | Update the fork, Create a pull request
-Old Gradle      | Out-of-date   | Exists        | Update the fork, Create a pull request
-No Gradle       | -             | -             | Fork, Create a pull request
-
-i.e.
-
 1. Receive a request for _repository_.
   1. Check if _user_ have permission to push to the _repository_.
   2. Check if Gradle Update have permission to pull from the _repository_.
-  3. Queue a task for the _repository_ on the default branch.
-2. In a task for the _repository_:_default-branch_,
-  1. Check if the _repository_:_default-branch_ has Gradle Wrapper.
-  2. Check if the _repository_:_default-branch_ has the old version of Gradle Wrapper.
-  3. Fork the _repository_ as _fork_.
-  4. If the _fork_:_default-branch_ and the _repository_:_default-branch_ are different,
-    1. Reset _fork_:_default-branch_ to _repository_:_default-branch_.
-  5. Create a branch from _default-branch_ as _gradle-branch_.
-  6. Create a commit with the latest Gradle Wrapper on _gradle-branch_.
-  7. Create a pull request from _fork_:_gradle-branch_ onto _repository_:_branch_.
+  3. Queue a task for the _repository_.
+2. In a task,
+  1. Check if the _repository_:_default-branch_ does not have the latest version of Gradle Wrapper.
+  2. Fork the _repository_ as _fork_ and sync _default-branch_ to upstream.
+  3. Create or update a commit with the latest version of Gradle Wrapper as _fork_:_gradle-branch_.
+  4. Create or update a pull request from _fork_:_gradle-branch_ onto _repository_:_default-branch_.
 
 
 ### Periodically

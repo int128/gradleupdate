@@ -1,13 +1,13 @@
-import domain.TemplateRepository
+import domain.GradleUpdate
 
 import static util.RequestUtil.relativePath
 
 assert params.gradle_version
 
-final templateRepository = new TemplateRepository()
+def gradleUpdate = new GradleUpdate()
 
 log.info("Requesting bump Gradle version of the template")
-templateRepository.bumpVersion(params.gradle_version)
+gradleUpdate.gradleWrapperTemplateRepository.updateAsync(params.gradle_version)
 
 log.info("Queue updating the template repository to $params.gradle_version")
 defaultQueue.add(

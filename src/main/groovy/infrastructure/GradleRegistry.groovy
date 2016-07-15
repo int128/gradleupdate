@@ -1,36 +1,25 @@
 package infrastructure
 
+import groovy.util.logging.Log
 import wslite.rest.RESTClient
 
+@Log
 class GradleRegistry {
 
-    private final client = new RESTClient('https://services.gradle.org', new CacheAwareHTTPClient())
+    private final client = new RESTClient('https://services.gradle.org', new MemcacheHTTPClient())
 
     def fetchCurrentStableRelease() {
-        client.get(path: '/versions/current').json
+        log.info('Fetching current stable version from Gradle registry')
+        def response = client.get(path: '/versions/current')
+        assert response.statusCode == 200
+        response.json
     }
 
     def fetchCurrentReleaseCandidateRelease() {
-        client.get(path: '/versions/release-candidate').json
+        log.info('Fetching current RC version from Gradle registry')
+        def response = client.get(path: '/versions/release-candidate')
+        assert response.statusCode == 200
+        response.json
     }
 
-    def fetchReleases() {
-        def releases = client.get(path: '/versions/all').json
-        assert releases instanceof List
-        releases
-    }
-
-    def fetchStableReleases() {
-        fetchReleases().findAll { !it.snapshot && !it.rcFor }
-    }
-
-    def fetchReleaseCandidateReleases() {
-        fetchReleases().findAll { !it.snapshot }
-    }
-
-    def fetchIssuesFixedIn(String version) {
-        def issues = client.get(path: "/fixed-issues/$version").json
-        assert issues instanceof List
-        issues
-    }
 }

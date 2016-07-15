@@ -1,7 +1,5 @@
-import domain.GradleVersionWatcher
+import domain.LatestGradle
 
-final watcher = new GradleVersionWatcher()
+final latestGradle = new LatestGradle()
 
-watcher.checkIfNewRcReleaseIsAvailable {
-    // no task at this time
-}
+latestGradle.checkIfNewRcVersionIsAvailable()

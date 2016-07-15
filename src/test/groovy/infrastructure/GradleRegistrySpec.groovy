@@ -16,17 +16,4 @@ class GradleRegistrySpec extends GaelykUnitSpec {
         version.version =~ /[0-9\.]+/
     }
 
-    def "getReleases() should return versions"() {
-        given:
-        def service = new GradleRegistry()
-
-        when:
-        def versions = service.fetchReleases()
-
-        then:
-        versions instanceof List
-        versions.find { it.version == '2.3' }
-        versions.find { it.version == '1.12-rc-2' }
-    }
-
 }

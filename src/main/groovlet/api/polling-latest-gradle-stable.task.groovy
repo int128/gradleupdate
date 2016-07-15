@@ -1,8 +1,8 @@
-import domain.GradleVersionWatcher
+import domain.LatestGradle
 
-final watcher = new GradleVersionWatcher()
+final latestGradle = new LatestGradle()
 
-watcher.checkIfNewStableReleaseIsAvailable { gradleVersion ->
+latestGradle.checkIfNewStableVersionIsAvailable { gradleVersion ->
     defaultQueue.add(
             url: '/internal/api/found-new-gradle/index.task.groovy',
             params: [gradle_version: gradleVersion]
