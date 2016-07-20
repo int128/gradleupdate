@@ -18,4 +18,12 @@ class RequestUtil {
         "${dirName(request)}/$path"
     }
 
+    static String token(Map<String, String> headers) {
+        if (headers.Authorization?.startsWith('token ')) {
+            headers.Authorization.substring('token '.length())
+        } else {
+            null
+        }
+    }
+
 }

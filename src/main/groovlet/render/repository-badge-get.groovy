@@ -1,4 +1,4 @@
-import domain.GHRepository
+import domain.GradleUpdate
 
 assert params.full_name
 
@@ -34,16 +34,14 @@ final renderBadge = { String message, String fill ->
     }
 }
 
-final repository = new GHRepository(params.full_name)
-final state = repository.checkIfGradleWrapperIsLatest(params.branch ?: 'master')
-switch (state) {
-    case GHRepository.GradleWrapperState.UP_TO_DATE:
-        renderBadge(state.currentVersion, '#4c1')
-        break
-    case GHRepository.GradleWrapperState.OUT_OF_DATE:
-        renderBadge(state.currentVersion, '#e05d44')
-        break
-    default:
-        renderBadge('unknown', '#9f9f9f')
-        break
+final gradleUpdate = new GradleUpdate()
+final status = gradleUpdate.getGradleWrapperStatusOrNull(params.full_name, params.branch)
+if (status) {
+    if (status.checkUpToDate()) {
+        renderBadge(status.currentVersion.string, '#4c1')
+    } else {
+        renderBadge(status.currentVersion.string, '#e05d44')
+    }
+} else {
+    renderBadge('unknown', '#9f9f9f')
 }

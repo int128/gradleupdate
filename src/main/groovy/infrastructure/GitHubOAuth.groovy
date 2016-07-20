@@ -8,10 +8,9 @@ import static entity.Credential.CredentialKey.GitHubClientKey
 
 class GitHubOAuth {
 
-    final client
+    final client = new RESTClient('https://github.com/login/oauth/access_token')
 
     def GitHubOAuth() {
-        client = new RESTClient('https://github.com/login/oauth/access_token')
         client.httpClient.defaultHeaders += [Accept: 'application/json']
     }
 

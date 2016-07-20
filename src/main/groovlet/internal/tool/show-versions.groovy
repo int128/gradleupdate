@@ -1,10 +1,11 @@
-import domain.TemplateRepository
+import domain.GHSession
+import domain.GradleWrapperTemplateRepository
 import entity.CurrentGradleVersion
 import infrastructure.GradleRegistry
 
 final gradleRegistry = new GradleRegistry()
 
-final templateRepository = new TemplateRepository()
+final template = GradleWrapperTemplateRepository.get(GHSession.defaultToken())
 
 html.html {
     body {
@@ -20,8 +21,8 @@ html.html {
         }
 
         h2('Template Repository')
-        p { a(href: templateRepository.htmlUrl, templateRepository.fullName) }
-        p('master')
-        p(templateRepository.fetchGradleWrapperVersion('master'))
+        p { a(href: template.repository.rawJson.html_url, template.repository.fullName) }
+        p(template.repository.defaultBranch.name)
+        p(template.gradleWrapper.version)
     }
 }

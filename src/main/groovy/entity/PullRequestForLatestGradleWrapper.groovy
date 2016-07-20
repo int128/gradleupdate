@@ -5,18 +5,14 @@ import groovyx.gaelyk.datastore.Entity
 import groovyx.gaelyk.datastore.Indexed
 import groovyx.gaelyk.datastore.Key
 
-@Deprecated
 @Entity
 @Canonical
-class PullRequest {
+class PullRequestForLatestGradleWrapper {
 
     @Key String url
-    @Indexed String htmlUrl
-    @Indexed String gradleVersion
+    @Indexed String fullName
     @Indexed Date createdAt
-    @Indexed String repo
-    @Indexed String owner
-    @Indexed int ownerId
-    @Indexed boolean merged
+    @Indexed String fromVersion
+    @Indexed String toVersion
 
 }

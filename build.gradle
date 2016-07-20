@@ -46,7 +46,6 @@ appengine {
     jvmFlags << "-Ddatastore.backing_store=$buildDir/local_db.bin"
     downloadSdk = true
     disableUpdateCheck = true
-    daemon = true
     appcfg {
         oauth2 = true
         if (file("$buildDir/appengine-key.json").exists()) {
