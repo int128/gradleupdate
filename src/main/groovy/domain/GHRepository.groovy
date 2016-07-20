@@ -1,27 +1,15 @@
 package domain
 
-import groovy.util.logging.Log
+import infrastructure.RestAPI
 
-import static infrastructure.HTTPClientExceptionUtil.nullIfResourceIsNotFound
-
-@Log
 class GHRepository {
 
     final GHSession session
     final def rawJson
 
-    private def GHRepository(GHSession session, def rawJson) {
+    def GHRepository(GHSession session, def rawJson) {
         this.session = session
         this.rawJson = rawJson
-    }
-
-    static GHRepository get(GHSession session, String fullName) {
-        assert session
-        assert fullName
-        log.info("Fetching repository $fullName")
-        def response = session.client.get(path: "/repos/$fullName")
-        assert response.statusCode == 200
-        new GHRepository(session, response.json)
     }
 
     @Lazy
@@ -30,43 +18,55 @@ class GHRepository {
     @Lazy
     String ownerName = { rawJson.owner.login }()
 
+    @Lazy
+    def forks = { RestAPI.of(GHRepository, "/repos/$this/forks", session, session.client) }()
+
+    @Lazy
+    def refs = { RestAPI.of(GHBranch, "/repos/$this/git/refs", this, session.client) }()
+
+    @Lazy
+    def commits = { RestAPI.of(GHCommit, "/repos/$this/git/commits", this, session.client) }()
+
+    @Lazy
+    def trees = { RestAPI.of(GHTree, "/repos/$this/git/trees", this, session.client) }()
+
+    @Lazy
+    def blobs = { RestAPI.of(GHBlob, "/repos/$this/git/blobs", this, session.client) }()
+
+    @Lazy
+    def contents = { RestAPI.of(GHContent, "/repos/$this/contents", this, session.client) }()
+
+    @Lazy
+    def pullRequests = { RestAPI.of(GHPullRequest, "/repos/$this/pulls", this, session.client) }()
+
     GHRepository fork() {
-        log.info("Creating fork from repository $this")
-        def response = session.client.post(path: "/repos/$fullName/forks")
-        assert response.statusCode == 202
-        new GHRepository(session, response.json)
+        forks.invoke()
     }
 
     boolean checkPermissionPush() {
         rawJson.permissions?.push == true
     }
 
-    boolean checkPermissionPull() {
-        rawJson.permissions?.pull == true
-    }
-
     GHBranch getBranch(String name) {
-        GHBranch.get(this, name)
+        refs.get("heads/$name")
     }
 
     @Lazy
     GHBranch defaultBranch = {
         assert rawJson.default_branch
-        GHBranch.get(this, rawJson.default_branch)
+        getBranch(rawJson.default_branch)
     }()
 
-    GHBranch createBranch(String name, GHCommitSha reference) {
-        GHBranch.create(this, name, reference)
+    GHBranch createBranch(String name, GHCommitSha sha) {
+        refs.create(ref: "refs/heads/$name", sha: sha.value)
     }
 
     boolean removeBranch(String name) {
-        GHBranch.remove(this, name)
+        refs.delete("heads/$name")
     }
 
     GHBranch createOrResetBranch(String name, GHCommitSha sha) {
-        nullIfResourceIsNotFound {
-            GHBranch.update(this, name, sha, true)
-        } ?: createBranch(name, sha)
+        refs.find("heads/$name")?.syncTo(sha) ?: createBranch(name, sha)
     }
 
     @Override

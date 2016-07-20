@@ -1,26 +1,13 @@
 package domain
 
-import groovy.util.logging.Log
-
-@Log
 class GHContent {
 
+    final GHRepository repository
     final def rawJson
 
-    def GHContent(def rawJson) {
+    def GHContent(GHRepository repository, def rawJson) {
+        this.repository = repository
         this.rawJson = rawJson
-    }
-
-    static GHContent get(GHBranch branch, String path) {
-        assert branch
-        assert path
-        log.info("Fetching content from branch $branch: $path")
-        def response = branch.repository.session.client.get(
-                path: "/repos/$branch.repository/contents/$path",
-                query: [ref: branch.name]
-        )
-        assert response.statusCode == 200
-        new GHContent(response.json)
     }
 
     @Lazy
@@ -37,5 +24,10 @@ class GHContent {
 
     @Lazy
     String contentAsString = { new String(data) }()
+
+    @Override
+    String toString() {
+        "$repository/contents/$path"
+    }
 
 }

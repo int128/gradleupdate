@@ -2,10 +2,7 @@ package infrastructure
 
 import com.google.appengine.api.memcache.MemcacheService
 import groovyx.gaelyk.GaelykBindings
-import wslite.http.HTTPClient
-import wslite.http.HTTPMethod
-import wslite.http.HTTPRequest
-import wslite.http.HTTPResponse
+import wslite.http.*
 
 import java.security.MessageDigest
 
@@ -21,7 +18,7 @@ class MemcacheHTTPClient extends HTTPClient {
                 request.headers.put('If-None-Match', cache.eTag)
             }
 
-            def response = super.execute(request)
+            def response = executeInternal(request)
             if (response.statusCode == 304) {
                 assert cache instanceof ContentCache
                 cache.hit(response)
@@ -30,7 +27,24 @@ class MemcacheHTTPClient extends HTTPClient {
             }
             response
         } else {
+            executeInternal(request)
+        }
+    }
+
+    private HTTPResponse executeInternal(HTTPRequest request) {
+        if (app.env == 'Production') {
             super.execute(request)
+        } else {
+            try {
+                super.execute(request)
+            } catch (HTTPClientException e) {
+                // openjdk raises exception on 404 but App Engine runtime does not
+                if (e.cause instanceof FileNotFoundException) {
+                    e.response
+                } else {
+                    throw e
+                }
+            }
         }
     }
 

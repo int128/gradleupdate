@@ -1,9 +1,5 @@
 package domain
 
-import groovy.util.logging.Log
-import wslite.rest.ContentType
-
-@Log
 class GHPullRequest {
 
     final GHRepository repository
@@ -14,45 +10,30 @@ class GHPullRequest {
         this.rawJson = rawJson
     }
 
-    static List<GHPullRequest> find(GHBranch forkBranch, GHBranch originBranch) {
-        log.info("Finding pull request: $forkBranch -> $originBranch")
-        def response = originBranch.repository.session.client.get(path: "/repos/$originBranch.repository/pulls", query: [
+    static GHPullRequest findLatest(GHBranch forkBranch, GHBranch originBranch) {
+        firstOrNull(originBranch.repository.pullRequests.findAll(
                 head: "${forkBranch.repository.ownerName}:${forkBranch.name}",
                 base: originBranch.name,
-        ])
-        assert response.statusCode == 200
-        response.json.collect { single ->
-            new GHPullRequest(originBranch.repository, single)
-        }
+                state: 'all',
+                direction: 'desc',
+        ))
     }
 
     static GHPullRequest create(GHBranch forkBranch, GHBranch originBranch, String title, String body) {
-        log.info("Creating pull request: $forkBranch -> $originBranch")
-        def response = originBranch.repository.session.client.post(path: "/repos/$originBranch.repository/pulls") {
-            type ContentType.JSON
-            json head: "${forkBranch.repository.ownerName}:${forkBranch.name}", base: originBranch.name, title: title, body: body
-        }
-        assert response.statusCode == 201
-        new GHPullRequest(forkBranch.repository, response.json)
+        originBranch.repository.pullRequests.create(
+                head: "${forkBranch.repository.ownerName}:${forkBranch.name}",
+                base: originBranch.name,
+                title: title,
+                body: body
+        )
     }
 
     static GHPullRequest update(GHRepository repository, int number, String title, String body) {
-        log.info("Updating pull request: $repository/PullRequest($number)")
-        def response = repository.session.client.patch(path: "/repos/$repository/pulls/$number") {
-            type ContentType.JSON
-            json title: title, body: body
-        }
-        assert response.statusCode == 200
-        new GHPullRequest(repository, response.json)
+        repository.pullRequests.update(number as String, title: title, body: body)
     }
 
     static GHPullRequest createOrUpdate(GHBranch forkBranch, GHBranch originBranch, String title, String body) {
-        def existing = find(forkBranch, originBranch)
-        if (existing.empty) {
-            create(forkBranch, originBranch, title, body)
-        } else {
-            existing.last().update(title, body)
-        }
+        findLatest(forkBranch, originBranch)?.update(title, body) ?: create(forkBranch, originBranch, title, body)
     }
 
     @Lazy
@@ -70,7 +51,11 @@ class GHPullRequest {
 
     @Override
     String toString() {
-        "$repository/PullRequest($number)"
+        "$repository/pulls/$number"
+    }
+
+    private static <E> E firstOrNull(List<E> list) {
+        list.empty ? null : list.first()
     }
 
 }

@@ -9,7 +9,7 @@ class GHTreeSha {
 
     @Override
     String toString() {
-        "Tree($value)"
+        value
     }
 
 }

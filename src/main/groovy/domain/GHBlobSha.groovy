@@ -9,7 +9,7 @@ class GHBlobSha {
 
     @Override
     String toString() {
-        "Blob($value)"
+        value
     }
 
 }

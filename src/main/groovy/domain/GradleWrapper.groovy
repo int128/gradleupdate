@@ -27,7 +27,7 @@ class GradleWrapper {
 
     List<GHTreeContent> fetchContents() {
         files.collect { path, mode ->
-            def content = GHContent.get(branch, path)
+            def content = branch.getContent(path)
             new GHTreeContent(content.path, mode, content.base64encoded)
         }
     }

@@ -9,7 +9,7 @@ class GHCommitSha {
 
     @Override
     String toString() {
-        "Commit($value)"
+        value
     }
 
 }

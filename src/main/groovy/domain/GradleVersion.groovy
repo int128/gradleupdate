@@ -2,22 +2,19 @@ package domain
 
 import groovy.transform.Immutable
 
-import static infrastructure.HTTPClientExceptionUtil.nullIfResourceIsNotFound
-
 @Immutable
 class GradleVersion {
 
     final String string
 
     static GradleVersion get(GHBranch branch) {
-        def content = GHContent.get(branch, 'gradle/wrapper/gradle-wrapper.properties')
+        def content = branch.getContent('gradle/wrapper/gradle-wrapper.properties')
         new GradleVersion(parseGradleWrapperProperties(content.contentAsString))
     }
 
     static GradleVersion getOrNull(GHBranch branch) {
-        nullIfResourceIsNotFound {
-            get(branch)
-        }
+        def content = branch.findContent('gradle/wrapper/gradle-wrapper.properties')
+        content ? new GradleVersion(parseGradleWrapperProperties(content.contentAsString)) : null
     }
 
     static String parseGradleWrapperProperties(String gradleWrapperProperties) {

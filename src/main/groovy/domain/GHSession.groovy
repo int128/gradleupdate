@@ -2,6 +2,7 @@ package domain
 
 import entity.Credential
 import infrastructure.MemcacheHTTPClient
+import infrastructure.RestAPI
 import wslite.rest.RESTClient
 
 import static entity.Credential.CredentialKey.GitHubToken
@@ -32,8 +33,11 @@ class GHSession {
         new GHSession()
     }
 
+    @Lazy
+    def repositories = { RestAPI.of(GHRepository, '/repos', this, client) }()
+
     GHRepository getRepository(String fullName) {
-        GHRepository.get(this, fullName)
+        repositories.get(fullName)
     }
 
 }

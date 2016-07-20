@@ -1,8 +1,5 @@
 package domain
 
-import groovy.util.logging.Log
-
-@Log
 class GradleUpdate {
 
     private final GHSession session
