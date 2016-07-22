@@ -26,5 +26,8 @@ deployment:
   appengine:
     branch: /.+/
     commands:
-      - echo "$APPENGINE_KEY" | base64 --decode > build/appengine-key.json
-      - ./gradlew appengineUpdate
+      - |
+        if [ "$APPENGINE_KEY" ]; then
+          echo "$APPENGINE_KEY" | base64 --decode > build/appengine-key.json
+          ./gradlew appengineUpdate
+        fi
