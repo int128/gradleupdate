@@ -28,7 +28,7 @@ export default class extends React.Component {
           <div className="col-lg-3 col-md-3 col-sm-3">
             <MenuPane
               user={this.state.user}
-              onSignOut={this.props.onUnauthorize.bind(this)}/>
+              signOut={this.props.onUnauthorize.bind(this)}/>
           </div>
           <div className="col-lg-9 col-md-9 col-sm-9">
             <ContentPane

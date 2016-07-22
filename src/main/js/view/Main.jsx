@@ -12,7 +12,7 @@ export default class extends React.Component {
   }
 
   componentDidMount() {
-    const token = sessionStorage.getItem('oauthToken');
+    const token = localStorage.getItem('oauthToken');
     if (token) {
       this.setState({oauth: {state: 'Authorized', token: token}});
     } else if (location.search) {
@@ -64,12 +64,12 @@ export default class extends React.Component {
     location.replace(url);
   }
   unauthorize() {
-    sessionStorage.removeItem('oauthToken');
+    localStorage.removeItem('oauthToken');
     this.setState({oauth: {state: 'Unauthorized'}});
   }
   onGotToken(token) {
     sessionStorage.removeItem('oauthKey');
-    sessionStorage.setItem('oauthToken', token);
+    localStorage.setItem('oauthToken', token);
     this.setState({oauth: {state: 'Authorized', token: token}});
   }
   onGotError(e) {
