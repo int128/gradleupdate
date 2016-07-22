@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "bootswatch": "^3.3.6",
+    "parse-link-header": "^0.4.1",
+    "pinkyswear": "^2.2.2",
     "query-string": "^3.0.0",
     "qwest": "^3.0.0",
     "react": "^0.14.3"

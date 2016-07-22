@@ -4,6 +4,7 @@ import qwest from "qwest";
 import queryString from "query-string";
 import Authorized from "./Authorized.jsx";
 import Unauthorized from "./Unauthorized.jsx";
+import OAuthSession from "../repository/OAuthSession.jsx";
 
 export default class extends React.Component {
   constructor(props) {
@@ -12,13 +13,13 @@ export default class extends React.Component {
   }
 
   componentDidMount() {
-    const token = localStorage.getItem('oauthToken');
+    const token = OAuthSession.getToken();
     if (token) {
       this.setState({oauth: {state: 'Authorized', token: token}});
     } else if (location.search) {
       const params = queryString.parse(location.search);
       if (params.state && params.code) {
-        if (sessionStorage.getItem('oauthKey') == params.state) {
+        if (OAuthSession.validateKey(params.state)) {
           this.setState({oauth: {state: 'GotCode', code: params.code}});
           history.replaceState(null, null, '/');
         } else {
@@ -60,16 +61,15 @@ export default class extends React.Component {
       + `?client_id=${Constants.oauthClientId}`
       + `&scope=${Constants.oauthScope}`
       + `&state=${key}`;
-    sessionStorage.setItem('oauthKey', key);
+    OAuthSession.saveKey(key);
     location.replace(url);
   }
   unauthorize() {
-    localStorage.removeItem('oauthToken');
+    OAuthSession.expireToken();
     this.setState({oauth: {state: 'Unauthorized'}});
   }
   onGotToken(token) {
-    sessionStorage.removeItem('oauthKey');
-    localStorage.setItem('oauthToken', token);
+    OAuthSession.saveToken(token);
     this.setState({oauth: {state: 'Authorized', token: token}});
   }
   onGotError(e) {

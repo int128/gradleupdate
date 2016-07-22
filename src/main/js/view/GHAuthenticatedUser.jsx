@@ -5,9 +5,10 @@ export default class extends React.Component {
     this.props.signOut();
     e.preventDefault();
   }
+
   render() {
     return (
-      <section className="text-center">
+      <div>
         {this.props.user ? (
           <div>
             <img src={this.props.user.avatar_url} className="img-circle" width="128" height="128"/>
@@ -20,7 +21,7 @@ export default class extends React.Component {
             Sign Out
           </button>
         </div>
-      </section>
+      </div>
     );
   }
 }
