@@ -9,7 +9,7 @@ class GHTreeSha {
 
     @Override
     String toString() {
-        value
+        value.take(8)
     }
 
 }

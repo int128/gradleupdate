@@ -21,7 +21,7 @@ class GHCommit {
 
     @Override
     String toString() {
-        "$repository/commits/$sha"
+        "GHCommit($sha)@$repository"
     }
 
 }

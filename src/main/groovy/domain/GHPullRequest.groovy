@@ -51,7 +51,7 @@ class GHPullRequest {
 
     @Override
     String toString() {
-        "$repository/pulls/$number"
+        "GHPullRequest($number)@$repository"
     }
 
     private static <E> E firstOrNull(List<E> list) {

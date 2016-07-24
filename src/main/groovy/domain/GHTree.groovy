@@ -18,7 +18,7 @@ class GHTree {
 
     @Override
     String toString() {
-        "$repository/trees/$sha"
+        "GHTree($sha)@$repository"
     }
 
 }

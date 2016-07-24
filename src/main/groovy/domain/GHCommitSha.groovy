@@ -9,7 +9,7 @@ class GHCommitSha {
 
     @Override
     String toString() {
-        value
+        value.take(8)
     }
 
 }

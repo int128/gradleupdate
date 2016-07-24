@@ -1,5 +1,8 @@
 package domain
 
+import groovy.util.logging.Log
+
+@Log
 class GHBranch {
 
     final GHRepository repository
@@ -24,11 +27,7 @@ class GHBranch {
 
     GHBranch syncTo(GHCommitSha newSha) {
         assert newSha
-        if (sha == newSha) {
-            this
-        } else {
-            repository.refs.update("heads/$name", sha: sha.value, force: true)
-        }
+        sha == newSha ? this : repository.refs.update("heads/$name", sha: sha.value, force: true)
     }
 
     GHBranch clone(String intoName) {
@@ -51,7 +50,7 @@ class GHBranch {
 
     @Override
     String toString() {
-        "$repository:$name"
+        "GHBranch($name:$sha)@$repository"
     }
 
     GHContent getContent(String path) {

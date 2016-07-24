@@ -27,7 +27,7 @@ class GHContent {
 
     @Override
     String toString() {
-        "$repository/contents/$path"
+        "GHContent($path)@$repository"
     }
 
 }

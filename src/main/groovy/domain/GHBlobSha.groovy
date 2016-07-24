@@ -9,7 +9,7 @@ class GHBlobSha {
 
     @Override
     String toString() {
-        value
+        value.take(8)
     }
 
 }

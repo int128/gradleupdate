@@ -21,7 +21,7 @@ class RestAPI<E> {
 
     E get(Map queryMap = null, String key) {
         assert key
-        log.info("Fetching $entityClass.simpleName($key) of $parentEntity")
+        log.info("Finding $entityClass.simpleName($key) of $parentEntity by ${summarize(queryMap)}")
         def response = client.get(path: "$resourcePath/$key", query: queryMap)
         switch (response.statusCode) {
             case 200: return withLog(response, entityClass.newInstance(parentEntity, response.json))
@@ -31,7 +31,7 @@ class RestAPI<E> {
 
     E find(Map queryMap = null, String key) {
         assert key
-        log.info("Finding $entityClass.simpleName($key) of $parentEntity")
+        log.info("Finding $entityClass.simpleName($key) of $parentEntity by ${summarize(queryMap)}")
         def response = client.get(path: "$resourcePath/$key", query: queryMap)
         switch (response.statusCode) {
             case 200: return withLog(response, entityClass.newInstance(parentEntity, response.json))
@@ -41,7 +41,7 @@ class RestAPI<E> {
     }
 
     List<E> findAll(Map queryMap = null) {
-        log.info("Finding $entityClass.simpleName of $parentEntity by $queryMap")
+        log.info("Finding $entityClass.simpleName of $parentEntity by ${summarize(queryMap)}")
         def response = client.get(path: resourcePath, query: queryMap)
         switch (response.statusCode) {
             case 200: return withLog(response, response.json.collect { item ->
@@ -53,7 +53,7 @@ class RestAPI<E> {
     }
 
     E create(Map contentJson) {
-        log.info("Creating $entityClass.simpleName on $parentEntity")
+        log.info("Creating $entityClass.simpleName on $parentEntity as ${summarize(contentJson)}")
         def response = client.post(path: resourcePath) {
             type ContentType.JSON
             json contentJson
@@ -65,7 +65,7 @@ class RestAPI<E> {
     }
 
     E update(Map contentJson, String key) {
-        log.info("Updating $entityClass.simpleName($key) on $parentEntity")
+        log.info("Updating $entityClass.simpleName($key) on $parentEntity as ${summarize(contentJson)}")
         def response = client.patch(path: "$resourcePath/$key") {
             type ContentType.JSON
             json contentJson
@@ -99,6 +99,14 @@ class RestAPI<E> {
     private static <T> T withLog(Response response, T t) {
         log.info("$response.statusCode $response.statusMessage $t")
         t
+    }
+
+    private static String summarize(Map map) {
+        "[${map?.collect { k, v -> "$k:${summarize(v as String)}"}?.join(', ')}]"
+    }
+
+    private static String summarize(String text) {
+        text.length() > 8 ? "${text.take(8)}..." : text
     }
 
 }

@@ -18,7 +18,7 @@ class GHBlob {
 
     @Override
     String toString() {
-        "$repository/blobs/$sha"
+        "GHBlob($sha)@$repository"
     }
 
 }

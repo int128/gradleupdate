@@ -19,25 +19,25 @@ class GHRepository {
     String ownerName = { rawJson.owner.login }()
 
     @Lazy
-    def forks = { RestAPI.of(GHRepository, "/repos/$this/forks", session, session.client) }()
+    def forks = { RestAPI.of(GHRepository, "/repos/$fullName/forks", session, session.client) }()
 
     @Lazy
-    def refs = { RestAPI.of(GHBranch, "/repos/$this/git/refs", this, session.client) }()
+    def refs = { RestAPI.of(GHBranch, "/repos/$fullName/git/refs", this, session.client) }()
 
     @Lazy
-    def commits = { RestAPI.of(GHCommit, "/repos/$this/git/commits", this, session.client) }()
+    def commits = { RestAPI.of(GHCommit, "/repos/$fullName/git/commits", this, session.client) }()
 
     @Lazy
-    def trees = { RestAPI.of(GHTree, "/repos/$this/git/trees", this, session.client) }()
+    def trees = { RestAPI.of(GHTree, "/repos/$fullName/git/trees", this, session.client) }()
 
     @Lazy
-    def blobs = { RestAPI.of(GHBlob, "/repos/$this/git/blobs", this, session.client) }()
+    def blobs = { RestAPI.of(GHBlob, "/repos/$fullName/git/blobs", this, session.client) }()
 
     @Lazy
-    def contents = { RestAPI.of(GHContent, "/repos/$this/contents", this, session.client) }()
+    def contents = { RestAPI.of(GHContent, "/repos/$fullName/contents", this, session.client) }()
 
     @Lazy
-    def pullRequests = { RestAPI.of(GHPullRequest, "/repos/$this/pulls", this, session.client) }()
+    def pullRequests = { RestAPI.of(GHPullRequest, "/repos/$fullName/pulls", this, session.client) }()
 
     GHRepository fork() {
         forks.invoke()
@@ -71,7 +71,7 @@ class GHRepository {
 
     @Override
     String toString() {
-        fullName
+        "GHRepository($fullName)"
     }
 
 }
