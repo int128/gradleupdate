@@ -27,7 +27,7 @@ class GHBranch {
 
     GHBranch syncTo(GHCommitSha newSha) {
         assert newSha
-        sha == newSha ? this : repository.refs.update("heads/$name", sha: sha.value, force: true)
+        sha == newSha ? this : repository.refs.update("heads/$name", sha: newSha.value, force: true)
     }
 
     GHBranch clone(String intoName) {
