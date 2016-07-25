@@ -1,6 +1,4 @@
 import React from "react";
-import Constants from "../Constants.jsx";
-import qwest from "qwest";
 import queryString from "query-string";
 import Authorized from "./Authorized.jsx";
 import Unauthorized from "./Unauthorized.jsx";
@@ -56,13 +54,7 @@ export default class extends React.Component {
   }
 
   authorize() {
-    const key = Math.random().toString(36).substring(2);
-    const url = 'https://github.com/login/oauth/authorize'
-      + `?client_id=${Constants.oauthClientId}`
-      + `&scope=${Constants.oauthScope}`
-      + `&state=${key}`;
-    OAuthSession.saveKey(key);
-    location.replace(url);
+    OAuthSession.redirectToAuthorize();
   }
   unauthorize() {
     OAuthSession.expireToken();
@@ -79,7 +71,7 @@ export default class extends React.Component {
 
 class GotCode extends React.Component {
   componentDidMount() {
-    qwest.post('/api/exchange-oauth-token', {code: this.props.code})
+    OAuthSession.exchangeCodeAndToken(this.props.code)
       .then((xhr, response) => this.props.onGotToken(response.token))
       .catch((e) => this.props.onGotError(e));
   }
