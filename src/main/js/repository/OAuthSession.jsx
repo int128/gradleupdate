@@ -1,5 +1,5 @@
 import qwest from "qwest";
-import Constants from "../Constants.jsx";
+import Constants from "../config/Constants.jsx";
 
 export default {
   getToken() {
@@ -7,7 +7,6 @@ export default {
   },
 
   saveToken(token) {
-    sessionStorage.removeItem('oauthKey');
     localStorage.setItem('oauthToken', token);
   },
 
@@ -15,22 +14,18 @@ export default {
     localStorage.removeItem('oauthToken');
   },
 
-  validateKey(key) {
-    return sessionStorage.getItem('oauthKey') == key;
-  },
-
-  saveKey(key) {
-    sessionStorage.setItem('oauthKey', key);
-  },
-
-  redirectToAuthorize() {
-    const key = Math.random().toString(36).substring(2);
-    const url = 'https://github.com/login/oauth/authorize'
+  authorize(redirectURI) {
+    const state = Math.random().toString(36).substring(2);
+    sessionStorage.setItem('oauthState', state);
+    location.replace('https://github.com/login/oauth/authorize'
       + `?client_id=${Constants.oauthClientId}`
+      + `&redirect_uri=${location.origin}${redirectURI}`
       + `&scope=${Constants.oauthScope}`
-      + `&state=${key}`;
-    this.saveKey(key);
-    location.replace(url);
+      + `&state=${state}`);
+  },
+
+  validateState(state) {
+    return sessionStorage.getItem('oauthState') == state;
   },
 
   exchangeCodeAndToken(code) {
