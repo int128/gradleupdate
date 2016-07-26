@@ -1,10 +1,12 @@
+import qwest from "qwest";
+import Constants from "../config/Constants.jsx";
+
 export default {
   getToken() {
     return localStorage.getItem('oauthToken');
   },
 
   saveToken(token) {
-    sessionStorage.removeItem('oauthKey');
     localStorage.setItem('oauthToken', token);
   },
 
@@ -12,11 +14,21 @@ export default {
     localStorage.removeItem('oauthToken');
   },
 
-  validateKey(key) {
-    return sessionStorage.getItem('oauthKey') == key;
+  authorize(redirectURI) {
+    const state = Math.random().toString(36).substring(2);
+    sessionStorage.setItem('oauthState', state);
+    location.replace('https://github.com/login/oauth/authorize'
+      + `?client_id=${Constants.oauthClientId}`
+      + `&redirect_uri=${location.origin}${redirectURI}`
+      + `&scope=${Constants.oauthScope}`
+      + `&state=${state}`);
   },
 
-  saveKey(key) {
-    sessionStorage.setItem('oauthKey', key);
+  validateState(state) {
+    return sessionStorage.getItem('oauthState') == state;
+  },
+
+  exchangeCodeAndToken(code) {
+    return qwest.post('/api/exchange-oauth-token', {code: code});
   }
 }

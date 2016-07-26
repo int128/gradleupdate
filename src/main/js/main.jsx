@@ -1,7 +1,6 @@
-import React from 'react';
+import React from "react";
+import {render} from "react-dom";
+import Router from "./config/Router.jsx";
+import "./main.less";
 
-import Main from './view/Main.jsx';
-
-import MainStyle from './main.less';
-
-React.render(<Main/>, document.body);
+render(<Router/>, document.getElementById('app'));

@@ -46,6 +46,11 @@
     </security-constraint>
 
     <error-page>
+        <error-code>404</error-code>
+        <location>/index.html</location>
+    </error-page>
+
+    <error-page>
         <exception-type>java.lang.AssertionError</exception-type>
         <location>/error/assertion-error.groovy</location>
     </error-page>
