@@ -18,7 +18,7 @@ export default class {
   }
 
   findRepository(fullName) {
-    return qwest.get(`${this._endpoint}/${fullName}`, null, {
+    return qwest.get(`${this._endpoint}/repos/${fullName}`, null, {
       headers: {Authorization: this._authorization},
       cache: true  // prevent Cache-Control for CORS
     });
