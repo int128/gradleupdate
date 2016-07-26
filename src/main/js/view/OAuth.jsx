@@ -14,7 +14,7 @@ export class SignIn extends React.Component {
     } else if (query.error_description) {
       this.props.history.replace({pathname: '/signin/error', state: query.error_description});
     } else {
-      OAuthSession.authorize(this.props.location.pathname);
+      OAuthSession.authorize();
     }
   }
   render() {
@@ -25,12 +25,8 @@ export class SignIn extends React.Component {
 export class SignInExchange extends React.Component {
   componentDidMount() {
     OAuthSession.exchangeCodeAndToken(this.props.location.state)
-      .then((xhr, response) => {
-        OAuthSession.saveToken(response.token);
-        this.props.history.replace({pathname: '/'});
-      })
-      .catch((e) =>
-        this.props.history.replace({pathname: '/signin/error', state: e}));
+      .then(() => this.props.history.replace({pathname: '/'}))
+      .catch((e) => this.props.history.replace({pathname: '/signin/error', state: e}));
   }
   render() {
     return (<Authorizing progress="67%"/>);
@@ -76,6 +72,6 @@ export class SignOut extends React.Component {
     this.props.history.replace({pathname: '/'});
   }
   render() {
-    return (<div></div>);
+    return null;
   }
 }
