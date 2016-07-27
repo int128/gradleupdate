@@ -67,16 +67,14 @@ How to Run
 Build and run App Engine development server.
 
 ```bash
-npm install
-npm run build
-./gradlew --daemon appengineRun
-./gradlew appengineStop
+npm run watch
+./gradlew appengineRun
 ```
 
 We can run Webpack development server instead.
 
 ```bash
-npm start
+npm run start
 ```
 
 How to Deploy
