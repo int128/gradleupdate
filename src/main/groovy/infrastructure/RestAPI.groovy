@@ -79,7 +79,7 @@ class RestAPI<E> {
     boolean delete(String key) {
         assert key
         log.info("Deleting $entityClass.simpleName($key) from $parentEntity")
-        def response = client.get(path: "$resourcePath/$key")
+        def response = client.delete(path: "$resourcePath/$key")
         switch (response.statusCode) {
             case 200: return withLog(response, true)
             case 422: return withLog(response, false)
