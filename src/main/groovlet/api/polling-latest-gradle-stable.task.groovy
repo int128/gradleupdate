@@ -4,7 +4,7 @@ final latestGradle = new LatestGradle()
 
 latestGradle.checkIfNewStableVersionIsAvailable { gradleVersion ->
     defaultQueue.add(
-            url: '/internal/api/found-new-gradle/index.task.groovy',
+            url: '/api/found-new-gradle/index.task.groovy',
             params: [gradle_version: gradleVersion]
     )
 }
