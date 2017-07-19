@@ -10,6 +10,7 @@ buildscript {
 plugins {
   id 'java'
   id 'war'
+  id 'org.springframework.boot' version '1.5.3.RELEASE'
 }
 apply plugin: 'com.google.cloud.tools.appengine'
 
@@ -18,6 +19,11 @@ repositories {
 }
 
 dependencies {
+  compile('org.springframework.boot:spring-boot-starter-web') {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+  }
+  compile 'org.slf4j:jul-to-slf4j'
+
   compile 'com.google.appengine:appengine-api-1.0-sdk:+'
   providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
 
@@ -26,3 +32,4 @@ dependencies {
   testCompile 'com.google.appengine:appengine-tools-sdk:+'
 }
 
+bootRepackage.enabled = false
