@@ -10,7 +10,7 @@ buildscript {
 plugins {
   id 'java'
   id 'war'
-  id 'org.springframework.boot' version '1.5.3.RELEASE'
+  id 'org.springframework.boot' version '1.5.6.RELEASE'
 }
 apply plugin: 'com.google.cloud.tools.appengine'
 
