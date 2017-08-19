@@ -11,6 +11,7 @@ plugins {
   id 'java'
   id 'war'
   id 'org.springframework.boot' version '1.5.6.RELEASE'
+  id 'org.jetbrains.kotlin.jvm' version '1.1.4'
 }
 apply plugin: 'com.google.cloud.tools.appengine'
 
@@ -19,6 +20,8 @@ repositories {
 }
 
 dependencies {
+  compile 'org.jetbrains.kotlin:kotlin-stdlib'
+
   compile('org.springframework.boot:spring-boot-starter-web') {
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
   }

@@ -1,6 +1,6 @@
-# Spring Boot on App Engine Java
+# Spring Boot + Kotlin + App Engine
 
-An example application of Spring Boot on App Engine Java 8 Standard Environment.
+A template project of Spring Boot and Kotlin on App Engine Java 8 Standard Environment.
 
 ## How to Run
 
