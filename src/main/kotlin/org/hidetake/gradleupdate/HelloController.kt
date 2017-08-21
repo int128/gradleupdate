@@ -1,10 +1,10 @@
-package example
+package org.hidetake.gradleupdate
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class ApiController {
-    @GetMapping("/api/hello")
+class HelloController {
+    @GetMapping("/")
     fun hello(): String = "Hello"
 }

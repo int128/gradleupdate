@@ -1,4 +1,4 @@
-package example
+package org.hidetake.gradleupdate
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.web.support.SpringBootServletInitializer
