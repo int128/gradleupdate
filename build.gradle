@@ -22,9 +22,8 @@ repositories {
 dependencies {
   compile 'org.jetbrains.kotlin:kotlin-stdlib'
 
-  compile('org.springframework.boot:spring-boot-starter-web') {
-    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-  }
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
   compile 'org.slf4j:jul-to-slf4j'
 
   compile 'com.google.appengine:appengine-api-1.0-sdk:+'
@@ -33,6 +32,10 @@ dependencies {
   testCompile 'com.google.appengine:appengine-testing:+'
   testCompile 'com.google.appengine:appengine-api-stubs:+'
   testCompile 'com.google.appengine:appengine-tools-sdk:+'
+}
+
+configurations.all {
+  exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
 }
 
 bootRepackage.enabled = false

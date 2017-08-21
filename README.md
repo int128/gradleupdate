@@ -2,6 +2,14 @@
 
 A template project of Spring Boot and Kotlin on App Engine Java 8 Standard Environment.
 
+This contains followings:
+
+- Spring Boot
+- Thymeleaf
+- Kotlin
+- Gradle
+
+
 ## How to Run
 
 Google Cloud SDK is required.
