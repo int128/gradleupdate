@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+  compile 'org.kohsuke:github-api:1.86'
+
   compile 'org.jetbrains.kotlin:kotlin-stdlib'
 
   compile 'org.springframework.boot:spring-boot-starter-web'
