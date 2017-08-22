@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Bean
 @SpringBootApplication
 open class App : SpringBootServletInitializer() {
     @Bean
-    open fun gitHub() = GitHub.connectAnonymously()
+    open fun gitHub(): GitHub = GitHub.connectAnonymously()
 }

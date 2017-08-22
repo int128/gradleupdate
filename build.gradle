@@ -15,6 +15,9 @@ plugins {
 }
 apply plugin: 'com.google.cloud.tools.appengine'
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 repositories {
   jcenter()
 }
@@ -26,7 +29,6 @@ dependencies {
 
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-  compile 'org.slf4j:jul-to-slf4j'
 
   compile 'com.google.appengine:appengine-api-1.0-sdk:+'
   providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
@@ -38,6 +40,13 @@ dependencies {
 
 configurations.all {
   exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+  exclude group: 'org.slf4j', module: 'jul-to-slf4j'
 }
 
 bootRepackage.enabled = false
+findMainClass.enabled = false
+
+task explodeWar(type: Sync, overwrite: true) {
+  with war
+  into "$buildDir/exploded-${project.name}"
+}
