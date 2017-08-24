@@ -47,6 +47,9 @@ bootRepackage.enabled = false
 findMainClass.enabled = false
 
 appengine {
+  deploy {
+    project = 'gradleupdate'
+  }
   run {
     environment = [SPRING_THYMELEAF_CACHE: 'false']
   }
