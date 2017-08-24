@@ -46,6 +46,12 @@ configurations.all {
 bootRepackage.enabled = false
 findMainClass.enabled = false
 
+appengine {
+  run {
+    environment = [SPRING_THYMELEAF_CACHE: 'false']
+  }
+}
+
 task explodeWar(type: Sync, overwrite: true) {
   with war
   into "$buildDir/exploded-${project.name}"

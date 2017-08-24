@@ -1,27 +1,23 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>GradleUpdate</title>
-  <meta name="description"
-        content="GradleUpdate keeps the latest Gradle wrapper on your GitHub repositories by pull requests automatically"/>
+  <title th:text="|${repository.fullName} - GradleUpdate|"></title>
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
         crossorigin="anonymous"/>
 </head>
 <body>
-
 <div class="container">
   <section class="text-center">
     <div class="jumbotron" style="background: none">
-      <h1>GradleUpdate</h1>
-      <p>keeps the latest Gradle wrapper on your GitHub repositories</p>
+      <img th:src="${repository.owner.avatarUrl}" alt="avatar" width="160" height="160" class="img-circle"/>
+      <h1 th:text="|${repository.description}|"></h1>
+      <p th:text="|${repository.fullName}|"></p>
     </div>
   </section>
   <section class="text-center">
-    <p>
-      Go to <code>https://gradleupdate.appspot.com/<strong>user</strong>/<strong>repo</strong>/status</code>
-    </p>
+    <img th:src="|/${repository.fullName}/status.svg|" alt="badge"/>
   </section>
   <section class="text-center" style="margin-top: 30ex">
     GradleUpdate &copy; Hidetake Iwata

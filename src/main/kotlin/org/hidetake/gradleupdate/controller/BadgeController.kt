@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable
 import java.io.FileNotFoundException
 
 @Controller
-class BadgeController(val gradleUpdateService: GradleUpdateService) {
+class BadgeController(val service: GradleUpdateService) {
     @GetMapping("/{owner}/{repo}/status.svg")
     fun get(@PathVariable owner: String, @PathVariable repo: String) =
-        BadgeSvg.render(gradleUpdateService.getStatus("$owner/$repo"))
+        BadgeSvg.render(service.getGradleWrapperVersionStatus("$owner/$repo"))
 
     @ExceptionHandler(FileNotFoundException::class)
     fun notFound() = BadgeSvg.notFound()
