@@ -13,6 +13,8 @@ object BadgeSvg {
             else  -> render(rightMessage = "unknown", rightFill = "#9f9f9f")
         }
 
+    fun notFound() = render(rightMessage = "unknown", rightFill = "#9f9f9f")
+
     fun render(
         leftMessage: String = "Gradle",
         leftWidth: Int = 47,
