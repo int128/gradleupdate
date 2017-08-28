@@ -1,7 +1,5 @@
-package org.hidetake.gradleupdate.controller
+package org.hidetake.gradleupdate.app
 
-import org.hidetake.gradleupdate.service.GradleUpdateService
-import org.hidetake.gradleupdate.view.BadgeSvg
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping

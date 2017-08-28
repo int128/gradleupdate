@@ -1,7 +1,6 @@
-package org.hidetake.gradleupdate.service
+package org.hidetake.gradleupdate.app
 
 import org.hidetake.gradleupdate.domain.GradleWrapperVersion
-import org.kohsuke.github.GHRepository
 
 fun GHRepository.findGradleWrapperVersion(): GradleWrapperVersion? {
     val content = getFileContent("gradle/wrapper/gradle-wrapper.properties")

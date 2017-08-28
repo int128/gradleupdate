@@ -1,4 +1,4 @@
-package org.hidetake.gradleupdate.view
+package org.hidetake.gradleupdate.app
 
 import org.hidetake.gradleupdate.domain.GradleWrapperVersionStatus
 import org.springframework.http.HttpHeaders
