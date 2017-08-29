@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title th:text="|${repository.fullName} - GradleUpdate|"></title>
+  <title th:text="|${repository.owner.login}/${repository.name} - GradleUpdate|"></title>
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
@@ -13,11 +13,11 @@
     <div class="jumbotron" style="background: none">
       <img th:src="${repository.owner.avatarUrl}" alt="avatar" width="160" height="160" class="img-circle"/>
       <h1 th:text="|${repository.description}|"></h1>
-      <p th:text="|${repository.fullName}|"></p>
+      <p th:text="|${repository.owner.login}/${repository.name}|"></p>
     </div>
   </section>
   <section class="text-center">
-    <img th:src="|/${repository.fullName}/status.svg|" alt="badge"/>
+    <img th:src="|/${repository.owner.login}/${repository.name}/status.svg|" alt="badge"/>
   </section>
   <section class="text-center" style="margin-top: 30ex">
     GradleUpdate &copy; Hidetake Iwata

@@ -1,23 +1,22 @@
 package org.hidetake.gradleupdate.app
 
+import org.hidetake.gradleupdate.domain.GradleWrapperRepository
 import org.hidetake.gradleupdate.domain.GradleWrapperVersionStatus
+import org.hidetake.gradleupdate.domain.RepositoryRepository
 import org.springframework.stereotype.Service
 
 @Service
-class GradleUpdateService(private val gitHub: GitHub) {
+class GradleUpdateService(
+    private val repositoryRepository: RepositoryRepository,
+    private val gradleWrapperRepository: GradleWrapperRepository
+) {
     fun getRepository(repositoryName: String) =
-        gitHub.getRepository(repositoryName)
+        repositoryRepository.getByName(repositoryName)
 
-    fun getLatestGradleWrapperRepository() =
-        getRepository("int128/latest-gradle-wrapper")
-
-    fun getGradleWrapperVersionStatus(repositoryName: String): GradleWrapperVersionStatus? {
-        val targetRepository = getRepository(repositoryName)
-        val latestRepository = getLatestGradleWrapperRepository()
-        return targetRepository.findGradleWrapperVersion()?.let { target ->
-            latestRepository.findGradleWrapperVersion()?.let { latest ->
+    fun getGradleWrapperVersionStatus(repositoryName: String): GradleWrapperVersionStatus? =
+        gradleWrapperRepository.findVersion(repositoryName)?.let { target ->
+            gradleWrapperRepository.findVersion("int128/latest-gradle-wrapper")?.let { latest ->
                 GradleWrapperVersionStatus(target, latest)
             }
         }
-    }
 }

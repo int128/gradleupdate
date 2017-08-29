@@ -20,10 +20,14 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
   jcenter()
+  maven {
+    url 'https://repo.eclipse.org/content/groups/releases/'
+  }
 }
 
 dependencies {
-  compile 'org.kohsuke:github-api:1.86'
+  compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:4.8.0.201706111038-r'
+  compile 'com.google.code.gson:gson'
 
   compile 'org.jetbrains.kotlin:kotlin-stdlib'
 
@@ -52,6 +56,7 @@ appengine {
   }
   run {
     environment = [SPRING_THYMELEAF_CACHE: 'false']
+    jvmFlags = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
   }
 }
 
