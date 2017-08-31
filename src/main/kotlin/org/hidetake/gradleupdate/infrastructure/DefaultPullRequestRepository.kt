@@ -18,7 +18,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         val headBranchName = gradleWrapperPullRequest.branchName
 
         val baseRepository = repositoryService.getRepository({repositoryName})
-        val baseRef = dataService.getReference(baseRepository, baseRepository.defaultBranch)
+        val baseRef = dataService.getReference(baseRepository, "refs/heads/${baseRepository.defaultBranch}")
 
         val fork = repositoryService.forkRepository(baseRepository)
 
