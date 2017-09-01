@@ -10,5 +10,6 @@ import org.springframework.context.annotation.Bean
 open class App : SpringBootServletInitializer() {
     @Bean
     open fun gitHubClient(): GitHubClient = LoggingGitHubClient().apply {
+        setOAuth2Token(System.getenv("GITHUB_TOKEN"))
     }
 }

@@ -55,7 +55,11 @@ appengine {
     project = 'gradleupdate'
   }
   run {
-    environment = [SPRING_THYMELEAF_CACHE: 'false']
+    environment = [SPRING_THYMELEAF_CACHE: 'false'] + file('.env').withReader {
+      final properties = new Properties()
+      properties.load(it)
+      properties
+    }
     jvmFlags = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
   }
 }
