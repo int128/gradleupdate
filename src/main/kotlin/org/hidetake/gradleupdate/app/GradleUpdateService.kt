@@ -29,8 +29,8 @@ class GradleUpdateService(
                     status.upToDate -> TODO()
                     else -> {
                         val files = gradleWrapperRepository.findFiles(LATEST_GRADLE_WRAPPER)
-                        val pullRequest = GradleWrapperPullRequestFactory.create(latest, files)
-                        pullRequestRepository.create(repositoryName, pullRequest)
+                        val pullRequest = GradleWrapperPullRequestFactory.create(repositoryName, latest, files)
+                        pullRequestRepository.createOrUpdate(pullRequest)
                     }
                 }
             }

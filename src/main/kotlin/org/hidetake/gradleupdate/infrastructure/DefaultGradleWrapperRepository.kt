@@ -26,7 +26,7 @@ class DefaultGradleWrapperRepository(client: GitHubClient) : GradleWrapperReposi
         listOf(
             GradleWrapperFile("gradle/wrapper/gradle-wrapper.properties"),
             GradleWrapperFile("gradle/wrapper/gradle-wrapper.jar"),
-            GradleWrapperFile("gradlew"),
+            GradleWrapperFile("gradlew", true),
             GradleWrapperFile("gradlew.bat")
         ).map { file ->
             GradleWrapperFile(file.path, file.executable, findFile(repositoryName, file.path)?.content)

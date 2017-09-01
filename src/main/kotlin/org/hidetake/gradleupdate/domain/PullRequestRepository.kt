@@ -1,5 +1,7 @@
 package org.hidetake.gradleupdate.domain
 
+import org.eclipse.egit.github.core.PullRequest
+
 interface PullRequestRepository {
-    fun create(repositoryName: String, gradleWrapperPullRequest: GradleWrapperPullRequest)
+    fun createOrUpdate(gradleWrapperPullRequest: GradleWrapperPullRequest): PullRequest
 }
