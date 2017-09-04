@@ -64,6 +64,23 @@ appengine {
   }
 }
 
+appengineStage.doLast {
+  final envProperties = file('.env').withReader {
+    final properties = new Properties()
+    properties.load(it)
+    properties
+  }
+
+  final appengineWebXml = file("${appengine.stage.stagingDirectory}/WEB-INF/appengine-web.xml")
+  final parser = new XmlParser()
+  final rootNode = parser.parse(appengineWebXml)
+  final envVariablesNode = rootNode.'env-variables'.first() ?: rootNode.appendNode('env-variables')
+  envProperties.each { k, v ->
+    envVariablesNode.appendNode('env-var', [name: k, value: v])
+  }
+  appengineWebXml.text = groovy.xml.XmlUtil.serialize(rootNode)
+}
+
 task explodeWar(type: Sync, overwrite: true) {
   with war
   into "$buildDir/exploded-${project.name}"
