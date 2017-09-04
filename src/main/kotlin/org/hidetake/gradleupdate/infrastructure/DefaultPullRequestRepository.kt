@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.service.DataService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.hidetake.gradleupdate.domain.GradleWrapperPullRequest
 import org.hidetake.gradleupdate.domain.PullRequestRepository
+import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
 import java.util.*
 
 @org.springframework.stereotype.Repository

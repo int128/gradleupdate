@@ -1,4 +1,4 @@
-package org.hidetake.gradleupdate.infrastructure
+package org.hidetake.gradleupdate.infrastructure.egit
 
 import org.eclipse.egit.github.core.PullRequest
 import org.eclipse.egit.github.core.Repository
