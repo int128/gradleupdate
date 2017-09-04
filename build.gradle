@@ -14,6 +14,7 @@ plugins {
   id 'org.jetbrains.kotlin.jvm' version '1.1.4'
 }
 apply plugin: 'com.google.cloud.tools.appengine'
+apply plugin: 'org.hidetake.appengine.spring.boot'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -47,38 +48,10 @@ configurations.all {
   exclude group: 'org.slf4j', module: 'jul-to-slf4j'
 }
 
-bootRepackage.enabled = false
-findMainClass.enabled = false
-
 appengine {
   deploy {
     project = 'gradleupdate'
   }
-  run {
-    environment = [SPRING_THYMELEAF_CACHE: 'false'] + file('.env').withReader {
-      final properties = new Properties()
-      properties.load(it)
-      properties
-    }
-    jvmFlags = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005']
-  }
-}
-
-appengineStage.doLast {
-  final envProperties = file('.env').withReader {
-    final properties = new Properties()
-    properties.load(it)
-    properties
-  }
-
-  final appengineWebXml = file("${appengine.stage.stagingDirectory}/WEB-INF/appengine-web.xml")
-  final parser = new XmlParser()
-  final rootNode = parser.parse(appengineWebXml)
-  final envVariablesNode = rootNode.'env-variables'.first() ?: rootNode.appendNode('env-variables')
-  envProperties.each { k, v ->
-    envVariablesNode.appendNode('env-var', [name: k, value: v])
-  }
-  appengineWebXml.text = groovy.xml.XmlUtil.serialize(rootNode)
 }
 
 task explodeWar(type: Sync, overwrite: true) {
