@@ -16,10 +16,10 @@ class DefaultGradleWrapperRepository(client: GitHubClient) : GradleWrapperReposi
         findFile(repositoryName, "gradle/wrapper/gradle-wrapper.properties")
         ?.let { content ->
             val decoded = String(Base64.getMimeDecoder().decode(content.content))
-            Regex("""distributionUrl=.+?/gradle-(.+?)-(.+?)\.zip""")
+            Regex("""distributionUrl=.+?/gradle-(.+?)-.+?\.zip""")
                 .find(decoded)
                 ?.groupValues
-                ?.let { m -> GradleWrapperVersion(m[1], m[2]) }
+                ?.let { m -> GradleWrapperVersion(m[1]) }
         }
 
     override fun findFiles(repositoryName: String): List<GradleWrapperFile> =

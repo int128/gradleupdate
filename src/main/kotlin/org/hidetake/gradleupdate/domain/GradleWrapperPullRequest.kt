@@ -4,8 +4,20 @@ class GradleWrapperPullRequest(
     val title: String,
     val description: String,
     val repositoryName: String,
-    val branchName: String,
-    val authorName: String,
-    val authorEmail: String,
-    val files: List<GradleWrapperFile>
-)
+    val branch: GradleWrapperPullRequestBranch,
+    val files: List<GradleWrapperFile> = emptyList()
+) {
+    object Factory {
+        fun create(
+            repositoryName: String,
+            gradleWrapperVersion: GradleWrapperVersion,
+            files: List<GradleWrapperFile>
+        ) =
+            GradleWrapperPullRequest(
+                "Gradle ${gradleWrapperVersion.version}",
+                "Gradle ${gradleWrapperVersion.version} is available.",
+                repositoryName,
+                GradleWrapperPullRequestBranch.Factory.create(repositoryName, gradleWrapperVersion),
+                files)
+    }
+}

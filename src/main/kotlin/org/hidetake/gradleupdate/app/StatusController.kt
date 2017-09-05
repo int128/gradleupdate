@@ -8,10 +8,12 @@ import org.springframework.web.servlet.ModelAndView
 @Controller
 class StatusController(val service: GradleUpdateService) {
     @GetMapping("/{owner}/{repo}/status")
-    fun get(@PathVariable owner: String, @PathVariable repo: String) =
-        service.getRepository("$owner/$repo").let {
-            ModelAndView("status", mapOf(
-                "repository" to it
-            ))
-        }
+    fun get(@PathVariable owner: String, @PathVariable repo: String): ModelAndView {
+        val repository = service.getRepository("$owner/$repo")
+        val pullRequest = service.findPullRequestForLatestGradleWrapper("$owner/$repo")
+        return ModelAndView("status", mapOf(
+            "repository" to repository,
+            "pullRequest" to pullRequest
+        ))
+    }
 }

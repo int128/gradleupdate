@@ -21,6 +21,11 @@ class GradleUpdateService(
             }
         }
 
+    fun findPullRequestForLatestGradleWrapper(repositoryName: String): GradleWrapperPullRequest? =
+        gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
+            pullRequestRepository.find(repositoryName, latest)
+        }
+
     fun createPullRequestForLatestGradleWrapper(repositoryName: String) =
         gradleWrapperRepository.findVersion(repositoryName)?.let { target ->
             gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
@@ -29,7 +34,7 @@ class GradleUpdateService(
                     status.upToDate -> TODO()
                     else -> {
                         val files = gradleWrapperRepository.findFiles(LATEST_GRADLE_WRAPPER)
-                        val pullRequest = GradleWrapperPullRequestFactory.create(repositoryName, latest, files)
+                        val pullRequest = GradleWrapperPullRequest.Factory.create(repositoryName, latest, files)
                         pullRequestRepository.createOrUpdate(pullRequest)
                     }
                 }

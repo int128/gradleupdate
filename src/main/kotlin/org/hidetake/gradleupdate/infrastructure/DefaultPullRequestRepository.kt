@@ -4,25 +4,47 @@ import org.eclipse.egit.github.core.*
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.DataService
 import org.eclipse.egit.github.core.service.RepositoryService
+import org.eclipse.egit.github.core.service.UserService
 import org.hidetake.gradleupdate.domain.GradleWrapperPullRequest
+import org.hidetake.gradleupdate.domain.GradleWrapperPullRequestBranch
+import org.hidetake.gradleupdate.domain.GradleWrapperVersion
 import org.hidetake.gradleupdate.domain.PullRequestRepository
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
-import java.util.*
 
 @org.springframework.stereotype.Repository
 class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository {
+    private val userService = UserService(client)
     private val repositoryService = RepositoryService(client)
     private val pullRequestService = EnhancedPullRequestService(client)
     private val dataService = DataService(client)
 
-    override fun createOrUpdate(gradleWrapperPullRequest: GradleWrapperPullRequest): PullRequest {
+    override fun createOrUpdate(gradleWrapperPullRequest: GradleWrapperPullRequest) {
         val baseRepository = repositoryService.getRepository({gradleWrapperPullRequest.repositoryName})
         val baseCommit = dataService.getCommit(baseRepository,
             dataService.getReference(baseRepository,
                 "refs/heads/${baseRepository.defaultBranch}").`object`.sha)
         val fork = repositoryService.forkRepository(baseRepository)
         createOrUpdateBranchWithCommit(fork, baseCommit, gradleWrapperPullRequest)
-        return createOrUpdatePullRequest(baseRepository, fork, gradleWrapperPullRequest)
+        createOrUpdatePullRequest(baseRepository, fork, gradleWrapperPullRequest)
+    }
+
+    override fun find(repositoryName: String, version: GradleWrapperVersion): GradleWrapperPullRequest? {
+        val baseRepository = repositoryService.getRepository({repositoryName})
+        val headBranch = GradleWrapperPullRequestBranch.Factory.create(repositoryName, version)
+        val query = EnhancedPullRequestService.Query(
+            base = baseRepository.defaultBranch,
+            head = headBranch.toLabel(userService.user),
+            start = 1,
+            size = 1
+        )
+        return pullRequestService.query(baseRepository, query).firstOrNull()?.let { pr ->
+            GradleWrapperPullRequest(
+                pr.title,
+                pr.body,
+                repositoryName,
+                headBranch
+            )
+        }
     }
 
     private fun createOrUpdatePullRequest(
@@ -32,7 +54,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
     ): PullRequest {
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = "${headRepository.owner.login}:${gradleWrapperPullRequest.branchName}",
+            head = gradleWrapperPullRequest.branch.toLabel(headRepository.owner),
             state = "open",
             start = 1,
             size = 1
@@ -58,7 +80,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         parent: Commit,
         gradleWrapperPullRequest: GradleWrapperPullRequest
     ): Reference {
-        val refName = "refs/heads/${gradleWrapperPullRequest.branchName}"
+        val refName = "refs/heads/${gradleWrapperPullRequest.branch.name}"
         val existentRef = nullIfNotFound {
             dataService.getReference(repository, refName)
         }
@@ -87,12 +109,6 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
 
     private fun createCommit(repository: Repository, parent: Commit, gradleWrapperPullRequest: GradleWrapperPullRequest) =
         dataService.createCommit(repository, Commit().apply {
-            author = CommitUser().apply {
-                name = gradleWrapperPullRequest.authorName
-                email = gradleWrapperPullRequest.authorEmail
-                date = Date()
-            }
-            committer = author
             message = gradleWrapperPullRequest.title
             parents = listOf(parent)
             tree = dataService.createTree(repository,

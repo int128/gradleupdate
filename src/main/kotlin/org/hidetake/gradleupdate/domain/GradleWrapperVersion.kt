@@ -1,6 +1,6 @@
 package org.hidetake.gradleupdate.domain
 
-class GradleWrapperVersion(val version: String, val type: String) {
+class GradleWrapperVersion(val version: String) {
     fun isNewerOrEqual(another: GradleWrapperVersion): Boolean {
         val leftElements = version.split(".")
         val rightElements = another.version.split(".")
