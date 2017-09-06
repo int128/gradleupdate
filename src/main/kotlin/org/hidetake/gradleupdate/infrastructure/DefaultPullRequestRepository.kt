@@ -28,7 +28,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         createOrUpdatePullRequest(baseRepository, fork, gradleWrapperPullRequest)
     }
 
-    override fun find(repositoryName: String, version: GradleWrapperVersion): GradleWrapperPullRequest? {
+    override fun find(repositoryName: String, version: GradleWrapperVersion): PullRequest? {
         val baseRepository = repositoryService.getRepository({repositoryName})
         val headBranch = GradleWrapperPullRequestBranch.Factory.create(repositoryName, version)
         val query = EnhancedPullRequestService.Query(
@@ -37,14 +37,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
             start = 1,
             size = 1
         )
-        return pullRequestService.query(baseRepository, query).firstOrNull()?.let { pr ->
-            GradleWrapperPullRequest(
-                pr.title,
-                pr.body,
-                repositoryName,
-                headBranch
-            )
-        }
+        return pullRequestService.query(baseRepository, query).firstOrNull()
     }
 
     private fun createOrUpdatePullRequest(

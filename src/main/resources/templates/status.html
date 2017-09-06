@@ -1,7 +1,9 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <!--/*@thymesVar id="repository" type="org.eclipse.egit.github.core.Repository"*/-->
-<!--/*@thymesVar id="pullRequest" type="org.hidetake.gradleupdate.domain.GradleWrapperPullRequest"*/-->
+<!--/*@thymesVar id="status" type="org.hidetake.gradleupdate.domain.GradleWrapperVersionStatus"*/-->
+<!--/*@thymesVar id="pullRequest" type="org.eclipse.egit.github.core.PullRequest"*/-->
 
 <head>
   <title th:text="|${repository.owner.login}/${repository.name} - GradleUpdate|"></title>
@@ -9,13 +11,14 @@
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
         crossorigin="anonymous"/>
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"/>
 </head>
 <body>
 
 <nav class="navbar navbar-default">
-  <div class="container-fluid">
+  <div class="container">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">GradleUpdate</a>
+      <a class="navbar-brand" href="/">GradleUpdate</a>
     </div>
   </div>
 </nav>
@@ -33,24 +36,30 @@
   </section>
 
   <section class="text-center">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <h3>
-          <small>#100</small>
-          <span th:text="${pullRequest.title}"></span>
-        </h3>
-        <p th:text="${pullRequest.description}"></p>
-        <form action="pullRequest" method="post">
-          <input type="submit" value="Rebase branch" class="btn btn-default"/>
-        </form>
-      </div>
+    <h3>Status</h3>
+    <p th:if="${status}">
+      Current Gradle Wrapper is <span th:text="${status.target.version}"></span>
+      and seems
+      <span th:if="${status.upToDate}">UP TO DATE</span>
+      <span th:if="!${status.upToDate}">OUT OF DATE</span>
+      .
+    </p>
+    <div th:if="!${status}">
+      NO GRADLE WRAPPER
     </div>
+
+    <p><strong class="text-uppercase">Pull Request for Update</strong></p>
+    <input type="checkbox" data-toggle="toggle" data-onstyle="success"/>
   </section>
 
   <section class="text-center" style="margin-top: 30ex">
     GradleUpdate &copy; Hidetake Iwata
   </section>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
 </body>
 </html>

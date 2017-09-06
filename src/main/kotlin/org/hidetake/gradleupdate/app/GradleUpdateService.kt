@@ -1,5 +1,6 @@
 package org.hidetake.gradleupdate.app
 
+import org.eclipse.egit.github.core.PullRequest
 import org.hidetake.gradleupdate.domain.*
 import org.springframework.stereotype.Service
 
@@ -21,7 +22,7 @@ class GradleUpdateService(
             }
         }
 
-    fun findPullRequestForLatestGradleWrapper(repositoryName: String): GradleWrapperPullRequest? =
+    fun findPullRequestForLatestGradleWrapper(repositoryName: String): PullRequest? =
         gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
             pullRequestRepository.find(repositoryName, latest)
         }
