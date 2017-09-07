@@ -11,6 +11,7 @@ import org.gradle.api.Project
 class AppEngineSpringBootPlugin implements Plugin<Project> {
   static final EXTENSION_NAME = 'appengineSpringBoot'
   static final INJECT_APP_ENGINE_WEB_XML_TASK = 'injectAppEngineWebXml'
+  static final WATCH_AND_SYNC_RESOURCES_TASK = 'WatchAndSyncResources'
 
   @Override
   void apply(Project project) {
@@ -18,6 +19,7 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
       environment = project.file('.env')
     }
 
+    project.tasks.create(WATCH_AND_SYNC_RESOURCES_TASK, WatchAndSyncResources)
     project.tasks.create(INJECT_APP_ENGINE_WEB_XML_TASK, InjectAppEngineWebXml)
 
     project.afterEvaluate {
@@ -48,6 +50,7 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
 
     project.tasks[INJECT_APP_ENGINE_WEB_XML_TASK].dependsOn('explodeWar')
     project.tasks.appengineRun.dependsOn(INJECT_APP_ENGINE_WEB_XML_TASK)
+    project.tasks.appengineRun.dependsOn(WATCH_AND_SYNC_RESOURCES_TASK)
     project.tasks.appengineStage.dependsOn(INJECT_APP_ENGINE_WEB_XML_TASK)
   }
 
