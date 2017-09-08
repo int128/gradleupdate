@@ -1,35 +1,55 @@
 package org.hidetake.gradle.appengine.spring.boot
 
-import groovy.transform.Canonical
+import groovy.transform.Immutable
 
 import java.nio.file.*
-import java.nio.file.WatchEvent.Kind
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import static java.nio.file.StandardWatchEventKinds.*
 
-@Canonical
 class WatchAndSync implements Runnable {
-  final Path sourceDirectory
-  final Path targetDirectory
-  final Map<WatchKey, Path> watchKeyPathMap = [:]
+  final List<SyncSpec> syncSpecs
+  private final Map<WatchKey, WatchContext> watchContextMap = [:]
+
+  WatchAndSync(SyncSpec... syncSpecs) {
+    this.syncSpecs = syncSpecs
+  }
+
+  @Immutable(knownImmutableClasses = [File])
+  static class SyncSpec {
+    final File sourceDirectory
+    final File targetDirectory
+
+    Path getSourcePath() {
+      sourceDirectory.toPath()
+    }
+    Path getTargetPath() {
+      targetDirectory.toPath()
+    }
+  }
+
+  @Immutable(knownImmutableClasses = [Path])
+  static class WatchContext {
+    final SyncSpec syncSpec
+    final Path relativePath
+  }
 
   @Override
   void run() {
     final watchService = FileSystems.default.newWatchService()
-    registerWatchService(watchService)
+    syncSpecs.each { syncSpec ->
+      registerWatchService(watchService, syncSpec)
+    }
 
     while (true) {
       try {
         final watchKey = watchService.take()
-        watchKey.pollEvents().each { event ->
-          if (event.kind() != OVERFLOW) {
-            final directory = watchKeyPathMap.get(watchKey)
-            try {
-              processEvent(event.kind(), directory, event.context() as Path)
-            } catch (IOException e) {
-              log(e.toString())
-            }
+        watchKey.pollEvents().findAll { it.kind() != OVERFLOW }.each { event ->
+          try {
+            final context = watchContextMap.get(watchKey)
+            processWatchEvent(event as WatchEvent<Path>, context)
+          } catch (IOException e) {
+            log(e.toString())
           }
         }
         watchKey.reset()
@@ -39,24 +59,24 @@ class WatchAndSync implements Runnable {
     }
   }
 
-  private void registerWatchService(WatchService watchService) {
-    final watchKey = sourceDirectory.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
-    watchKeyPathMap.put(watchKey, Paths.get(''))
-    log("Watching directory: $sourceDirectory")
+  private void registerWatchService(WatchService watchService, SyncSpec syncSpec) {
+    final watchKey = syncSpec.sourcePath.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
+    watchContextMap.put(watchKey, new WatchContext(syncSpec, Paths.get('')))
+    log("Watching directory: ${syncSpec.sourceDirectory}")
 
-    sourceDirectory.eachDirRecurse { Path directory ->
+    syncSpec.sourcePath.eachDirRecurse { Path directory ->
       final childWatchKey = directory.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
-      final relativePath = sourceDirectory.relativize(directory)
-      watchKeyPathMap.put(childWatchKey, relativePath)
+      final relativePath = syncSpec.sourcePath.relativize(directory)
+      watchContextMap.put(childWatchKey, new WatchContext(syncSpec, relativePath))
       log("Watching directory: $directory -> $relativePath")
     }
   }
 
-  private void processEvent(Kind kind, Path directory, Path path) {
-    final sourceFile = sourceDirectory.resolve(directory).resolve(path).toFile()
-    final targetFile = targetDirectory.resolve(directory).resolve(path).toFile()
+  private static void processWatchEvent(WatchEvent<Path> event, WatchContext context) {
+    final sourceFile = context.syncSpec.sourcePath.resolve(context.relativePath).resolve(event.context()).toFile()
+    final targetFile = context.syncSpec.targetPath.resolve(context.relativePath).resolve(event.context()).toFile()
 
-    switch (kind) {
+    switch (event.kind()) {
       case ENTRY_CREATE:
         if (sourceFile.directory) {
           log("Creating directory $targetFile")
