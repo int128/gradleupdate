@@ -42,11 +42,30 @@
 
   <section class="text-center">
     <h3>Pull Request for Update</h3>
-    <p class="text-uppercase">
-      <a th:href="${pullRequest.htmlUrl}">
-        Pull Request #<span th:text="${pullRequest.number}"></span>
-      </a>
-    </p>
+
+    <div th:if="${pullRequest} != null">
+      <form th:action="@{./pullRequest}" method="post">
+        <a th:href="${pullRequest.htmlUrl}" target="_blank" class="btn btn-primary">
+          Pull Request #<span th:text="${pullRequest.number}"></span>
+        </a>
+        <input type="submit"
+               th:value="|Rebase onto the latest branch|"
+               class="btn btn-default"/>
+      </form>
+    </div>
+
+    <div th:if="${pullRequest} == null">
+      <div th:if="${status.upToDate} == true">
+        <p>Gradle Wrapper is UP-TO-DATE</p>
+      </div>
+      <div th:if="${status.upToDate} == false">
+        <form th:action="@{./pullRequest}" method="post">
+          <input type="submit"
+                 th:value="|Update to Gradle Wrapper ${status.latest.version}|"
+                 class="btn btn-default"/>
+        </form>
+      </div>
+    </div>
   </section>
 </div>
 
