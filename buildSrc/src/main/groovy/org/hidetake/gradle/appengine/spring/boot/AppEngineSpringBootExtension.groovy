@@ -4,7 +4,7 @@ class AppEngineSpringBootExtension {
   /**
    * User defined .env file
    */
-  File environment
+  File dotEnv
 
   /**
    * JVM debug port
@@ -27,16 +27,4 @@ class AppEngineSpringBootExtension {
     "spring.mvc.log-resolved-exception": "true",
     "server.jsp-servlet.init-parameters.development": "true",
   ]
-
-  protected Properties loadEnvironmentOrNull() {
-    if (environment?.exists()) {
-      final properties = new Properties()
-      environment.withReader { reader ->
-        properties.load(reader)
-      }
-      properties
-    } else {
-      null
-    }
-  }
 }
