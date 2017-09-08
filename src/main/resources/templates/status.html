@@ -11,7 +11,23 @@
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
         crossorigin="anonymous"/>
-  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet"/>
+  <style>
+    .jumbotron {
+      background: none;
+    }
+    .input-text-monospace {
+      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+      text-align: center;
+    }
+    #footer {
+      margin-top: 60px;
+      background-color: #888;
+      color: #fff;
+    }
+    #footer .jumbotron {
+      margin-bottom: 0;
+    }
+  </style>
 </head>
 <body>
 
@@ -25,41 +41,36 @@
 
 <div class="container">
   <section class="text-center">
-    <div class="jumbotron" style="background: none">
+    <div class="jumbotron">
       <img th:src="${repository.owner.avatarUrl}" alt="avatar" width="160" height="160" class="img-circle"/>
       <h2 th:text="|${repository.description}|"></h2>
       <p th:text="|${repository.owner.login}/${repository.name}|"></p>
       <p>
         <img th:src="|/${repository.owner.login}/${repository.name}/status.svg|" alt="badge"/>
       </p>
+      <form>
+        <label class="text-uppercase" for="badge-markdown">Markdown:</label>
+        <input type="text" id="badge-markdown" class="form-control input-text-monospace"
+               th:value="|[![Gradle Status](${#httpServletRequest.requestURL}.svg)](${#httpServletRequest.requestURL})||"/>
+      </form>
     </div>
   </section>
 
   <section class="text-center">
-    <h3>Status</h3>
-    <p th:if="${status}">
-      Current Gradle Wrapper is <span th:text="${status.target.version}"></span>
-      and seems
-      <span th:if="${status.upToDate}">UP TO DATE</span>
-      <span th:if="!${status.upToDate}">OUT OF DATE</span>
-      .
+    <h3>Pull Request for Update</h3>
+    <p class="text-uppercase">
+      <a th:href="${pullRequest.htmlUrl}">
+        Pull Request #<span th:text="${pullRequest.number}"></span>
+      </a>
     </p>
-    <div th:if="!${status}">
-      NO GRADLE WRAPPER
-    </div>
-
-    <p><strong class="text-uppercase">Pull Request for Update</strong></p>
-    <input type="checkbox" data-toggle="toggle" data-onstyle="success"/>
-  </section>
-
-  <section class="text-center" style="margin-top: 30ex">
-    GradleUpdate &copy; Hidetake Iwata
   </section>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+<section id="footer" class="text-center">
+  <div class="jumbotron">
+    <p>GradleUpdate &copy; Hidetake Iwata</p>
+  </div>
+</section>
 
 </body>
 </html>
