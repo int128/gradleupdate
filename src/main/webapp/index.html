@@ -8,35 +8,47 @@
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
         crossorigin="anonymous"/>
+  <link href="/app.css" rel="stylesheet"/>
 </head>
 <body>
 
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">GradleUpdate</a>
+    </div>
+  </div>
+</nav>
+
 <div class="container">
   <section class="text-center">
-    <div class="jumbotron" style="background: none">
+    <div class="jumbotron">
       <h1>GradleUpdate</h1>
       <p>keeps the latest Gradle wrapper on your GitHub repositories</p>
+      <p>
+        <img src="/int128/latest-gradle-wrapper/status.svg"/>
+      </p>
     </div>
   </section>
   <section class="text-center">
-    <p>
-    <h2>Add a badge to your repository</h2>
-    <img src="/int128/gradleupdate/status.svg"/>
-    </p>
     <form method="post" action="/">
       <div class="form-group">
-        <label>
+        <label for="repo-url">
           Paste GitHub Repository URL
         </label>
-        <input type="text"
-               class="form-control text-center input-lg"
+        <input id="repo-url" type="text"
+               class="form-control text-center input-lg input-text-monospace"
                placeholder="https://github.com/int128/gradleupdate"/>
       </div>
     </form>
   </section>
-  <section class="text-center" style="margin-top: 30ex">
-    GradleUpdate &copy; Hidetake Iwata
-  </section>
 </div>
+
+<section id="footer">
+  <div class="jumbotron text-center">
+    <p>GradleUpdate &copy; Hidetake Iwata</p>
+  </div>
+</section>
+
 </body>
 </html>

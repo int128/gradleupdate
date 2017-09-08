@@ -1,0 +1,18 @@
+.jumbotron {
+  background: none;
+}
+
+.input-text-monospace {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  text-align: center;
+}
+
+#footer {
+  margin-top: 60px;
+  background-color: #888;
+  color: #fff;
+}
+
+#footer .jumbotron {
+  margin-bottom: 0;
+}

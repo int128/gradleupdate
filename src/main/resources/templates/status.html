@@ -11,23 +11,7 @@
         rel="stylesheet"
         integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
         crossorigin="anonymous"/>
-  <style>
-    .jumbotron {
-      background: none;
-    }
-    .input-text-monospace {
-      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-      text-align: center;
-    }
-    #footer {
-      margin-top: 60px;
-      background-color: #888;
-      color: #fff;
-    }
-    #footer .jumbotron {
-      margin-bottom: 0;
-    }
-  </style>
+  <link th:href="@{/app.css}" rel="stylesheet"/>
 </head>
 <body>
 
@@ -66,8 +50,8 @@
   </section>
 </div>
 
-<section id="footer" class="text-center">
-  <div class="jumbotron">
+<section id="footer">
+  <div class="jumbotron text-center">
     <p>GradleUpdate &copy; Hidetake Iwata</p>
   </div>
 </section>
