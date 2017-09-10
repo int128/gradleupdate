@@ -5,10 +5,7 @@ import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.DataService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.eclipse.egit.github.core.service.UserService
-import org.hidetake.gradleupdate.domain.GradleWrapperPullRequest
-import org.hidetake.gradleupdate.domain.GradleWrapperPullRequestBranch
-import org.hidetake.gradleupdate.domain.GradleWrapperVersion
-import org.hidetake.gradleupdate.domain.PullRequestRepository
+import org.hidetake.gradleupdate.domain.*
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
 
 @org.springframework.stereotype.Repository
@@ -18,22 +15,32 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
     private val pullRequestService = EnhancedPullRequestService(client)
     private val dataService = DataService(client)
 
-    override fun createOrUpdate(gradleWrapperPullRequest: GradleWrapperPullRequest) {
-        val baseRepository = repositoryService.getRepository({gradleWrapperPullRequest.repositoryName})
-        val baseCommit = dataService.getCommit(baseRepository,
-            dataService.getReference(baseRepository,
-                "refs/heads/${baseRepository.defaultBranch}").`object`.sha)
+    override fun createOrUpdate(
+        repositoryPath: RepositoryPath,
+        gradleWrapperVersion: GradleWrapperVersion,
+        files: List<GradleWrapperFile>
+    ) {
+        val branch = Branch("gradle-${gradleWrapperVersion.version}-${repositoryPath.owner}")
+        val title = "Gradle ${gradleWrapperVersion.version}"
+        val description = "Gradle ${gradleWrapperVersion.version} is available."
+
+        val baseRepository = repositoryService.getRepository({repositoryPath.fullName})
+        val baseRef = dataService.getReference(baseRepository, "refs/heads/${baseRepository.defaultBranch}")
+        val baseCommit = dataService.getCommit(baseRepository, baseRef.`object`.sha)
         val fork = repositoryService.forkRepository(baseRepository)
-        createOrUpdateBranchWithCommit(fork, baseCommit, gradleWrapperPullRequest)
-        createOrUpdatePullRequest(baseRepository, fork, gradleWrapperPullRequest)
+        createOrUpdateBranchWithCommit(fork, branch, baseCommit, title, files)
+        createOrUpdatePullRequest(baseRepository, fork, branch, title, description)
     }
 
-    override fun find(repositoryName: String, version: GradleWrapperVersion): PullRequest? {
-        val baseRepository = repositoryService.getRepository({repositoryName})
-        val headBranch = GradleWrapperPullRequestBranch.Factory.create(repositoryName, version)
+    override fun find(
+        repositoryPath: RepositoryPath,
+        gradleWrapperVersion: GradleWrapperVersion
+    ): PullRequest? {
+        val baseRepository = repositoryService.getRepository({repositoryPath.fullName})
+        val branch = Branch("gradle-${gradleWrapperVersion.version}-${repositoryPath.owner}")
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = headBranch.toLabel(userService.user),
+            head = "${userService.user}:${branch.name}",
             start = 1,
             size = 1
         )
@@ -43,11 +50,13 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
     private fun createOrUpdatePullRequest(
         baseRepository: Repository,
         headRepository: Repository,
-        gradleWrapperPullRequest: GradleWrapperPullRequest
+        branch: Branch,
+        pullRequestTitle: String,
+        pullRequestBody: String
     ): PullRequest {
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = gradleWrapperPullRequest.branch.toLabel(headRepository.owner),
+            head = "${headRepository.owner}:${branch.name}",
             state = "open",
             start = 1,
             size = 1
@@ -55,33 +64,34 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         val latest = pullRequestService.query(baseRepository, query).firstOrNull()
         return if (latest == null) {
             pullRequestService.createPullRequest(baseRepository, PullRequest().apply {
-                title = gradleWrapperPullRequest.title
-                body = gradleWrapperPullRequest.description
+                title = pullRequestTitle
+                body = pullRequestBody
                 base = PullRequestMarker().apply { label = query.base }
                 head = PullRequestMarker().apply { label = query.head }
             })
         } else {
             pullRequestService.editPullRequest(baseRepository, latest.apply {
-                title = gradleWrapperPullRequest.title
-                body = gradleWrapperPullRequest.description
+                title = pullRequestTitle
+                body = pullRequestBody
             })
         }
     }
 
     private fun createOrUpdateBranchWithCommit(
         repository: Repository,
+        branch: Branch,
         parent: Commit,
-        gradleWrapperPullRequest: GradleWrapperPullRequest
+        commitMessage: String,
+        files: List<GradleWrapperFile>
     ): Reference {
-        val refName = "refs/heads/${gradleWrapperPullRequest.branch.name}"
         val existentRef = nullIfNotFound {
-            dataService.getReference(repository, refName)
+            dataService.getReference(repository, branch.ref)
         }
         return if (existentRef == null) {
             dataService.createReference(repository, Reference().apply {
-                ref = refName
+                ref = branch.ref
                 `object` = TypedResource().apply {
-                    sha = createCommit(repository, parent, gradleWrapperPullRequest).sha
+                    sha = createCommit(repository, parent, commitMessage, files).sha
                 }
             })
         } else {
@@ -89,9 +99,9 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
             val needToUpdateBranch = existentRefParent?.sha == parent.sha
             if (!needToUpdateBranch) {
                 dataService.editReference(repository, Reference().apply {
-                    ref = refName
+                    ref = branch.ref
                     `object` = TypedResource().apply {
-                        sha = createCommit(repository, parent, gradleWrapperPullRequest).sha
+                        sha = createCommit(repository, parent, commitMessage, files).sha
                     }
                 }, true)
             } else {
@@ -100,12 +110,17 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         }
     }
 
-    private fun createCommit(repository: Repository, parent: Commit, gradleWrapperPullRequest: GradleWrapperPullRequest) =
+    private fun createCommit(
+        repository: Repository,
+        parent: Commit,
+        commitMessage: String,
+        files: List<GradleWrapperFile>
+    ) =
         dataService.createCommit(repository, Commit().apply {
-            message = gradleWrapperPullRequest.title
+            message = commitMessage
             parents = listOf(parent)
             tree = dataService.createTree(repository,
-                gradleWrapperPullRequest.files.map { file ->
+                files.map { file ->
                     TreeEntry().apply {
                         path = file.path
                         mode = when (file.executable) {

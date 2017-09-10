@@ -10,33 +10,34 @@ class GradleUpdateService(
     private val gradleWrapperRepository: GradleWrapperRepository,
     private val pullRequestRepository: PullRequestRepository
 ) {
-    private val LATEST_GRADLE_WRAPPER = "int128/latest-gradle-wrapper"
+    private val LATEST_GRADLE_WRAPPER = RepositoryPath("int128", "latest-gradle-wrapper")
 
-    fun getRepository(repositoryName: String) =
-        repositoryRepository.getByName(repositoryName)
+    fun getRepository(repositoryPath: RepositoryPath) =
+        repositoryRepository.getByName(repositoryPath)
 
-    fun getGradleWrapperVersionStatus(repositoryName: String): GradleWrapperVersionStatus? =
-        gradleWrapperRepository.findVersion(repositoryName)?.let { target ->
+    fun getGradleWrapperVersionStatus(repositoryPath: RepositoryPath): GradleWrapperVersionStatus? =
+        gradleWrapperRepository.findVersion(repositoryPath)?.let { target ->
             gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
                 GradleWrapperVersionStatus(target, latest)
             }
         }
 
-    fun findPullRequestForLatestGradleWrapper(repositoryName: String): PullRequest? =
+    fun getPullRequestStatus(repositoryPath: RepositoryPath): GradleWrapperPullRequestStatus = TODO()
+
+    fun findPullRequestForLatestGradleWrapper(repositoryPath: RepositoryPath): PullRequest? =
         gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
-            pullRequestRepository.find(repositoryName, latest)
+            pullRequestRepository.find(repositoryPath, latest)
         }
 
-    fun createPullRequestForLatestGradleWrapper(repositoryName: String) =
-        gradleWrapperRepository.findVersion(repositoryName)?.let { target ->
+    fun createPullRequestForLatestGradleWrapper(repositoryPath: RepositoryPath) =
+        gradleWrapperRepository.findVersion(repositoryPath)?.let { target ->
             gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
                 val status = GradleWrapperVersionStatus(target, latest)
                 when {
                     status.upToDate -> TODO()
                     else -> {
                         val files = gradleWrapperRepository.findFiles(LATEST_GRADLE_WRAPPER)
-                        val pullRequest = GradleWrapperPullRequest.Factory.create(repositoryName, latest, files)
-                        pullRequestRepository.createOrUpdate(pullRequest)
+                        pullRequestRepository.createOrUpdate(repositoryPath, latest, files)
                     }
                 }
             }

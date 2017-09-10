@@ -1,7 +1,7 @@
 package org.hidetake.gradleupdate.domain
 
 interface GradleWrapperRepository {
-    fun findVersion(repositoryName: String): GradleWrapperVersion?
+    fun findVersion(repositoryPath: RepositoryPath): GradleWrapperVersion?
 
-    fun findFiles(repositoryName: String): List<GradleWrapperFile>
+    fun findFiles(repositoryPath: RepositoryPath): List<GradleWrapperFile>
 }
