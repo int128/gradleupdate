@@ -7,11 +7,15 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.servlet.ModelAndView
 
 @Controller
-class StatusController(private val service: GradleUpdateService) {
+class StatusController(val service: GradleUpdateService) {
+    @GetMapping("/{owner}/{repo}/status.svg")
+    fun badge(@PathVariable owner: String, @PathVariable repo: String) =
+        BadgeSvg.render(service.getGradleWrapperVersionStatus(RepositoryPath(owner, repo)))
+
     @GetMapping("/{owner}/{repo}/status")
-    fun get(@PathVariable owner: String, @PathVariable repo: String) =
+    fun html(@PathVariable owner: String, @PathVariable repo: String) =
         ModelAndView("status", mapOf(
             "repository" to service.getRepository(RepositoryPath(owner, repo)),
-            "status" to service.getPullRequestStatus(RepositoryPath(owner, repo))
+            "pullRequest" to service.findPullRequestForUpdate(RepositoryPath(owner, repo))
         ))
 }

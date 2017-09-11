@@ -2,8 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <!--/*@thymesVar id="repository" type="org.eclipse.egit.github.core.Repository"*/-->
-<!--/*@thymesVar id="status" type="org.hidetake.gradleupdate.domain.GradleWrapperVersionStatus"*/-->
-<!--/*@thymesVar id="pullRequest" type="org.eclipse.egit.github.core.PullRequest"*/-->
+<!--/*@thymesVar id="pullRequest" type="org.hidetake.gradleupdate.domain.PullRequestForUpdate"*/-->
 
 <head>
   <title th:text="|${repository.owner.login}/${repository.name} - GradleUpdate|"></title>
@@ -43,27 +42,32 @@
   <section class="text-center">
     <h3>Pull Request for Update</h3>
 
-    <div th:if="${pullRequest} != null">
+    <div th:if="${pullRequest} == null">
       <form th:action="@{./pullRequest}" method="post">
-        <a th:href="${pullRequest.htmlUrl}" target="_blank" class="btn btn-primary">
-          Pull Request #<span th:text="${pullRequest.number}"></span>
-        </a>
         <input type="submit"
-               th:value="|Rebase onto the latest branch|"
+               th:value="|Check Version|"
                class="btn btn-default"/>
       </form>
     </div>
 
-    <div th:if="${pullRequest} == null">
-      <div th:if="${status.upToDate} == true">
-        <p>Gradle Wrapper is UP-TO-DATE</p>
-      </div>
-      <div th:if="${status.upToDate} == false">
-        <form th:action="@{./pullRequest}" method="post">
-          <input type="submit"
-                 th:value="|Update to Gradle Wrapper ${status.latest.version}|"
-                 class="btn btn-default"/>
-        </form>
+    <div th:if="${pullRequest} != null">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h4>
+            <a th:href="${pullRequest.raw.htmlUrl}" target="_blank">
+              #<span th:text="${pullRequest.raw.number}"></span> <span th:text="${pullRequest.raw.title}"></span>
+            </a>
+          </h4>
+          <p th:text="${pullRequest.raw.bodyText}"></p>
+        </div>
+        <div th:if="${pullRequest.state} == pullRequest.State.OPEN_BRANCH_OUT_OF_DATE">
+          <hr/>
+          <form th:action="@{./pullRequest}" method="post">
+            <input type="submit"
+                   th:value="|Rebase onto the latest branch|"
+                   class="btn btn-default"/>
+          </form>
+        </div>
       </div>
     </div>
   </section>

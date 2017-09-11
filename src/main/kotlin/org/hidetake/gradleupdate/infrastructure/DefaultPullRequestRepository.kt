@@ -25,38 +25,46 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
         val description = "Gradle ${gradleWrapperVersion.version} is available."
 
         val baseRepository = repositoryService.getRepository({repositoryPath.fullName})
-        val baseRef = dataService.getReference(baseRepository, "refs/heads/${baseRepository.defaultBranch}")
-        val baseCommit = dataService.getCommit(baseRepository, baseRef.`object`.sha)
-        val fork = repositoryService.forkRepository(baseRepository)
-        createOrUpdateBranchWithCommit(fork, branch, baseCommit, title, files)
-        createOrUpdatePullRequest(baseRepository, fork, branch, title, description)
+        val headRepository = repositoryService.forkRepository(baseRepository)
+        createOrUpdateBranchWithCommit(baseRepository, headRepository, branch, title, files)
+        createOrUpdatePullRequest(baseRepository, headRepository, branch, title, description)
     }
 
     override fun find(
         repositoryPath: RepositoryPath,
         gradleWrapperVersion: GradleWrapperVersion
-    ): PullRequest? {
+    ): PullRequestForUpdate? {
         val baseRepository = repositoryService.getRepository({repositoryPath.fullName})
-        val branch = Branch("gradle-${gradleWrapperVersion.version}-${repositoryPath.owner}")
+        val headBranch = Branch("gradle-${gradleWrapperVersion.version}-${repositoryPath.owner}")
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = "${userService.user}:${branch.name}",
+            head = "${userService.user.login}:${headBranch.name}",
             start = 1,
             size = 1
         )
-        return pullRequestService.query(baseRepository, query).firstOrNull()
+        return pullRequestService.query(baseRepository, query).firstOrNull()?.let { pullRequest ->
+            val parentOfHeadRef = dataService.getCommit(pullRequest.head.repo, pullRequest.head.sha).parents.firstOrNull()
+            val headRefIsUpToDate = parentOfHeadRef?.sha == pullRequest.base.sha
+            val state = when {
+                pullRequest.state == "open" &&  headRefIsUpToDate -> PullRequestForUpdate.State.OPEN_BRANCH_UP_TO_DATE
+                pullRequest.state == "open" && !headRefIsUpToDate -> PullRequestForUpdate.State.OPEN_BRANCH_OUT_OF_DATE
+                pullRequest.isMerged -> PullRequestForUpdate.State.MERGED
+                else -> PullRequestForUpdate.State.CLOSED
+            }
+            PullRequestForUpdate(state, gradleWrapperVersion, pullRequest)
+        }
     }
 
     private fun createOrUpdatePullRequest(
         baseRepository: Repository,
         headRepository: Repository,
-        branch: Branch,
+        headBranch: Branch,
         pullRequestTitle: String,
         pullRequestBody: String
     ): PullRequest {
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = "${headRepository.owner}:${branch.name}",
+            head = "${headRepository.owner}:${headBranch.name}",
             state = "open",
             start = 1,
             size = 1
@@ -78,34 +86,34 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
     }
 
     private fun createOrUpdateBranchWithCommit(
-        repository: Repository,
-        branch: Branch,
-        parent: Commit,
+        baseRepository: Repository,
+        headRepository: Repository,
+        headBranch: Branch,
         commitMessage: String,
         files: List<GradleWrapperFile>
     ): Reference {
-        val existentRef = nullIfNotFound {
-            dataService.getReference(repository, branch.ref)
-        }
-        return if (existentRef == null) {
-            dataService.createReference(repository, Reference().apply {
-                ref = branch.ref
+        val baseRef = dataService.getReference(baseRepository, Branch(baseRepository.defaultBranch).ref)
+        val baseCommit = dataService.getCommit(baseRepository, baseRef.`object`.sha)
+        val headRef = nullIfNotFound { dataService.getReference(headRepository, headBranch.ref) }
+        return if (headRef == null) {
+            dataService.createReference(headRepository, Reference().apply {
+                ref = headBranch.ref
                 `object` = TypedResource().apply {
-                    sha = createCommit(repository, parent, commitMessage, files).sha
+                    sha = createCommit(headRepository, baseCommit, commitMessage, files).sha
                 }
             })
         } else {
-            val existentRefParent = dataService.getCommit(repository, existentRef.`object`.sha).parents.firstOrNull()
-            val needToUpdateBranch = existentRefParent?.sha == parent.sha
-            if (!needToUpdateBranch) {
-                dataService.editReference(repository, Reference().apply {
-                    ref = branch.ref
+            val parentOfHeadRef = dataService.getCommit(headRepository, headRef.`object`.sha).parents.firstOrNull()
+            val headRefIsUpToDate = parentOfHeadRef?.sha == baseCommit.sha
+            if (!headRefIsUpToDate) {
+                dataService.editReference(headRepository, Reference().apply {
+                    ref = headBranch.ref
                     `object` = TypedResource().apply {
-                        sha = createCommit(repository, parent, commitMessage, files).sha
+                        sha = createCommit(headRepository, baseCommit, commitMessage, files).sha
                     }
                 }, true)
             } else {
-                existentRef
+                headRef
             }
         }
     }

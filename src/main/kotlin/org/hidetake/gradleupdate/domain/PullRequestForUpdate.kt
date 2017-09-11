@@ -1,9 +1,16 @@
 package org.hidetake.gradleupdate.domain
 
+import org.eclipse.egit.github.core.PullRequest
+
 class PullRequestForUpdate(
-    val title: String,
-    val description: String,
-    val repositoryName: String,
-    val branch: Branch,
-    val files: List<GradleWrapperFile> = emptyList()
-)
+    val state: State,
+    val targetVersion: GradleWrapperVersion,
+    val raw: PullRequest
+) {
+    enum class State {
+        OPEN_BRANCH_UP_TO_DATE,
+        OPEN_BRANCH_OUT_OF_DATE,
+        CLOSED,
+        MERGED
+    }
+}
