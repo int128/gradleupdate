@@ -43,7 +43,7 @@
     <h3>Pull Request for Update</h3>
 
     <div th:if="${pullRequest} == null">
-      <form th:action="@{./pullRequest}" method="post">
+      <form th:action="@{./update}" method="post">
         <input type="submit"
                th:value="|Check Version|"
                class="btn btn-default"/>
@@ -62,7 +62,7 @@
         </div>
         <div th:if="${pullRequest.state} == pullRequest.State.OPEN_BRANCH_OUT_OF_DATE">
           <hr/>
-          <form th:action="@{./pullRequest}" method="post">
+          <form th:action="@{./update}" method="post">
             <input type="submit"
                    th:value="|Rebase onto the latest branch|"
                    class="btn btn-default"/>
