@@ -64,7 +64,7 @@ class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository
     ): PullRequest {
         val query = EnhancedPullRequestService.Query(
             base = baseRepository.defaultBranch,
-            head = "${headRepository.owner}:${headBranch.name}",
+            head = "${headRepository.owner.login}:${headBranch.name}",
             state = "open",
             start = 1,
             size = 1

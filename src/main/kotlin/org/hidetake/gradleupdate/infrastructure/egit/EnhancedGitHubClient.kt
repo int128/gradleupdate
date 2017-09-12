@@ -10,6 +10,12 @@ import java.net.HttpURLConnection
 class EnhancedGitHubClient(private val responseCacheRepository: ResponseCacheRepository) : GitHubClient() {
     private val log = LoggerFactory.getLogger(javaClass)
 
+    init {
+        // EGit always sends author and committer on Commit API
+        // but GitHub rejects null value.
+        setSerializeNulls(false)
+    }
+
     override fun createConnection(uri: String, method: String): HttpURLConnection {
         log.debug("$method $uri")
         return super.createConnection(uri, method)
