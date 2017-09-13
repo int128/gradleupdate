@@ -7,3 +7,9 @@ logging:
 spring:
   main:
     banner-mode: "off"
+
+github:
+  oauth:
+    client-id: ${github.client.id}
+    client-secret: ${github.client.secret}
+    scope: public_repo
