@@ -53,8 +53,3 @@ appengine {
     project = 'gradleupdate'
   }
 }
-
-task explodeWar(type: Sync, overwrite: true) {
-  with war
-  into "$buildDir/exploded-${project.name}"
-}
