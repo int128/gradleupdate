@@ -2,7 +2,7 @@ package org.hidetake.gradleupdate.app
 
 import com.google.appengine.api.memcache.Expiration
 import com.google.appengine.api.memcache.MemcacheService
-import org.eclipse.egit.github.core.client.GitHubClient
+import org.hidetake.gradleupdate.infrastructure.egit.GitHubOAuthClient
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import java.util.*
@@ -10,13 +10,13 @@ import java.util.*
 @Component
 @ConfigurationProperties("github.oauth")
 class GitHubOAuthService(private val memcacheService: MemcacheService) {
-    private val gitHubClient = GitHubClient()
-
     val authorizationEndpoint = "https://github.com/login/oauth/authorize"
+
     var clientId: String = ""
+    var clientSecret: String = ""
     var scope: String = ""
 
-    fun buildAuthorizationParameters(backTo: String) = mapOf(
+    fun createAuthorizationParameters(backTo: String) = mapOf(
         "client_id" to clientId,
         "scope" to scope,
         "redirect_uri" to backTo,
@@ -25,10 +25,14 @@ class GitHubOAuthService(private val memcacheService: MemcacheService) {
         }
     )
 
-    fun exchangeCodeAndToken(state: String, code: String) =
+    fun createSession(state: String, code: String): String =
         when (memcacheService.delete(state)) {
             true -> {
-                // TODO
+                val client = GitHubOAuthClient(clientId, clientSecret)
+                val accessToken = client.acquireAccessToken(code)
+                UUID.randomUUID().toString().also { sessionId ->
+                    memcacheService.put(sessionId, accessToken)
+                }
             }
             false ->
                 throw IllegalStateException("OAuth state did not match: state=$state")
