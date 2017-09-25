@@ -1,15 +1,16 @@
 package org.hidetake.gradleupdate.infrastructure
 
 import org.eclipse.egit.github.core.*
-import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.DataService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.eclipse.egit.github.core.service.UserService
 import org.hidetake.gradleupdate.domain.*
+import org.hidetake.gradleupdate.infrastructure.egit.EnhancedGitHubClient
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
+import org.springframework.beans.factory.annotation.Qualifier
 
 @org.springframework.stereotype.Repository
-class DefaultPullRequestRepository(client: GitHubClient) : PullRequestRepository {
+class DefaultPullRequestRepository(@Qualifier("gradleUpdateGitHubClient") client: EnhancedGitHubClient) : PullRequestRepository {
     private val userService = UserService(client)
     private val repositoryService = RepositoryService(client)
     private val pullRequestService = EnhancedPullRequestService(client)

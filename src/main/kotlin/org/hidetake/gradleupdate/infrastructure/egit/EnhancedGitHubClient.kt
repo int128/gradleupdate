@@ -7,13 +7,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import java.net.HttpURLConnection
 
-class EnhancedGitHubClient(private val responseCacheRepository: ResponseCacheRepository) : GitHubClient() {
+open class EnhancedGitHubClient(private val responseCacheRepository: ResponseCacheRepository) : GitHubClient() {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    init {
-        // EGit always sends author and committer on Commit API
-        // but GitHub rejects null value.
-        setSerializeNulls(false)
+    fun setAccessToken(accessToken: String) {
+        setOAuth2Token(accessToken)
     }
 
     override fun createConnection(uri: String, method: String): HttpURLConnection {

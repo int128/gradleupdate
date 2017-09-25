@@ -7,11 +7,11 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @Controller
-class LoginController(private val gitHubOAuthService: GitHubOAuthService) {
+class LoginController(private val service: GitHubOAuthService) {
     @GetMapping("/login")
     fun authorize() = ModelAndView(
-        "redirect:${gitHubOAuthService.authorizationEndpoint}",
-        gitHubOAuthService.createAuthorizationParameters(
+        "redirect:${service.getRedirectURL()}",
+        service.createAuthorizationParameters(
             ServletUriComponentsBuilder.fromCurrentRequest()
                 .replacePath("/login/auth")
                 .replaceQuery(null)
@@ -19,7 +19,7 @@ class LoginController(private val gitHubOAuthService: GitHubOAuthService) {
 
     @GetMapping("/login/auth")
     fun accessToken(@RequestParam state: String, @RequestParam code: String): String {
-        val sid = gitHubOAuthService.createSession(state, code)
+        service.continueAuthorization(state, code)
         return "redirect:/my"
     }
 }

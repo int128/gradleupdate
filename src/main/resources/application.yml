@@ -10,6 +10,5 @@ spring:
 
 github:
   oauth:
-    client-id: ${github.client.id}
-    client-secret: ${github.client.secret}
+    redirect-url: https://github.com/login/oauth/authorize
     scope: public_repo

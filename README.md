@@ -1,21 +1,24 @@
-# Spring Boot + Kotlin + App Engine
+# GradleUpdate [![Gradle Status](https://gradleupdate.appspot.com/int128/gradleupdate/status.svg)](https://gradleupdate.appspot.com/int128/gradleupdate/status)
 
-A template project of Spring Boot and Kotlin on App Engine Java 8 Standard Environment.
-
-This contains followings:
-
-- Spring Boot
-- Thymeleaf
-- Kotlin
-- Gradle
+Automatic Gradle Updater.
 
 
 ## How to Run
 
+Create `.env` file.
+
+```properties
+GRADLEUPDATE_GITHUB_ACCESS_TOKEN=
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+```
+
 Google Cloud SDK is required.
-See [Quickstart for Java 8 for App Engine Standard Environment](https://cloud.google.com/appengine/docs/standard/java/quickstart-java8).
 
 ```sh
+brew cask install google-cloud-sdk
+gcloud components install app-engine-java
+
 # Run dev server
 ./gradlew appengineRun
 
