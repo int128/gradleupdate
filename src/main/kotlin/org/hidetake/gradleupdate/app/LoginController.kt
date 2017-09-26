@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @Controller
-class LoginController(private val service: GitHubOAuthService) {
+class LoginController(private val service: LoginService) {
     @GetMapping("/login")
     fun authorize() = ModelAndView(
         "redirect:${service.getRedirectURL()}",

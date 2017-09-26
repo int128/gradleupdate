@@ -19,7 +19,6 @@ class OAuthContextFilter(
         cookiePath = "/"
         cookieMaxAge = 60 * 60 * 24 * 90
         isCookieHttpOnly = true
-        isCookieSecure = true
     }
 
     private fun extractSessionId(request: HttpServletRequest) =

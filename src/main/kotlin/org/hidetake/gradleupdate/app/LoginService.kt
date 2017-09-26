@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class GitHubOAuthService(
+class LoginService(
     private val memcacheService: MemcacheService,
     private val client: GitHubOAuthClient,
     private val context: OAuthContext
