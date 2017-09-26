@@ -29,4 +29,8 @@ class GitHubOAuthService(
             false ->
                 throw IllegalStateException("OAuth state did not match: state=$state")
         }
+
+    fun logout() {
+        context.accessToken = null
+    }
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.CookieGenerator
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -18,7 +17,7 @@ class OAuthContextFilter(
     private val COOKIE = CookieGenerator().apply {
         cookieName = "S"
         cookiePath = "/"
-        cookieMaxAge = TimeUnit.DAYS.toSeconds(30).toInt()
+        cookieMaxAge = 60 * 60 * 24 * 90
         isCookieHttpOnly = true
         isCookieSecure = true
     }

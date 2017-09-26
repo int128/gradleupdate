@@ -12,14 +12,19 @@ class LoginController(private val service: GitHubOAuthService) {
     fun authorize() = ModelAndView(
         "redirect:${service.getRedirectURL()}",
         service.createAuthorizationParameters(
-            ServletUriComponentsBuilder.fromCurrentRequest()
-                .replacePath("/login/auth")
-                .replaceQuery(null)
+            ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/login/auth")
                 .build().toUriString()))
 
     @GetMapping("/login/auth")
-    fun accessToken(@RequestParam state: String, @RequestParam code: String): String {
+    fun continueAuthorization(@RequestParam state: String, @RequestParam code: String): String {
         service.continueAuthorization(state, code)
         return "redirect:/my"
+    }
+
+    @GetMapping("/logout")
+    fun logout(): String {
+        service.logout()
+        return "redirect:/"
     }
 }
