@@ -5,34 +5,34 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedGitHubClient
 import org.hidetake.gradleupdate.infrastructure.egit.GitHubOAuthClient
 import org.hidetake.gradleupdate.infrastructure.egit.ResponseCacheRepository
-import org.hidetake.gradleupdate.infrastructure.oauth.OAuthContext
+import org.hidetake.gradleupdate.infrastructure.oauth.AccessToken
+import org.hidetake.gradleupdate.infrastructure.oauth.AccessTokenContext
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.web.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean
-import org.springframework.web.context.annotation.RequestScope
 
 @SpringBootApplication
 open class App : SpringBootServletInitializer() {
     @Bean
-    @ConfigurationProperties("gradleupdate.github")
-    open fun gradleUpdateGitHubClient(responseCacheRepository: ResponseCacheRepository) =
-        EnhancedGitHubClient(responseCacheRepository).apply {
-            // EGit always sends author and committer on Commit API
-            // but GitHub rejects null value.
-            setSerializeNulls(false)
-        }
+    open fun gradleUpdateGitHubClient(responseCacheRepository: ResponseCacheRepository): EnhancedGitHubClient {
+        val accessToken = AccessToken(System.getenv("GRADLEUPDATE_GITHUB_ACCESS_TOKEN"))
+        return EnhancedGitHubClient(responseCacheRepository, { accessToken })
+    }
 
     @Bean
-    @RequestScope
-    open fun contextGitHubClient(responseCacheRepository: ResponseCacheRepository, context: OAuthContext) =
-        EnhancedGitHubClient(responseCacheRepository).apply {
-            context.accessToken?.also { setAccessToken(it.value) }
-        }
+    open fun contextGitHubClient(responseCacheRepository: ResponseCacheRepository, context: AccessTokenContext): EnhancedGitHubClient =
+        EnhancedGitHubClient(responseCacheRepository, {
+            context.get() ?: throw IllegalStateException("Login required")
+        })
 
     @Bean
-    @ConfigurationProperties("github.oauth")
-    open fun gitHubOAuthClient() = GitHubOAuthClient()
+    open fun gitHubOAuthClient(): GitHubOAuthClient =
+        GitHubOAuthClient(
+            System.getenv("GITHUB_OAUTH_CLIENT_ID"),
+            System.getenv("GITHUB_OAUTH_CLIENT_SECRET"),
+            "public_repo",
+            "https://github.com/login/oauth/authorize"
+        )
 
     @Bean
     open fun memcacheService(): MemcacheService =

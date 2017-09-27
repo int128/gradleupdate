@@ -7,8 +7,3 @@ logging:
 spring:
   main:
     banner-mode: "off"
-
-github:
-  oauth:
-    redirect-url: https://github.com/login/oauth/authorize
-    scope: public_repo

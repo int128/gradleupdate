@@ -3,21 +3,32 @@ package org.hidetake.gradleupdate.infrastructure.egit
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.client.GitHubRequest
 import org.eclipse.egit.github.core.client.GitHubResponse
+import org.hidetake.gradleupdate.infrastructure.oauth.AccessToken
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import java.net.HttpURLConnection
 
-open class EnhancedGitHubClient(private val responseCacheRepository: ResponseCacheRepository) : GitHubClient() {
+class EnhancedGitHubClient(
+    private val responseCacheRepository: ResponseCacheRepository,
+    private val accessTokenProvider: () -> AccessToken
+) : GitHubClient() {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    fun setAccessToken(accessToken: String) {
-        setOAuth2Token(accessToken)
+    init {
+        // EGit always sends author and committer on Commit API
+        // but GitHub rejects null value.
+        setSerializeNulls(false)
     }
 
-    override fun createConnection(uri: String, method: String): HttpURLConnection {
-        log.debug("$method $uri")
-        return super.createConnection(uri, method)
-    }
+    override fun setOAuth2Token(token: String?): GitHubClient =
+        throw UnsupportedOperationException()
+
+    override fun createConnection(uri: String, method: String): HttpURLConnection =
+        super.createConnection(uri, method).also { connection ->
+            log.debug("$method $uri")
+            val accessToken = accessTokenProvider()
+            connection.setRequestProperty("Authorization", "token ${accessToken.value}")
+        }
 
     override fun get(request: GitHubRequest): GitHubResponse {
         val uri = request.generateUri()
@@ -26,7 +37,8 @@ open class EnhancedGitHubClient(private val responseCacheRepository: ResponseCac
             httpRequest.setRequestProperty(HttpHeaders.ACCEPT, accept)
         }
 
-        val responseCache = responseCacheRepository.find(uri)
+        val requestProperties = httpRequest.requestProperties
+        val responseCache = responseCacheRepository.find(uri, requestProperties)
         responseCache?.also {
             httpRequest.setRequestProperty(HttpHeaders.IF_NONE_MATCH, responseCache.eTag)
         }
@@ -37,7 +49,7 @@ open class EnhancedGitHubClient(private val responseCacheRepository: ResponseCac
             isOk(code) ->
                 GitHubResponse(httpRequest, getBody(request, getStream(httpRequest))).also { response ->
                     val eTag = response.getHeader(HttpHeaders.ETAG)
-                    responseCacheRepository.save(uri, ResponseCache(eTag, response.body))
+                    responseCacheRepository.save(uri, requestProperties, ResponseCache(eTag, response.body))
                     log.debug("CACHED {} @ {}", uri, eTag)
                 }
             isEmpty(code) ->
