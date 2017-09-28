@@ -15,6 +15,7 @@ class AppEngineSpringBootExtension {
    * @see org.springframework.boot.devtools.env.DevToolsPropertyDefaultsPostProcessor
    */
   Map springBootDevProperties = [
+    "spring.output.ansi.enabled": "always",
     "spring.thymeleaf.cache": "false",
     "spring.freemarker.cache": "false",
     "spring.groovy.template.cache": "false",
