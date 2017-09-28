@@ -35,7 +35,6 @@ dependencies {
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
   compile 'org.springframework.boot:spring-boot-starter-security'
-  compile 'org.springframework.session:spring-session'
 
   compile 'com.google.appengine:appengine-api-1.0-sdk:+'
   providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
