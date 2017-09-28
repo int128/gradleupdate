@@ -21,10 +21,4 @@ class LoginController(private val service: LoginService) {
         service.continueAuthorization(state, code)
         return "redirect:/my"
     }
-
-    @GetMapping("/logout")
-    fun logout(): String {
-        service.logout()
-        return "redirect:/"
-    }
 }

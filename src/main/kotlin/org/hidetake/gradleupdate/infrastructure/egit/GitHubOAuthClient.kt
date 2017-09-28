@@ -1,7 +1,6 @@
 package org.hidetake.gradleupdate.infrastructure.egit
 
 import org.eclipse.egit.github.core.client.GitHubClient
-import org.hidetake.gradleupdate.infrastructure.oauth.AccessToken
 
 class GitHubOAuthClient(
     private val clientId: String,

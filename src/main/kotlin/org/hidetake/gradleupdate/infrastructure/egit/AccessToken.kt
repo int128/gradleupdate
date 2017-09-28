@@ -1,4 +1,4 @@
-package org.hidetake.gradleupdate.infrastructure.oauth
+package org.hidetake.gradleupdate.infrastructure.egit
 
 import java.io.Serializable
 

@@ -3,7 +3,6 @@ package org.hidetake.gradleupdate.infrastructure.egit
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.client.GitHubRequest
 import org.eclipse.egit.github.core.client.GitHubResponse
-import org.hidetake.gradleupdate.infrastructure.oauth.AccessToken
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import java.net.HttpURLConnection
