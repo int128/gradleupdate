@@ -9,7 +9,7 @@ import java.net.HttpURLConnection
 
 class EnhancedGitHubClient(
     private val responseCacheRepository: ResponseCacheRepository,
-    private val accessTokenProvider: () -> AccessToken
+    private val accessTokenProvider: () -> String
 ) : GitHubClient() {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -26,7 +26,7 @@ class EnhancedGitHubClient(
         super.createConnection(uri, method).also { connection ->
             log.debug("$method $uri")
             val accessToken = accessTokenProvider()
-            connection.setRequestProperty("Authorization", "token ${accessToken.value}")
+            connection.setRequestProperty("Authorization", "token $accessToken")
         }
 
     override fun get(request: GitHubRequest): GitHubResponse {

@@ -7,3 +7,15 @@ logging:
 spring:
   main:
     banner-mode: "off"
+
+security:
+  oauth2:
+    client:
+      clientId: ${github.oauth.client.id}
+      clientSecret: ${github.oauth.client.secret}
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      clientAuthenticationScheme: form
+      scope: public_repo
+    resource:
+      userInfoUri: https://api.github.com/user
