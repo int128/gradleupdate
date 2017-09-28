@@ -10,6 +10,7 @@ import org.gradle.api.Project
  */
 class AppEngineSpringBootPlugin implements Plugin<Project> {
   private AppEngineSpringBootExtension extension
+  private InjectLoggingProperties injectLoggingProperties
   private InjectAppEngineWebXml injectAppEngineWebXml
   private WatchAndSyncWebAppTask watchAndSyncWebApp
 
@@ -19,6 +20,7 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
     extension.dotEnv = project.file('.env')
     watchAndSyncWebApp = project.tasks.create('watchAndSyncWebApp', WatchAndSyncWebAppTask)
     injectAppEngineWebXml = project.tasks.create('injectAppEngineWebXml', InjectAppEngineWebXml)
+    injectLoggingProperties = project.tasks.create('injectLoggingProperties', InjectLoggingProperties)
 
     project.afterEvaluate {
       configureAppEnginePlugin(project)
@@ -41,6 +43,11 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
         "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${extension.debugPort}".toString())
     }
 
+    if (injectLoggingProperties.enabled) {
+      appengine.run.jvmFlags.add(
+        "-Djava.util.logging.config.file=${injectLoggingProperties.loggingProperties}".toString())
+    }
+
     if (appengine.run.environment == null) {
       appengine.run.environment = [:]
     }
@@ -55,6 +62,7 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
         project.file("${appengine.stage.stagingDirectory}/WEB-INF/appengine-web.xml")
     }
 
+    project.tasks.appengineRun.dependsOn(injectLoggingProperties)
     project.tasks.appengineRun.dependsOn(watchAndSyncWebApp)
     project.tasks.appengineStage.finalizedBy(injectAppEngineWebXml)
     project.tasks.appengineDeploy.dependsOn(injectAppEngineWebXml)
