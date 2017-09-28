@@ -57,6 +57,7 @@ class WatchAndSync implements Runnable {
         break
       }
     }
+    log('Finished watch')
   }
 
   private void registerWatchService(WatchService watchService, SyncSpec syncSpec) {

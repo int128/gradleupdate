@@ -5,9 +5,11 @@ import org.gradle.api.tasks.TaskAction
 import org.hidetake.gradle.appengine.spring.boot.WatchAndSync.SyncSpec
 
 class WatchAndSyncWebAppTask extends DefaultTask {
+  final List<Thread> threads = []
+
   @TaskAction
   void startThread() {
-    new Thread(new WatchAndSync(*forResources(), forWebApp())).start()
+    threads << new Thread(new WatchAndSync(*forResources(), forWebApp())).start()
   }
 
   private SyncSpec forWebApp() {

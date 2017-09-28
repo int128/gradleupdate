@@ -13,14 +13,18 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
   private InjectLoggingProperties injectLoggingProperties
   private InjectAppEngineWebXml injectAppEngineWebXml
   private WatchAndSyncWebAppTask watchAndSyncWebApp
+  private ShutdownWatchAndSyncWebAppTask shutdownWatchAndSyncWebAppTask
 
   @Override
   void apply(Project project) {
     extension = project.extensions.create('appengineSpringBoot', AppEngineSpringBootExtension)
     extension.dotEnv = project.file('.env')
     watchAndSyncWebApp = project.tasks.create('watchAndSyncWebApp', WatchAndSyncWebAppTask)
+    shutdownWatchAndSyncWebAppTask = project.tasks.create('shutdownWatchAndSyncWebApp', ShutdownWatchAndSyncWebAppTask)
     injectAppEngineWebXml = project.tasks.create('injectAppEngineWebXml', InjectAppEngineWebXml)
     injectLoggingProperties = project.tasks.create('injectLoggingProperties', InjectLoggingProperties)
+
+    shutdownWatchAndSyncWebAppTask.watchAndSyncWebAppTask = watchAndSyncWebApp
 
     project.afterEvaluate {
       configureAppEnginePlugin(project)
