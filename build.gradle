@@ -45,6 +45,10 @@ dependencies {
   testCompile 'com.google.appengine:appengine-tools-sdk:+'
 }
 
+ext.'thymeleaf.version' = '3.0.2.RELEASE'
+ext.'thymeleaf-layout-dialect.version' = '2.1.1'
+ext.'thymeleaf-extras-springsecurity4.version' = '3.0.2.RELEASE'
+
 configurations.all {
   exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
   exclude group: 'org.slf4j', module: 'jul-to-slf4j'
