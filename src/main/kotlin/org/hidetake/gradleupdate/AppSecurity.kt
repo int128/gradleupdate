@@ -12,5 +12,8 @@ open class AppSecurity : WebSecurityConfigurerAdapter() {
         http.authorizeRequests()
             .antMatchers("/my", "/my/**").authenticated()
             .anyRequest().permitAll()
+
+        http.logout()
+            .logoutSuccessUrl("/")
     }
 }
