@@ -5,24 +5,11 @@
 
 <head>
   <title th:text="|${user.login} - GradleUpdate|"></title>
-  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
-        crossorigin="anonymous"/>
-  <link th:href="@{/app.css}" rel="stylesheet"/>
+  <head th:include="fragments/header :: stylesheets" th:remove="tag"></head>
 </head>
 <body>
 
-<nav class="navbar navbar-default">
-  <div class="container">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="/">GradleUpdate</a>
-    </div>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a th:href="@{/logout}">Logout</a></li>
-    </ul>
-  </div>
-</nav>
+<nav th:replace="fragments/header :: #navbar"></nav>
 
 <div class="container">
   <section class="text-center">
@@ -34,11 +21,7 @@
   </section>
 </div>
 
-<section id="footer">
-  <div class="jumbotron text-center">
-    <p>GradleUpdate &copy; Hidetake Iwata</p>
-  </div>
-</section>
+<section th:replace="fragments/footer :: #footer"></section>
 
 </body>
 </html>

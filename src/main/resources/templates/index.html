@@ -7,6 +7,7 @@
         content="GradleUpdate keeps the latest Gradle wrapper on your GitHub repositories by pull requests automatically"/>
   <head th:include="fragments/header :: stylesheets" th:remove="tag"></head>
 </head>
+<body>
 
 <nav th:replace="fragments/header :: #navbar"></nav>
 
@@ -21,7 +22,7 @@
     </div>
   </section>
   <section class="text-center">
-    <form method="post" action="/landing">
+    <form th:method="post" th:action="@{/landing}">
       <div class="form-group">
         <label for="github-url">
           Paste GitHub Repository URL
