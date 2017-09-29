@@ -47,7 +47,7 @@ class WatchAndSync implements Runnable {
         watchKey.pollEvents().findAll { it.kind() != OVERFLOW }.each { event ->
           try {
             final context = watchContextMap.get(watchKey)
-            processWatchEvent(event as WatchEvent<Path>, context)
+            processWatchEvent(watchService, event as WatchEvent<Path>, context)
           } catch (IOException e) {
             log(e.toString())
           }
@@ -61,19 +61,20 @@ class WatchAndSync implements Runnable {
   }
 
   private void registerWatchService(WatchService watchService, SyncSpec syncSpec) {
-    final watchKey = syncSpec.sourcePath.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
-    watchContextMap.put(watchKey, new WatchContext(syncSpec, Paths.get('')))
-    log("Watching directory: ${syncSpec.sourceDirectory}")
-
+    registerWatchService(watchService, syncSpec, syncSpec.sourcePath)
     syncSpec.sourcePath.eachDirRecurse { Path directory ->
-      final childWatchKey = directory.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
-      final relativePath = syncSpec.sourcePath.relativize(directory)
-      watchContextMap.put(childWatchKey, new WatchContext(syncSpec, relativePath))
-      log("Watching directory: $directory -> $relativePath")
+      registerWatchService(watchService, syncSpec, directory)
     }
   }
 
-  private static void processWatchEvent(WatchEvent<Path> event, WatchContext context) {
+  private void registerWatchService(WatchService watchService, SyncSpec syncSpec, Path directory) {
+    final watchKey = directory.register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE)
+    final relativePath = syncSpec.sourcePath.relativize(directory)
+    watchContextMap.put(watchKey, new WatchContext(syncSpec, relativePath))
+    log("Watching $directory -> $relativePath")
+  }
+
+  private void processWatchEvent(WatchService watchService, WatchEvent<Path> event, WatchContext context) {
     final sourceFile = context.syncSpec.sourcePath.resolve(context.relativePath).resolve(event.context()).toFile()
     final targetFile = context.syncSpec.targetPath.resolve(context.relativePath).resolve(event.context()).toFile()
 
@@ -82,6 +83,7 @@ class WatchAndSync implements Runnable {
         if (sourceFile.directory) {
           log("Creating directory $targetFile")
           targetFile.mkdirs()
+          registerWatchService(watchService, context.syncSpec, sourceFile.toPath())
         } else {
           log("Creating file $targetFile")
           Files.copy(sourceFile.toPath(), targetFile.toPath(), REPLACE_EXISTING)
@@ -105,6 +107,6 @@ class WatchAndSync implements Runnable {
   }
 
   private static void log(String message) {
-    println("[${Thread.currentThread().name}] $message")
+    println("${new Date().format('yyyy-MM-dd HH:mm:ss.SSS')} --- [${Thread.currentThread().name}] $message")
   }
 }

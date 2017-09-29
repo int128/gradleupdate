@@ -68,6 +68,7 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
 
     project.tasks.appengineRun.dependsOn(injectLoggingProperties)
     project.tasks.appengineRun.dependsOn(watchAndSyncWebApp)
+    project.tasks.appengineRun.finalizedBy(shutdownWatchAndSyncWebAppTask)
     project.tasks.appengineStage.finalizedBy(injectAppEngineWebXml)
     project.tasks.appengineDeploy.dependsOn(injectAppEngineWebXml)
   }
