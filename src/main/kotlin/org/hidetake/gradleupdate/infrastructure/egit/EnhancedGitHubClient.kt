@@ -37,7 +37,7 @@ class EnhancedGitHubClient(
         }
 
         val requestProperties = httpRequest.requestProperties
-        val responseCache = responseCacheRepository.find(uri, requestProperties)
+        val responseCache = responseCacheRepository.find(ResponseCacheKey(uri, requestProperties))
         responseCache?.also {
             httpRequest.setRequestProperty(HttpHeaders.IF_NONE_MATCH, responseCache.eTag)
         }
@@ -48,7 +48,9 @@ class EnhancedGitHubClient(
             isOk(code) ->
                 GitHubResponse(httpRequest, getBody(request, getStream(httpRequest))).also { response ->
                     val eTag = response.getHeader(HttpHeaders.ETAG)
-                    responseCacheRepository.save(uri, requestProperties, ResponseCache(eTag, response.body))
+                    responseCacheRepository.save(
+                        ResponseCacheKey(uri, requestProperties),
+                        ResponseCache(eTag, response.body))
                     log.debug("CACHED {} @ {}", uri, eTag)
                 }
             isEmpty(code) ->
