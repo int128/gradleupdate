@@ -24,7 +24,9 @@ jobs:
           at: .
       - run: echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > "$HOME/gcp-service-account-key.json"
       - run: gcloud auth activate-service-account --key-file "$HOME/gcp-service-account-key.json"
-      - run: echo "$DOTENV" | base64 -d > .env
+      - run: echo "SYSTEM_GITHUB_ACCESS_TOKEN=$SYSTEM_GITHUB_ACCESS_TOKEN" >> .env
+      - run: echo "GITHUB_OAUTH_CLIENT_ID=$GITHUB_OAUTH_CLIENT_ID" >> .env
+      - run: echo "GITHUB_OAUTH_CLIENT_SECRET=$GITHUB_OAUTH_CLIENT_SECRET" >> .env
       - run: ./gradlew appengineDeploy
 
 workflows:

@@ -8,9 +8,9 @@ Automatic Gradle Updater.
 Create `.env` file.
 
 ```properties
-SYSTEM_GITHUB_ACCESS_TOKEN=
-GITHUB_OAUTH_CLIENT_ID=
-GITHUB_OAUTH_CLIENT_SECRET=
+SYSTEM_GITHUB_ACCESS_TOKEN=Personal access token for local development
+GITHUB_OAUTH_CLIENT_ID=OAuth client ID for local development
+GITHUB_OAUTH_CLIENT_SECRET=OAuth client secret for local development
 ```
 
 Google Cloud SDK is required.
@@ -31,5 +31,9 @@ gcloud components install app-engine-java
 
 Configure following environment variables on CircleCI.
 
-- `GCP_SERVICE_ACCOUNT_KEY` - Base64 encoded service account key
-- `DOTENV` - Base64 encoded `.env` for production
+```properties
+GCP_SERVICE_ACCOUNT_KEY=Base64 encoded service account key
+SYSTEM_GITHUB_ACCESS_TOKEN=Personal access token for production
+GITHUB_OAUTH_CLIENT_ID=OAuth client ID for production
+GITHUB_OAUTH_CLIENT_SECRET=OAuth client secret for production
+```
