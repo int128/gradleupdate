@@ -5,16 +5,14 @@ import org.eclipse.egit.github.core.service.DataService
 import org.eclipse.egit.github.core.service.RepositoryService
 import org.eclipse.egit.github.core.service.UserService
 import org.hidetake.gradleupdate.domain.*
-import org.hidetake.gradleupdate.infrastructure.egit.EnhancedGitHubClient
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
-import org.springframework.beans.factory.annotation.Qualifier
 
 @org.springframework.stereotype.Repository
-class DefaultPullRequestRepository(@Qualifier("gradleUpdateGitHubClient") client: EnhancedGitHubClient) : PullRequestRepository {
-    private val userService = UserService(client)
-    private val repositoryService = RepositoryService(client)
-    private val pullRequestService = EnhancedPullRequestService(client)
-    private val dataService = DataService(client)
+class DefaultPullRequestRepository(systemGitHubClient: SystemGitHubClient) : PullRequestRepository {
+    private val userService = UserService(systemGitHubClient)
+    private val repositoryService = RepositoryService(systemGitHubClient)
+    private val pullRequestService = EnhancedPullRequestService(systemGitHubClient)
+    private val dataService = DataService(systemGitHubClient)
 
     override fun createOrUpdate(
         repositoryPath: RepositoryPath,

@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<!--/*@thymesVar id="user" type="org.eclipse.egit.github.core.User"*/-->
+<!--/*@thymesVar id="repositories" type="java.util.List<org.eclipse.egit.github.core.Repository>"*/-->
 
 <head>
-  <title th:text="|${user.login} - GradleUpdate|"></title>
+  <title>GradleUpdate</title>
   <head th:include="fragments/header :: stylesheets" th:remove="tag"></head>
 </head>
 <body>
@@ -14,10 +14,31 @@
 <div class="container">
   <section class="text-center">
     <div class="jumbotron">
-      <img th:src="${user.avatarUrl}" alt="avatar" width="160" height="160" class="img-circle"/>
-      <h2 th:text="|${user.name}|"></h2>
-      <p th:text="|@${user.login}|"></p>
+      <div th:with="user=${#request.userPrincipal.userAuthentication.details}">
+        <img th:src="${user.avatar_url}" alt="avatar" width="160" height="160" class="img-circle"/>
+        <h2 th:text="|${user.name}|"></h2>
+        <p th:text="|@${user.login}|"></p>
+      </div>
     </div>
+  </section>
+
+  <section>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Repository</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="repository: ${repositories}">
+          <td>
+            <a th:href="|/${repository.owner.login}/${repository.name}/status|">
+              <span th:text="|${repository.owner.login}/${repository.name}|"></span>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 </div>
 

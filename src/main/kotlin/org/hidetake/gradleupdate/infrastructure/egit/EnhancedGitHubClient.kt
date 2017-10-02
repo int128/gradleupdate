@@ -7,17 +7,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import java.net.HttpURLConnection
 
-class EnhancedGitHubClient(
-    private val responseCacheRepository: ResponseCacheRepository,
-    private val accessTokenProvider: () -> String
-) : GitHubClient() {
+abstract class EnhancedGitHubClient(private val responseCacheRepository: ResponseCacheRepository) : GitHubClient() {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    init {
-        // EGit always sends author and committer on Commit API
-        // but GitHub rejects null value.
-        setSerializeNulls(false)
-    }
+    abstract fun getAccessToken(): String
 
     override fun setOAuth2Token(token: String?): GitHubClient =
         throw UnsupportedOperationException()
@@ -25,8 +18,7 @@ class EnhancedGitHubClient(
     override fun createConnection(uri: String, method: String): HttpURLConnection =
         super.createConnection(uri, method).also { connection ->
             log.debug("$method $uri")
-            val accessToken = accessTokenProvider()
-            connection.setRequestProperty("Authorization", "token $accessToken")
+            connection.setRequestProperty("Authorization", "token ${getAccessToken()}")
         }
 
     override fun get(request: GitHubRequest): GitHubResponse {

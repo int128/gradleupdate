@@ -5,14 +5,12 @@ import org.hidetake.gradleupdate.domain.GradleWrapperFile
 import org.hidetake.gradleupdate.domain.GradleWrapperRepository
 import org.hidetake.gradleupdate.domain.GradleWrapperVersion
 import org.hidetake.gradleupdate.domain.RepositoryPath
-import org.hidetake.gradleupdate.infrastructure.egit.EnhancedGitHubClient
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class DefaultGradleWrapperRepository(@Qualifier("gradleUpdateGitHubClient") client: EnhancedGitHubClient) : GradleWrapperRepository {
-    private val contentsService = ContentsService(client)
+class DefaultGradleWrapperRepository(systemGitHubClient: SystemGitHubClient) : GradleWrapperRepository {
+    private val contentsService = ContentsService(systemGitHubClient)
 
     override fun findVersion(repositoryPath: RepositoryPath): GradleWrapperVersion? =
         findFile(repositoryPath, "gradle/wrapper/gradle-wrapper.properties")
