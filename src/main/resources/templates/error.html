@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>GradleUpdate</title>
+  <head th:include="fragments/header :: stylesheets" th:remove="tag"></head>
+</head>
+<body>
+
+<nav th:replace="fragments/header :: #navbar"></nav>
+
+<div class="container">
+  <section class="text-center">
+    <div class="jumbotron">
+      <h1 th:text="|${status} ${error}|"></h1>
+      <p>Oops... something is wrong</p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
