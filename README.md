@@ -25,3 +25,11 @@ gcloud components install app-engine-java
 # Deploy
 ./gradlew appengineDeploy
 ```
+
+
+## How to Deploy
+
+Configure following environment variables on CircleCI.
+
+- `GCP_SERVICE_ACCOUNT_KEY` - Base64 encoded service account key
+- `DOTENV` - Base64 encoded `.env` for production
