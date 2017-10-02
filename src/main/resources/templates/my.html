@@ -12,28 +12,24 @@
 <nav th:replace="fragments/header :: #navbar"></nav>
 
 <div class="container">
-  <section class="text-center">
-    <div class="jumbotron">
-      <div th:with="user=${#request.userPrincipal.userAuthentication.details}">
-        <img th:src="${user.avatar_url}" alt="avatar" width="160" height="160" class="img-circle"/>
-        <h2 th:text="|${user.name}|"></h2>
-        <p th:text="|@${user.login}|"></p>
-      </div>
-    </div>
-  </section>
-
   <section>
     <table class="table">
       <thead>
         <tr>
           <th>Repository</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr th:each="repository: ${repositories}">
           <td>
+            <a th:href="|/${repository.owner.login}/${repository.name}/status|" th:text="|${repository.owner.login}/${repository.name}|"></a>
+            -
+            <span th:text="${repository.description}"></span>
+          </td>
+          <td>
             <a th:href="|/${repository.owner.login}/${repository.name}/status|">
-              <span th:text="|${repository.owner.login}/${repository.name}|"></span>
+              <img th:src="|/${repository.owner.login}/${repository.name}/status.svg|" alt="badge"/>
             </a>
           </td>
         </tr>

@@ -11,5 +11,5 @@ class LoginUserService(
 ) {
     fun getLoginUser() = userRepository.getLoginUser()
 
-    fun getRepositories() = repositoryRepository.findAllOfLoginUser()
+    fun getRepositories() = repositoryRepository.findAllOfLoginUser(mapOf("sort" to "updated"))
 }

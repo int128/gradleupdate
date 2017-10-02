@@ -16,6 +16,6 @@ class DefaultRepositoryRepository(
     override fun getByName(repositoryPath: RepositoryPath): Repository =
         systemRepositoryService.getRepository({repositoryPath.fullName})
 
-    override fun findAllOfLoginUser(): List<Repository> =
-        loginUserRepositoryService.repositories
+    override fun findAllOfLoginUser(criteria: Map<String, String>): List<Repository> =
+        loginUserRepositoryService.getRepositories(criteria)
 }
