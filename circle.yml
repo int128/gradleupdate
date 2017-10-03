@@ -2,41 +2,30 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8
-    working_directory: ~/gradleupdate
-    steps:
-      - checkout
-      - run: ./gradlew build
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build
-
-  deploy:
-    docker:
       - image: google/cloud-sdk:alpine
     working_directory: ~/gradleupdate
     steps:
-      - run: apk --update add openjdk8
-      - run: gcloud components install app-engine-java
-      - checkout
-      - attach_workspace:
-          at: .
-      - run: echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > "$HOME/gcp-service-account-key.json"
-      - run: gcloud auth activate-service-account --key-file "$HOME/gcp-service-account-key.json"
-      - run: echo "SYSTEM_GITHUB_ACCESS_TOKEN=$SYSTEM_GITHUB_ACCESS_TOKEN" >> .env
-      - run: echo "GITHUB_OAUTH_CLIENT_ID=$GITHUB_OAUTH_CLIENT_ID" >> .env
-      - run: echo "GITHUB_OAUTH_CLIENT_SECRET=$GITHUB_OAUTH_CLIENT_SECRET" >> .env
-      - run: ./gradlew appengineDeploy
+      - run:
+          name: Install
+          command: |
+            apk --update add openjdk8
+            gcloud components install app-engine-java
 
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - build
+      - checkout
+
+      - run:
+          name: Build
+          command: |
+            ./gradlew build
+
       - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+          name: Deploy
+          command: |
+            if [ "$CIRCLE_BRANCH" = "master" ]; then
+              echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > "$HOME/gcp-service-account-key.json"
+              gcloud auth activate-service-account --key-file "$HOME/gcp-service-account-key.json"
+              echo "SYSTEM_GITHUB_ACCESS_TOKEN=$SYSTEM_GITHUB_ACCESS_TOKEN" >> .env
+              echo "GITHUB_OAUTH_CLIENT_ID=$GITHUB_OAUTH_CLIENT_ID" >> .env
+              echo "GITHUB_OAUTH_CLIENT_SECRET=$GITHUB_OAUTH_CLIENT_SECRET" >> .env
+              ./gradlew appengineDeploy
+            fi
