@@ -10,6 +10,9 @@ class WatchAndSyncWebAppTask extends DefaultTask {
   @TaskAction
   void startThread() {
     threads << new Thread(new WatchAndSync(*forResources(), forWebApp())).start()
+    project.gradle.buildFinished {
+      threads*.interrupt()
+    }
   }
 
   private SyncSpec forWebApp() {
