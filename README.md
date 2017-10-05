@@ -5,12 +5,12 @@ Automatic Gradle Updater.
 
 ## How to Run
 
-Create `.env` file.
+Create `.properties` file into the project.
 
 ```properties
-SYSTEM_GITHUB_ACCESS_TOKEN=Personal access token for local development
-GITHUB_OAUTH_CLIENT_ID=OAuth client ID for local development
-GITHUB_OAUTH_CLIENT_SECRET=OAuth client secret for local development
+gradleupdate.github.accessToken=Personal access token for local development
+security.oauth2.client.clientId=OAuth client ID for local development
+security.oauth2.client.clientSecret=OAuth client secret for local development
 ```
 
 Google Cloud SDK is required.

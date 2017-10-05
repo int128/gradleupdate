@@ -10,17 +10,14 @@ import org.gradle.api.Project
  */
 class AppEngineSpringBootPlugin implements Plugin<Project> {
   private AppEngineSpringBootExtension extension
-  private InjectLoggingProperties injectLoggingProperties
-  private InjectAppEngineWebXml injectAppEngineWebXml
-  private WatchAndSyncWebAppTask watchAndSyncWebApp
 
   @Override
   void apply(Project project) {
     extension = project.extensions.create('appengineSpringBoot', AppEngineSpringBootExtension)
-    extension.dotEnv = project.file('.env')
-    watchAndSyncWebApp = project.tasks.create('watchAndSyncWebApp', WatchAndSyncWebAppTask)
-    injectAppEngineWebXml = project.tasks.create('injectAppEngineWebXml', InjectAppEngineWebXml)
-    injectLoggingProperties = project.tasks.create('injectLoggingProperties', InjectLoggingProperties)
+    extension.devLoggingPropertiesTask = project.tasks.create('devLoggingProperties', DevLoggingPropertiesTask)
+    extension.watchAndSyncWebAppTask = project.tasks.create('watchAndSyncWebApp', WatchAndSyncWebAppTask)
+    extension.stageApplicationPropertiesTask = project.tasks.create('stageApplicationProperties', StageApplicationPropertiesTask)
+    extension.initialize(project)
 
     project.afterEvaluate {
       configureAppEnginePlugin(project)
@@ -35,37 +32,14 @@ class AppEngineSpringBootPlugin implements Plugin<Project> {
     final appengine = project.findProperty('appengine')
     assert appengine, 'appengine-gradle-plugin must be applied'
 
-    if (extension.debugPort > 0) {
-      if (appengine.run.jvmFlags == null) {
-        appengine.run.jvmFlags = []
-      }
-      appengine.run.jvmFlags.add(
-        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${extension.debugPort}".toString())
+    if (appengine.run.jvmFlags == null) {
+      appengine.run.jvmFlags = []
     }
+    appengine.run.jvmFlags.addAll(extension.computeDevServerJvmFlags())
 
-    if (injectLoggingProperties.enabled) {
-      appengine.run.jvmFlags.add(
-        "-Djava.util.logging.config.file=${injectLoggingProperties.loggingProperties}".toString())
-    }
-
-    if (appengine.run.environment == null) {
-      appengine.run.environment = [:]
-    }
-    appengine.run.environment.putAll(extension.springBootDevProperties)
-    appengine.run.environment.putAll(DotEnv.loadOrEmpty(extension.dotEnv))
-
-    if (injectAppEngineWebXml.dotEnv == null) {
-      injectAppEngineWebXml.dotEnv = extension.dotEnv
-    }
-    if (injectAppEngineWebXml.appEngineWebXml == null) {
-      injectAppEngineWebXml.appEngineWebXml =
-        project.file("${appengine.stage.stagingDirectory}/WEB-INF/appengine-web.xml")
-    }
-
-    project.tasks.appengineRun.dependsOn(injectLoggingProperties)
-    project.tasks.appengineRun.dependsOn(watchAndSyncWebApp)
-    project.tasks.appengineStage.finalizedBy(injectAppEngineWebXml)
-    project.tasks.appengineDeploy.dependsOn(injectAppEngineWebXml)
+    project.tasks.appengineRun.dependsOn(extension.devLoggingPropertiesTask)
+    project.tasks.appengineRun.dependsOn(extension.watchAndSyncWebAppTask)
+    project.tasks.appengineStage.finalizedBy(extension.stageApplicationPropertiesTask)
   }
 
   /**
