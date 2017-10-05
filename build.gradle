@@ -58,4 +58,7 @@ appengine {
   deploy {
     project = 'gradleupdate'
   }
+  stage {
+    enableQuickstart = true
+  }
 }
