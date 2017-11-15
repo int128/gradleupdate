@@ -25,6 +25,4 @@ jobs:
             echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > "$HOME/gcp-service-account-key.json"
             gcloud auth activate-service-account --key-file "$HOME/gcp-service-account-key.json"
             echo "gradleupdate.github.accessToken=$SYSTEM_GITHUB_ACCESS_TOKEN" >> .properties
-            echo "security.oauth2.client.clientId=$GITHUB_OAUTH_CLIENT_ID" >> .properties
-            echo "security.oauth2.client.clientSecret=$GITHUB_OAUTH_CLIENT_SECRET" >> .properties
             ./gradlew appengineDeploy

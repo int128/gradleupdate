@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class DefaultGradleWrapperRepository(systemGitHubClient: SystemGitHubClient) : GradleWrapperRepository {
-    private val contentsService = ContentsService(systemGitHubClient)
+class DefaultGradleWrapperRepository(client: SystemGitHubClient) : GradleWrapperRepository {
+    private val contentsService = ContentsService(client)
 
     override fun findVersion(repositoryPath: RepositoryPath): GradleWrapperVersion? =
         findFile(repositoryPath, "gradle/wrapper/gradle-wrapper.properties")

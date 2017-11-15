@@ -8,11 +8,11 @@ import org.hidetake.gradleupdate.domain.*
 import org.hidetake.gradleupdate.infrastructure.egit.EnhancedPullRequestService
 
 @org.springframework.stereotype.Repository
-class DefaultPullRequestRepository(systemGitHubClient: SystemGitHubClient) : PullRequestRepository {
-    private val userService = UserService(systemGitHubClient)
-    private val repositoryService = RepositoryService(systemGitHubClient)
-    private val pullRequestService = EnhancedPullRequestService(systemGitHubClient)
-    private val dataService = DataService(systemGitHubClient)
+class DefaultPullRequestRepository(client: SystemGitHubClient) : PullRequestRepository {
+    private val userService = UserService(client)
+    private val repositoryService = RepositoryService(client)
+    private val pullRequestService = EnhancedPullRequestService(client)
+    private val dataService = DataService(client)
 
     override fun createOrUpdate(
         repositoryPath: RepositoryPath,

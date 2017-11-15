@@ -13,19 +13,6 @@
       <div class="navbar-header">
         <a class="navbar-brand" href="/">GradleUpdate</a>
       </div>
-      <ul class="nav navbar-nav navbar-right">
-        <li th:if="${#request.userPrincipal == null}">
-          <a th:href="@{/login}">Login with GitHub</a>
-        </li>
-        <li th:if="${#request.userPrincipal}"
-            th:with="user=${#request.userPrincipal.userAuthentication.details}">
-          <a th:href="@{/my}">
-            <img th:src="${user.avatar_url}" class="img-circle" width="24"/>
-            &nbsp;
-            <span th:text="${user.name}"></span>
-          </a>
-        </li>
-      </ul>
     </div>
   </nav>
 </html>
