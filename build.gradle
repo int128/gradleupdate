@@ -44,9 +44,7 @@ configurations.all {
 
 appengine {
   deploy {
-    project = 'gradleupdate'
-  }
-  stage {
-    enableQuickstart = true
+    version = System.getenv('CIRCLE_BRANCH')
+    promote = false
   }
 }
