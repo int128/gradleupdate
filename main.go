@@ -3,14 +3,11 @@ package main
 import (
 	"net/http"
 
+	"github.com/int128/gradleupdate/handler"
 	"google.golang.org/appengine"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "Not Found", 404)
-}
-
 func main() {
-	http.HandleFunc("/", handler)
+	http.Handle("/", handler.New())
 	appengine.Main()
 }

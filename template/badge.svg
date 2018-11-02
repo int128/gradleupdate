@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="{{.Width}}" height="20">
+    <linearGradient id="b" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+        <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+    <clipPath id="a">
+        <rect width="{{.Width}}" height="20" rx="3" fill="#fff"/>
+    </clipPath>
+    <g clip-path="url(#a)">
+        <path fill="{{.LeftFill}}" d="M0 0h{{.LeftWidth}}v20H0z"/>
+        <path fill="{{.RightFill}}" d="M{{.LeftWidth}} 0h{{.RightWidth}}v20H{{.LeftWidth}}z"/>
+        <path fill="url(#b)" d="M0 0h{{.Width}}v20H0z"/>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+        <text x="{{.LeftX}}" y="15" fill="#010101" fill-opacity=".3">{{.LeftText}}</text>
+        <text x="{{.LeftX}}" y="14">{{.LeftText}}</text>
+        <text x="{{.RightX}}" y="15" fill="#010101" fill-opacity=".3">{{.RightText}}</text>
+        <text x="{{.RightX}}" y="14">{{.RightText}}</text>
+    </g>
+</svg>
