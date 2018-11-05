@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>GradleUpdate</title>
+  <meta name="description"
+        content="GradleUpdate keeps the latest Gradle wrapper on your GitHub repositories by pull requests automatically"/>
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
+        crossorigin="anonymous"/>
+  <link href="/static/app.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+  <section class="text-center">
+    <div class="jumbotron">
+      <h1>GradleUpdate</h1>
+      <p>Automatic Gradle Updater</p>
+      <p>
+        <img src="/int128/latest-gradle-wrapper/status.svg"/>
+      </p>
+    </div>
+  </section>
+  <section class="text-center">
+    <form method="post" action="/landing">
+      <div class="form-group">
+        <label for="github-url">
+          Paste GitHub URL
+        </label>
+        <input type="text" id="github-url" name="url"
+               class="form-control text-center input-lg input-text-monospace"
+               placeholder="https://github.com/int128/gradleupdate"/>
+      </div>
+      <button type="submit" class="btn btn-primary">Get a Badge</button>
+    </form>
+  </section>
+</div>
+
+<section id="footer">
+  <p>GradleUpdate &copy; Hidetake Iwata</p>
+</section>
+
+</body>
+</html>
