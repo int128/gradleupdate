@@ -10,10 +10,9 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-// Badge handles a request for a badge.
-type Badge struct{}
+type badge struct{}
 
-func (h *Badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]

@@ -9,7 +9,8 @@ import (
 // New returns a handler for all paths.
 func New() http.Handler {
 	r := mux.NewRouter()
-	r.Handle("/{owner}/{repo}/status.svg", &Badge{}).Methods("GET")
-	r.Handle("/", &Home{}).Methods("GET")
+	r.Handle("/landing", &landing{}).Methods("POST")
+	r.Handle("/{owner}/{repo}", &repository{}).Methods("GET")
+	r.Handle("/{owner}/{repo}/status.svg", &badge{}).Methods("GET")
 	return r
 }
