@@ -18,8 +18,9 @@ func (h *Badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	v, err := service.GetGradleWrapperVersion(ctx, owner, repo)
-	if err != nil {
+	status, err := service.GetGradleWrapperStatus(ctx, owner, repo)
+	switch{
+	case err != nil:
 		log.Warningf(ctx, "Could not get gradle wrapper version: %s", err)
 		t := template.Badge{
 			LeftText:  "Gradle",
@@ -32,18 +33,31 @@ func (h *Badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err := t.Render(w); err != nil {
 			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
 		}
-		return
-	}
 
-	t := template.Badge{
-		LeftText:  "Gradle",
-		LeftFill:  "#555",
-		LeftWidth: 47,
-		RightText: v,
-		RightFill: "#4c1",
-	}
-	w.Header().Set("Content-Type", "image/svg+xml")
-	if err := t.Render(w); err != nil {
-		log.Errorf(ctx, "Error while rendering SVG template: %s", err)
+	case status.UpToDate:
+		t := template.Badge{
+			LeftText:  "Gradle",
+			LeftFill:  "#555",
+			LeftWidth: 47,
+			RightText: string(status.TargetVersion),
+			RightFill: "#4c1",
+		}
+		w.Header().Set("Content-Type", "image/svg+xml")
+		if err := t.Render(w); err != nil {
+			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
+		}
+
+	case !status.UpToDate:
+		t := template.Badge{
+			LeftText:  "Gradle",
+			LeftFill:  "#555",
+			LeftWidth: 47,
+			RightText: string(status.TargetVersion),
+			RightFill: "#e05d44",
+		}
+		w.Header().Set("Content-Type", "image/svg+xml")
+		if err := t.Render(w); err != nil {
+			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
+		}
 	}
 }

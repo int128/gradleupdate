@@ -3,14 +3,15 @@ package service
 import (
 	"context"
 	"fmt"
-	"regexp"
+
+	"github.com/int128/gradleupdate/domain"
 
 	"github.com/google/go-github/v18/github"
 )
 
 const gradleWrapperPropsPath = "gradle/wrapper/gradle-wrapper.properties"
 
-func GetGradleWrapperVersion(ctx context.Context, owner, repo string) (string, error) {
+func GetGradleWrapperVersion(ctx context.Context, owner, repo string) (domain.GradleVersion, error) {
 	c := github.NewClient(nil)
 
 	fc, _, _, err := c.Repositories.GetContents(ctx, owner, repo, gradleWrapperPropsPath, nil)
@@ -24,19 +25,9 @@ func GetGradleWrapperVersion(ctx context.Context, owner, repo string) (string, e
 	if err != nil {
 		return "", fmt.Errorf("Could not decode content: %s", err)
 	}
-	v := findGradleWrapperVersion(content)
+	v := domain.FindGradleWrapperVersion(content)
 	if v == "" {
-		return "", fmt.Errorf("Could not determine version from file")
+		return "", fmt.Errorf("Could not determine version from gradle-wrapper.properties")
 	}
 	return v, nil
-}
-
-var regexpGradleWrapperVersion = regexp.MustCompile("distributionUrl=.+?/gradle-(.+?)-.+?\\.zip")
-
-func findGradleWrapperVersion(content string) string {
-	m := regexpGradleWrapperVersion.FindStringSubmatch(content)
-	if len(m) != 2 {
-		return ""
-	}
-	return m[1]
 }
