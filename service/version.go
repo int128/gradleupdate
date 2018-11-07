@@ -5,15 +5,13 @@ import (
 	"fmt"
 
 	"github.com/int128/gradleupdate/domain"
-
-	"github.com/google/go-github/v18/github"
+	"github.com/int128/gradleupdate/infrastructure"
 )
 
 const gradleWrapperPropsPath = "gradle/wrapper/gradle-wrapper.properties"
 
 func GetGradleWrapperVersion(ctx context.Context, owner, repo string) (domain.GradleVersion, error) {
-	c := github.NewClient(nil)
-
+	c := infrastructure.GitHubClient()
 	fc, _, _, err := c.Repositories.GetContents(ctx, owner, repo, gradleWrapperPropsPath, nil)
 	if err != nil {
 		return "", fmt.Errorf("Could not get content: %s", err)

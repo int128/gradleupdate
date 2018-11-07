@@ -1,6 +1,6 @@
 root = true
 
-[*.{css,html}]
+[*.{css,html,qtpl}]
 indent_style = space
 end_of_line = lf
 charset = utf-8

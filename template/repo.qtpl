@@ -1,0 +1,39 @@
+{% func Repository(owner, repo, description, avatarURL, thisURL, badgeURL string) %}
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <title>{%s owner %}/{%s repo %} - GradleUpdate</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
+        crossorigin="anonymous"/>
+  <link href="/static/app.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="container">
+	<section class="text-center">
+		<div class="jumbotron">
+      <img src="{%s avatarURL %}" alt="avatar" width="160" height="160" class="img-circle"/>
+      <h2>{%s description %}</h2>
+      <p>{%s owner %}/{%s repo %}</p>
+      <p>
+        <img src="/{%s owner %}/{%s repo %}/status.svg" alt="badge"/>
+      </p>
+      <form>
+        <label class="text-uppercase" for="badge-markdown">Markdown:</label>
+        <input type="text" id="badge-markdown" class="form-control input-text-monospace"
+          value="[![Gradle Status]({%s badgeURL %})]({%s thisURL %})"/>
+      </form>
+    </div>
+	</section>
+</div>
+
+<section id="footer">
+	<p>GradleUpdate &copy; Hidetake Iwata</p>
+</section>
+
+</body>
+</html>
+{% endfunc %}
