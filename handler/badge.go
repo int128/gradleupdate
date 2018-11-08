@@ -27,11 +27,10 @@ func (h *badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			LeftWidth: 47,
 			RightText: "unknown",
 			RightFill: "#9f9f9f",
+			RightWidth: template.BadgeTextWidth("unknown"),
 		}
 		w.Header().Set("Content-Type", "image/svg+xml")
-		if err := t.Render(w); err != nil {
-			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
-		}
+		t.WriteSVG(w)
 
 	case status.UpToDate:
 		t := template.Badge{
@@ -40,11 +39,10 @@ func (h *badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			LeftWidth: 47,
 			RightText: string(status.TargetVersion),
 			RightFill: "#4c1",
+			RightWidth: template.BadgeTextWidth(string(status.TargetVersion)),
 		}
 		w.Header().Set("Content-Type", "image/svg+xml")
-		if err := t.Render(w); err != nil {
-			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
-		}
+		t.WriteSVG(w)
 
 	case !status.UpToDate:
 		t := template.Badge{
@@ -53,10 +51,9 @@ func (h *badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			LeftWidth: 47,
 			RightText: string(status.TargetVersion),
 			RightFill: "#e05d44",
+			RightWidth: template.BadgeTextWidth(string(status.TargetVersion)),
 		}
 		w.Header().Set("Content-Type", "image/svg+xml")
-		if err := t.Render(w); err != nil {
-			log.Errorf(ctx, "Error while rendering SVG template: %s", err)
-		}
+		t.WriteSVG(w)
 	}
 }

@@ -1,0 +1,22 @@
+{% func (b Badge) SVG() %}
+<svg xmlns="http://www.w3.org/2000/svg" width="{%d= b.LeftWidth + b.RightWidth %}" height="20">
+    <linearGradient id="b" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+        <stop offset="1" stop-opacity=".1"/>
+    </linearGradient>
+    <clipPath id="a">
+        <rect width="{%d= b.LeftWidth + b.RightWidth %}" height="20" rx="3" fill="#fff"/>
+    </clipPath>
+    <g clip-path="url(#a)">
+        <path fill="{%s b.LeftFill %}" d="M0 0h{%d b.LeftWidth %}v20H0z"/>
+        <path fill="{%s b.RightFill %}" d="M{%d b.LeftWidth %} 0h{%d b.RightWidth %}v20H{%d b.LeftWidth %}z"/>
+        <path fill="url(#b)" d="M0 0h{%d= b.LeftWidth + b.RightWidth %}v20H0z"/>
+    </g>
+    <g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+        <text x="{%d= b.LeftWidth/2 %}" y="15" fill="#010101" fill-opacity=".3">{%s b.LeftText %}</text>
+        <text x="{%d= b.LeftWidth/2 %}" y="14">{%s b.LeftText %}</text>
+        <text x="{%d= b.LeftWidth + b.RightWidth/2 %}" y="15" fill="#010101" fill-opacity=".3">{%s b.RightText %}</text>
+        <text x="{%d= b.LeftWidth + b.RightWidth/2 %}" y="14">{%s b.RightText %}</text>
+    </g>
+</svg>
+{% endfunc %}
