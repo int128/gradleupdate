@@ -10,7 +10,7 @@ import (
 func New() http.Handler {
 	r := mux.NewRouter()
 	rh := routerHolder{r}
-	r.Handle("/landing", &landing{}).Methods("POST").Name("landing")
+	r.Handle("/landing", &landing{rh}).Methods("POST").Name("landing")
 	r.Handle("/{owner}/{repo}/status", &repository{rh}).Methods("GET").Name("repository")
 	r.Handle("/{owner}/{repo}/status.svg", &badge{}).Methods("GET").Name("badge")
 	return r

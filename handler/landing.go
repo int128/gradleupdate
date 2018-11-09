@@ -2,13 +2,15 @@ package handler
 
 import (
 	"net/http"
-	"regexp"
+	"strings"
 
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
 
-type landing struct{}
+type landing struct {
+	routerHolder
+}
 
 func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
@@ -18,18 +20,20 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	url := r.FormValue("url")
-	if url == "" {
+	owner, repo := h.extractOwnerAndRepo(url)
+	to, err := h.router.Get("repository").URL("owner", owner, "repo", repo)
+	if err != nil {
+		log.Infof(ctx, "Could not determine URL for %s/%s: %s", owner, repo, err)
 		http.Redirect(w, r, "/", 302)
+		return
 	}
-	ownerSlashRepo := h.extractGitHubRepository(url)
-	if ownerSlashRepo == "" {
-		http.Redirect(w, r, "/", 302)
-	}
-	http.Redirect(w, r, ownerSlashRepo, 302)
+	http.Redirect(w, r, to.String(), 302)
 }
 
-var regexpGitHubURL = regexp.MustCompile(`/\w+/\w+$`)
-
-func (h *landing) extractGitHubRepository(url string) string {
-	return regexpGitHubURL.FindString(url)
+func (h *landing) extractOwnerAndRepo(url string) (string, string) {
+	s := strings.Split(url, "/")
+	if len(s) < 2 {
+		return "", ""
+	}
+	return s[len(s)-2], s[len(s)-1]
 }
