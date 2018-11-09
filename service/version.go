@@ -11,7 +11,7 @@ import (
 const gradleWrapperPropsPath = "gradle/wrapper/gradle-wrapper.properties"
 
 func GetGradleWrapperVersion(ctx context.Context, owner, repo string) (domain.GradleVersion, error) {
-	c := infrastructure.GitHubClient()
+	c := infrastructure.GitHubClient(ctx)
 	fc, _, _, err := c.Repositories.GetContents(ctx, owner, repo, gradleWrapperPropsPath, nil)
 	if err != nil {
 		return "", fmt.Errorf("Could not get content: %s", err)

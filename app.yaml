@@ -7,3 +7,5 @@ handlers:
   upload: static/index.html
 - url: /.*
   script: _go_app
+includes:
+- .env.yaml
