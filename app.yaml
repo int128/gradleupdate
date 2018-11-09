@@ -6,6 +6,6 @@ handlers:
   static_files: static/index.html
   upload: static/index.html
 - url: /.*
-  script: _go_app
+  script: auto
 includes:
 - .env.yaml
