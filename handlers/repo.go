@@ -1,11 +1,11 @@
-package handler
+package handlers
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/service"
-	"github.com/int128/gradleupdate/template"
+	"github.com/int128/gradleupdate/templates"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
@@ -39,7 +39,7 @@ func (h *repository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("content-type", "text/html")
-	template.WriteRepository(w,
+	templates.WriteRepository(w,
 		owner,
 		repo,
 		ghr.GetDescription(),

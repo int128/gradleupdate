@@ -1,4 +1,4 @@
-package template
+package templates
 
 // Badge renders a badge image.
 type Badge struct {

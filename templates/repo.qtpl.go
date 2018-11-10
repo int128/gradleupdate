@@ -2,7 +2,7 @@
 // See https://github.com/valyala/quicktemplate for details.
 
 //line repo.qtpl:1
-package template
+package templates
 
 //line repo.qtpl:1
 import (
@@ -34,11 +34,11 @@ func StreamRepository(qw422016 *qt422016.Writer, owner, repo, description, avata
 	qw422016.E().S(repo)
 	//line repo.qtpl:6
 	qw422016.N().S(` - GradleUpdate</title>
-  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
-        crossorigin="anonymous"/>
-  <link href="/static/app.css" rel="stylesheet"/>
+  `)
+	//line repo.qtpl:7
+	StreamHeader(qw422016)
+	//line repo.qtpl:7
+	qw422016.N().S(`
 </head>
 <body>
 
@@ -46,46 +46,46 @@ func StreamRepository(qw422016 *qt422016.Writer, owner, repo, description, avata
 	<section class="text-center">
 		<div class="jumbotron">
       <img src="`)
-	//line repo.qtpl:18
+	//line repo.qtpl:14
 	qw422016.E().S(avatarURL)
-	//line repo.qtpl:18
+	//line repo.qtpl:14
 	qw422016.N().S(`" alt="avatar" width="160" height="160" class="img-circle"/>
       <h2>`)
-	//line repo.qtpl:19
+	//line repo.qtpl:15
 	qw422016.E().S(description)
-	//line repo.qtpl:19
+	//line repo.qtpl:15
 	qw422016.N().S(`</h2>
       <p>`)
-	//line repo.qtpl:20
+	//line repo.qtpl:16
 	qw422016.E().S(owner)
-	//line repo.qtpl:20
+	//line repo.qtpl:16
 	qw422016.N().S(`/`)
-	//line repo.qtpl:20
+	//line repo.qtpl:16
 	qw422016.E().S(repo)
-	//line repo.qtpl:20
+	//line repo.qtpl:16
 	qw422016.N().S(`</p>
       <p>
         <img src="/`)
-	//line repo.qtpl:22
+	//line repo.qtpl:18
 	qw422016.E().S(owner)
-	//line repo.qtpl:22
+	//line repo.qtpl:18
 	qw422016.N().S(`/`)
-	//line repo.qtpl:22
+	//line repo.qtpl:18
 	qw422016.E().S(repo)
-	//line repo.qtpl:22
+	//line repo.qtpl:18
 	qw422016.N().S(`/status.svg" alt="badge"/>
       </p>
       <form>
         <label class="text-uppercase" for="badge-markdown">Markdown:</label>
         <input type="text" id="badge-markdown" class="form-control input-text-monospace"
           value="[![Gradle Status](`)
-	//line repo.qtpl:27
+	//line repo.qtpl:23
 	qw422016.E().S(badgeURL)
-	//line repo.qtpl:27
+	//line repo.qtpl:23
 	qw422016.N().S(`)](`)
-	//line repo.qtpl:27
+	//line repo.qtpl:23
 	qw422016.E().S(thisURL)
-	//line repo.qtpl:27
+	//line repo.qtpl:23
 	qw422016.N().S(`)"/>
       </form>
     </div>
@@ -99,31 +99,31 @@ func StreamRepository(qw422016 *qt422016.Writer, owner, repo, description, avata
 </body>
 </html>
 `)
-//line repo.qtpl:39
+//line repo.qtpl:35
 }
 
-//line repo.qtpl:39
+//line repo.qtpl:35
 func WriteRepository(qq422016 qtio422016.Writer, owner, repo, description, avatarURL, thisURL, badgeURL string) {
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	StreamRepository(qw422016, owner, repo, description, avatarURL, thisURL, badgeURL)
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	qt422016.ReleaseWriter(qw422016)
-//line repo.qtpl:39
+//line repo.qtpl:35
 }
 
-//line repo.qtpl:39
+//line repo.qtpl:35
 func Repository(owner, repo, description, avatarURL, thisURL, badgeURL string) string {
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	WriteRepository(qb422016, owner, repo, description, avatarURL, thisURL, badgeURL)
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	qs422016 := string(qb422016.B)
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line repo.qtpl:39
+	//line repo.qtpl:35
 	return qs422016
-//line repo.qtpl:39
+//line repo.qtpl:35
 }

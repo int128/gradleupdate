@@ -2,7 +2,7 @@
 // See https://github.com/valyala/quicktemplate for details.
 
 //line badge.qtpl:1
-package template
+package templates
 
 //line badge.qtpl:1
 import (
