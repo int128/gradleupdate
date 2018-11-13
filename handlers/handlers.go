@@ -13,6 +13,7 @@ func New() http.Handler {
 	r.Handle("/landing", &landing{rh}).Methods("POST").Name("landing")
 	r.Handle("/{owner}/{repo}/status", &repository{rh}).Methods("GET").Name("repository")
 	r.Handle("/{owner}/{repo}/status.svg", &badge{}).Methods("GET").Name("badge")
+	r.Handle("/{owner}/{repo}/pull", &pullRequest{}).Methods("POST").Name("pullRequest")
 	return r
 }
 
