@@ -8,6 +8,7 @@ import (
 	"github.com/int128/gradleupdate/infrastructure"
 )
 
+// GetRepository returns the repository.
 func GetRepository(ctx context.Context, owner, repo string) (*github.Repository, error) {
 	c := infrastructure.GitHubClient(ctx)
 	r, _, err := c.Repositories.Get(ctx, owner, repo)

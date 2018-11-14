@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// CreateOrUpdatePullRequestForGradleWrapper opens a pull request for updating the wrapper.
 func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo, version string) error {
 	c := infrastructure.GitHubClient(ctx)
 	baseRepository, _, err := c.Repositories.Get(ctx, owner, repo)
