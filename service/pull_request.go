@@ -50,6 +50,10 @@ func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo,
 		Head:  head,
 		Base:  base,
 		Title: fmt.Sprintf("Gradle %s", version),
+		Body:  fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
+
+This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
+`, version),
 	}
 	if _, err := pr.CreateOrUpdatePullRequest(ctx, c, pull); err != nil {
 		return errors.Wrapf(err, "Could not create or update the pull request")
