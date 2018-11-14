@@ -12,6 +12,12 @@ import (
 // CreateOrUpdatePullRequestForGradleWrapper opens a pull request for updating the wrapper.
 func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo, version string) error {
 	c := infrastructure.GitHubClient(ctx)
+
+	files, err := FindGradleWrapperFiles(ctx, c, "int128", "latest-gradle-wrapper")
+	if err != nil {
+		return errors.Wrapf(err, "Could not find files of the latest Gradle wrapper")
+	}
+
 	baseRepository, _, err := c.Repositories.Get(ctx, owner, repo)
 	if err != nil {
 		return errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
@@ -34,14 +40,7 @@ func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo,
 	}
 	commit := pr.Commit{
 		Message: fmt.Sprintf("Gradle %s", version),
-		Files: []pr.File{
-			// TODO: Gradle wrapper files
-			pr.File{
-				Path:           "example",
-				Mode:           "100644",
-				EncodedContent: "MjAxOOW5tCAxMeaciDEz5pelIOeBq+abnOaXpSAxN+aZgjEy5YiGMDXnp5IgSlNUCg==",
-			},
-		},
+		Files:   files,
 	}
 	if err := pr.CreateOrUpdateBranch(ctx, c, base, head, commit); err != nil {
 		return errors.Wrapf(err, "Could not create or update the branch")
