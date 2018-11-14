@@ -12,7 +12,7 @@ import (
 func CreateOrUpdatePullRequest(ctx context.Context, c *github.Client, pr PullRequest) (*github.PullRequest, error) {
 	pulls, _, err := c.PullRequests.List(ctx, pr.Base.Owner, pr.Base.Repo, &github.PullRequestListOptions{
 		Base:        pr.Base.Branch,
-		Head:        pr.Head.Owner + ":" + pr.Head.Branch,
+		Head:        pr.Head.Branch,
 		State:       "open",
 		Direction:   "desc",
 		Sort:        "updated",
