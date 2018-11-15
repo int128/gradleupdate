@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/infrastructure"
+	"github.com/int128/gradleupdate/app/infrastructure"
 )
 
 // GetRepository returns the repository.

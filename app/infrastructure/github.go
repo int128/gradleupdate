@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/go-github/v18/github"
 	"github.com/gregjones/httpcache"
-	"github.com/int128/gradleupdate/infrastructure/memcache"
+	"github.com/int128/gradleupdate/app/infrastructure/memcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/log"
 )

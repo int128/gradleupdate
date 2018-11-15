@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/int128/gradleupdate/infrastructure"
-	"github.com/int128/gradleupdate/service/pr"
+	"github.com/int128/gradleupdate/app/infrastructure"
+	"github.com/int128/gradleupdate/app/service/pr"
 	"github.com/pkg/errors"
 )
 

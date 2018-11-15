@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/infrastructure"
-	"github.com/int128/gradleupdate/service/pr"
+	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/app/infrastructure"
+	"github.com/int128/gradleupdate/app/service/pr"
 	"github.com/pkg/errors"
 )
 
