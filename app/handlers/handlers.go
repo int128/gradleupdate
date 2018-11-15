@@ -9,16 +9,11 @@ import (
 // New returns a handler for all paths.
 func New() http.Handler {
 	r := mux.NewRouter()
-	rh := routerHolder{r}
-	r.Handle("/landing", &landing{rh}).Methods("POST").Name("landing")
-	r.Handle("/{owner}/{repo}/status", &repository{rh}).Methods("GET").Name("repository")
-	r.Handle("/{owner}/{repo}/status.svg", &badge{}).Methods("GET").Name("badge")
-	r.Handle("/{owner}/{repo}/pull", &pullRequest{}).Methods("POST").Name("pullRequest")
+	r.Handle("/landing", &landing{}).Methods("POST")
+	r.Handle("/{owner}/{repo}/status", &repository{}).Methods("GET")
+	r.Handle("/{owner}/{repo}/status.svg", &badge{}).Methods("GET")
+	r.Handle("/{owner}/{repo}/pull", &pullRequest{}).Methods("POST")
 	return r
-}
-
-type routerHolder struct {
-	router *mux.Router
 }
 
 func baseURL(r *http.Request) string {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -8,9 +9,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type landing struct {
-	routerHolder
-}
+type landing struct{}
 
 func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
@@ -21,13 +20,8 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	url := r.FormValue("url")
 	owner, repo := h.extractOwnerAndRepo(url)
-	to, err := h.router.Get("repository").URL("owner", owner, "repo", repo)
-	if err != nil {
-		log.Infof(ctx, "Could not determine URL for %s/%s: %s", owner, repo, err)
-		http.Redirect(w, r, "/", 302)
-		return
-	}
-	http.Redirect(w, r, to.String(), 302)
+	to := fmt.Sprintf("/%s/%s/status", owner, repo)
+	http.Redirect(w, r, to, 302)
 }
 
 func (h *landing) extractOwnerAndRepo(url string) (string, string) {

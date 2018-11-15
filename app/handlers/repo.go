@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,9 +11,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type repository struct {
-	routerHolder
-}
+type repository struct{}
 
 func (h *repository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
@@ -25,18 +24,9 @@ func (h *repository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not get the repository", 500)
 		return
 	}
-	thisURL, err := h.router.Get("repository").URL("owner", owner, "repo", repo)
-	if err != nil {
-		log.Warningf(ctx, "Could not resolve repository URL: %s", err)
-		http.Error(w, "Internal Error", 500)
-		return
-	}
-	badgeURL, err := h.router.Get("badge").URL("owner", owner, "repo", repo)
-	if err != nil {
-		log.Warningf(ctx, "Could not resolve badge URL: %s", err)
-		http.Error(w, "Internal Error", 500)
-		return
-	}
+
+	thisURL := fmt.Sprintf("%s/%s/%s/status", baseURL(r), owner, repo)
+	badgeURL := fmt.Sprintf("%s/%s/%s/status.svg", baseURL(r), owner, repo)
 
 	w.Header().Set("content-type", "text/html")
 	templates.WriteRepository(w,
@@ -44,6 +34,6 @@ func (h *repository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		repo,
 		ghr.GetDescription(),
 		ghr.GetOwner().GetAvatarURL(),
-		baseURL(r)+thisURL.String(),
-		baseURL(r)+badgeURL.String())
+		thisURL,
+		badgeURL)
 }
