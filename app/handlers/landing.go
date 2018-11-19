@@ -3,8 +3,8 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
+	"github.com/int128/gradleupdate/app/domain"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
@@ -18,16 +18,12 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not parse form", 400)
 		return
 	}
-	url := r.FormValue("url")
-	owner, repo := h.extractOwnerAndRepo(url)
-	to := fmt.Sprintf("/%s/%s/status", owner, repo)
-	http.Redirect(w, r, to, 302)
-}
-
-func (h *landing) extractOwnerAndRepo(url string) (string, string) {
-	s := strings.Split(url, "/")
-	if len(s) < 2 {
-		return "", ""
+	url := domain.GitHubRepositoryURL(r.FormValue("url"))
+	owner, repo := url.ExtractOwnerAndRepo()
+	if owner == "" || repo == "" {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
 	}
-	return s[len(s)-2], s[len(s)-1]
+	to := fmt.Sprintf("/%s/%s/status", owner, repo)
+	http.Redirect(w, r, to, http.StatusFound)
 }

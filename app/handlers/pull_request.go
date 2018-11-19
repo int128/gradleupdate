@@ -9,9 +9,9 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type pullRequest struct{}
+type sendPullRequest struct{}
 
-func (p *pullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *sendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]

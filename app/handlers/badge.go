@@ -4,21 +4,28 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/int128/gradleupdate/app/service"
+	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/app/registry"
 	"github.com/int128/gradleupdate/app/templates"
+	"github.com/int128/gradleupdate/app/usecases"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
 
-type badge struct{}
+type getBadge struct{
+	repositories registry.Repositories
+}
 
-func (h *badge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *getBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	status, err := service.GetGradleWrapperStatus(ctx, owner, repo)
-	switch{
+	u := usecases.GetGradleWrapperStatus{
+		Repository: h.repositories.Repository(ctx),
+	}
+	status, err := u.Do(ctx, domain.RepositoryIdentifier{Owner: owner, Repo: repo})
+	switch {
 	case err != nil:
 		log.Warningf(ctx, "Could not get gradle wrapper version: %s", err)
 		w.Header().Set("Content-Type", "image/svg+xml")

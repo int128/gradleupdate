@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/int128/gradleupdate/app/infrastructure"
+	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/app/service/pr"
 	"github.com/pkg/errors"
 )
 
 // CreateOrUpdatePullRequestForGradleWrapper opens a pull request for updating the wrapper.
 func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo, version string) error {
-	c := infrastructure.GitHubClient(ctx)
+	c := &github.Client{} //TODO
 
 	files, err := FindGradleWrapperFiles(ctx, c, "int128", "latest-gradle-wrapper")
 	if err != nil {
@@ -50,7 +50,7 @@ func CreateOrUpdatePullRequestForGradleWrapper(ctx context.Context, owner, repo,
 		Head:  head,
 		Base:  base,
 		Title: fmt.Sprintf("Gradle %s", version),
-		Body:  fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
+		Body: fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
 
 This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
 `, version),
