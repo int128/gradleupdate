@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/int128/gradleupdate/app/domain"
 	"github.com/int128/gradleupdate/app/registry"
 	"github.com/int128/gradleupdate/app/templates"
 	"github.com/int128/gradleupdate/app/usecases"
@@ -24,7 +23,7 @@ func (h *getBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	u := usecases.GetGradleWrapperStatus{
 		Repository: h.repositories.Repository(ctx),
 	}
-	status, err := u.Do(ctx, domain.RepositoryIdentifier{Owner: owner, Repo: repo})
+	status, err := u.Do(ctx, owner, repo)
 	switch {
 	case err != nil:
 		log.Warningf(ctx, "Could not get gradle wrapper version: %s", err)

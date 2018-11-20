@@ -1,0 +1,18 @@
+package repositories
+
+import (
+	"context"
+
+	"github.com/int128/gradleupdate/app/domain"
+)
+
+type Branch interface {
+	Get(context.Context, domain.BranchIdentifier) (domain.Branch, error)
+	Create(context.Context, domain.Branch) (domain.Branch, error)
+	UpdateForce(context.Context, domain.Branch) (domain.Branch, error)
+}
+
+type Commit interface {
+	Get(context.Context, domain.CommitIdentifier) (domain.Commit, error)
+	Create(context.Context, domain.Commit, []domain.File) (domain.Commit, error)
+}

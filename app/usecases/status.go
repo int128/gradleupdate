@@ -24,14 +24,12 @@ type GetGradleWrapperStatus struct {
 }
 
 // Do performs the usecase.
-func (interactor *GetGradleWrapperStatus) Do(ctx context.Context, id domain.RepositoryIdentifier) (*GradleWrapperStatus, error) {
-	targetVersion, err := interactor.getVersion(ctx, id)
+func (interactor *GetGradleWrapperStatus) Do(ctx context.Context, owner, repo string) (*GradleWrapperStatus, error) {
+	targetVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{owner, repo})
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get version of %s", id)
+		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
 	}
-	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{
-		Owner: "int128", Repo: "latest-gradle-wrapper",
-	})
+	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Repo: "latest-gradle-wrapper"})
 	if err != nil {
 		return nil, fmt.Errorf("Could not get the latest version: %s", err)
 	}
@@ -47,7 +45,7 @@ func (interactor *GetGradleWrapperStatus) getVersion(ctx context.Context, id dom
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropsPath)
 	}
-	v := domain.FindGradleWrapperVersion(file.Content)
+	v := domain.FindGradleWrapperVersion(string(file.Content))
 	if v == "" {
 		return "", fmt.Errorf("Could not determine version from %s", gradleWrapperPropsPath)
 	}

@@ -13,9 +13,9 @@ func New() http.Handler {
 
 	r := mux.NewRouter()
 	r.Handle("/landing", &landing{}).Methods("POST")
-	r.Handle("/{owner}/{repo}/status", &getStatus{}).Methods("GET")
+	r.Handle("/{owner}/{repo}/status", &getStatus{repositories}).Methods("GET")
 	r.Handle("/{owner}/{repo}/status.svg", &getBadge{repositories}).Methods("GET")
-	r.Handle("/{owner}/{repo}/pull", &sendPullRequest{}).Methods("POST")
+	r.Handle("/{owner}/{repo}/pull", &sendPullRequest{repositories}).Methods("POST")
 	return r
 }
 

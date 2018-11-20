@@ -8,6 +8,16 @@ type RepositoryIdentifier struct {
 	Repo  string
 }
 
+func (r *RepositoryIdentifier) String() string {
+	return r.Owner + "/" + r.Repo
+}
+
+// Repository represents a GitHub repository.
+type Repository struct {
+	RepositoryIdentifier
+	DefaultBranch BranchIdentifier
+}
+
 // GitHubRepositoryURL represents URL for a GitHub repository.
 type GitHubRepositoryURL string
 
@@ -24,5 +34,5 @@ func (url GitHubRepositoryURL) ExtractOwnerAndRepo() (string, string) {
 type File struct {
 	Path    string
 	Mode    string
-	Content string
+	Content []byte
 }

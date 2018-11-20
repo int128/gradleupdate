@@ -7,5 +7,7 @@ import (
 )
 
 type Repository interface {
-	GetFile(context.Context, domain.RepositoryIdentifier, string) (*domain.File, error)
+	Get(context.Context, domain.RepositoryIdentifier) (domain.Repository, error)
+	GetFile(context.Context, domain.RepositoryIdentifier, string) (domain.File, error)
+	Fork(context.Context, domain.RepositoryIdentifier) (domain.Repository, error)
 }
