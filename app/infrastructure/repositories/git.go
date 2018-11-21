@@ -107,36 +107,14 @@ func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Com
 	}, nil
 }
 
-func (r *Commit) Create(ctx context.Context, base domain.Commit, files []domain.File) (domain.Commit, error) {
-	ghEntries := make([]github.TreeEntry, len(files))
-	for i, file := range files {
-		content := base64.StdEncoding.EncodeToString(file.Content)
-		ghBlob, _, err := r.GitHub.Git.CreateBlob(ctx, base.Owner, base.Repo, &github.Blob{
-			Content:  github.String(content),
-			Encoding: github.String("base64"),
-		})
-		if err != nil {
-			return domain.Commit{}, errors.Wrapf(err, "GitHub API returned error")
-		}
-		ghEntries[i] = github.TreeEntry{
-			Path: github.String(file.Path),
-			Mode: github.String(file.Mode),
-			SHA:  ghBlob.SHA,
-		}
-	}
-
-	ghTree, _, err := r.GitHub.Git.CreateTree(ctx, base.Owner, base.Repo, base.SHA, ghEntries)
-	if err != nil {
-		return domain.Commit{}, errors.Wrapf(err, "GitHub API returned error")
-	}
-
-	ghParents := make([]github.Commit, len(base.Parents))
-	for i, parent := range base.Parents {
+func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commit, error) {
+	ghParents := make([]github.Commit, len(commit.Parents))
+	for i, parent := range commit.Parents {
 		ghParents[i] = github.Commit{SHA: github.String(parent.SHA)}
 	}
-	ghCommit, _, err := r.GitHub.Git.CreateCommit(ctx, base.Owner, base.Repo, &github.Commit{
-		Message: github.String(base.Message),
-		Tree:    &github.Tree{SHA: ghTree.SHA},
+	ghCommit, _, err := r.GitHub.Git.CreateCommit(ctx, commit.Owner, commit.Repo, &github.Commit{
+		Message: github.String(commit.Message),
+		Tree:    &github.Tree{SHA: github.String(commit.Tree.SHA)},
 		Parents: ghParents,
 	})
 	if err != nil {
@@ -145,20 +123,51 @@ func (r *Commit) Create(ctx context.Context, base domain.Commit, files []domain.
 	parents := make([]domain.CommitIdentifier, len(ghCommit.Parents))
 	for i, ghParent := range ghCommit.Parents {
 		parents[i] = domain.CommitIdentifier{
-			RepositoryIdentifier: base.RepositoryIdentifier,
+			RepositoryIdentifier: commit.RepositoryIdentifier,
 			SHA:                  ghParent.GetSHA(),
 		}
 	}
 	return domain.Commit{
 		CommitIdentifier: domain.CommitIdentifier{
-			RepositoryIdentifier: base.RepositoryIdentifier,
+			RepositoryIdentifier: commit.RepositoryIdentifier,
 			SHA:                  ghCommit.GetSHA(),
 		},
 		Message: ghCommit.GetMessage(),
 		Parents: parents,
 		Tree: domain.TreeIdentifier{
-			RepositoryIdentifier: base.RepositoryIdentifier,
+			RepositoryIdentifier: commit.RepositoryIdentifier,
 			SHA:                  ghCommit.GetTree().GetSHA(),
 		},
+	}, nil
+}
+
+type Tree struct {
+	GitHub *github.Client
+}
+
+func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base domain.TreeIdentifier, files []domain.File) (domain.TreeIdentifier, error) {
+	ghEntries := make([]github.TreeEntry, len(files))
+	for i, file := range files {
+		content := base64.StdEncoding.EncodeToString(file.Content)
+		ghBlob, _, err := r.GitHub.Git.CreateBlob(ctx, id.Owner, id.Repo, &github.Blob{
+			Content:  github.String(content),
+			Encoding: github.String("base64"),
+		})
+		if err != nil {
+			return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
+		}
+		ghEntries[i] = github.TreeEntry{
+			Path: github.String(file.Path),
+			Mode: github.String(file.Mode),
+			SHA:  ghBlob.SHA,
+		}
+	}
+	ghTree, _, err := r.GitHub.Git.CreateTree(ctx, id.Owner, id.Repo, base.SHA, ghEntries)
+	if err != nil {
+		return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
+	}
+	return domain.TreeIdentifier{
+		RepositoryIdentifier: id,
+		SHA:                  ghTree.GetSHA(),
 	}, nil
 }

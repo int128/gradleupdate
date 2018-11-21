@@ -14,5 +14,9 @@ type Branch interface {
 
 type Commit interface {
 	Get(context.Context, domain.CommitIdentifier) (domain.Commit, error)
-	Create(context.Context, domain.Commit, []domain.File) (domain.Commit, error)
+	Create(context.Context, domain.Commit) (domain.Commit, error)
+}
+
+type Tree interface {
+	Create(context.Context, domain.RepositoryIdentifier, domain.TreeIdentifier, []domain.File) (domain.TreeIdentifier, error)
 }

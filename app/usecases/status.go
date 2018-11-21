@@ -9,8 +9,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-const gradleWrapperPropsPath = "gradle/wrapper/gradle-wrapper.properties"
-
 // GradleWrapperStatus represents whether the wrapper is up-to-date or out-of-date.
 type GradleWrapperStatus struct {
 	TargetVersion domain.GradleVersion
@@ -41,13 +39,13 @@ func (interactor *GetGradleWrapperStatus) Do(ctx context.Context, owner, repo st
 }
 
 func (interactor *GetGradleWrapperStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
-	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropsPath)
+	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
-		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropsPath)
+		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
 	}
 	v := domain.FindGradleWrapperVersion(string(file.Content))
 	if v == "" {
-		return "", fmt.Errorf("Could not determine version from %s", gradleWrapperPropsPath)
+		return "", fmt.Errorf("Could not find version from %s", gradleWrapperPropertiesPath)
 	}
 	return v, nil
 }

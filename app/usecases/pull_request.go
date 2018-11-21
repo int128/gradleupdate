@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"google.golang.org/appengine/log"
 
 	"github.com/int128/gradleupdate/app/domain"
 	"github.com/int128/gradleupdate/app/domain/repositories"
@@ -13,25 +14,36 @@ type SendPullRequestForUpdate struct {
 	Repository  repositories.Repository
 	Branch      repositories.Branch
 	Commit      repositories.Commit
+	Tree        repositories.Tree
 	PullRequest repositories.PullRequest
 }
 
 func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo string) error {
 	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Repo: "latest-gradle-wrapper"}
 	targetRepository := domain.RepositoryIdentifier{Owner: owner, Repo: repo}
+
 	files, err := interactor.downloadGradleWrapperFiles(ctx, latestRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not find files of the latest Gradle wrapper")
 	}
+	version := findGradleWrapperVersion(files)
+	if version == "" {
+		return errors.Errorf("Could not find Gradle wrapper version from files %v", files)
+	}
+	log.Debugf(ctx, "Found Gradle wrapper %s in the repository %v", version, latestRepository)
+
 	base, err := interactor.Repository.Get(ctx, targetRepository)
 	if err != nil {
-		return errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
+		return errors.Wrapf(err, "Could not get the repository %v", targetRepository)
 	}
+	baseBranch := base.DefaultBranch
+
 	head, err := interactor.Repository.Fork(ctx, targetRepository)
 	if err != nil {
-		return errors.Wrapf(err, "Could not fork the repository %s/%s", owner, repo)
+		return errors.Wrapf(err, "Could not fork the repository %v", targetRepository)
 	}
-	version := "x.y.z" //TODO
+	log.Debugf(ctx, "Forked the repository %v into %v", targetRepository, head.RepositoryIdentifier)
+
 	commit := domain.Commit{
 		CommitIdentifier: domain.CommitIdentifier{RepositoryIdentifier: head.RepositoryIdentifier},
 		Message:          fmt.Sprintf("Gradle %s", version),
@@ -40,12 +52,15 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 		RepositoryIdentifier: head.RepositoryIdentifier,
 		Branch:               fmt.Sprintf("gradle-%s-%s", version, owner),
 	}
-	if _, err := interactor.commitAndPush(ctx, base.DefaultBranch, headBranch, commit, files); err != nil {
+	newHeadBranch, err := interactor.commitAndPush(ctx, baseBranch, headBranch, commit, files)
+	if err != nil {
 		return errors.Wrapf(err, "Could not commit and push a branch %s", headBranch)
 	}
+	log.Debugf(ctx, "Pushed a commit to branch %v", newHeadBranch)
+
 	pull := domain.PullRequest{
 		Head: headBranch,
-		Base: base.DefaultBranch,
+		Base: baseBranch,
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			RepositoryIdentifier: head.RepositoryIdentifier,
 		},
@@ -55,29 +70,12 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
 `, version),
 	}
-	if _, err := interactor.openPullRequest(ctx, pull); err != nil {
+	newPull, err := interactor.openPullRequest(ctx, pull)
+	if err != nil {
 		return errors.Wrapf(err, "Could not open a pull request %s", pull)
 	}
+	log.Debugf(ctx, "Opened a pull request %v", newPull.PullRequestIdentifier)
 	return nil
-}
-
-var gradleWrapperFiles = []domain.File{
-	{
-		Path: "gradle/wrapper/gradle-wrapper.properties",
-		Mode: "100644",
-	},
-	{
-		Path: "gradle/wrapper/gradle-wrapper.jar",
-		Mode: "100644",
-	},
-	{
-		Path: "gradlew",
-		Mode: "100755",
-	},
-	{
-		Path: "gradlew.bat",
-		Mode: "100644",
-	},
 }
 
 func (interactor *SendPullRequestForUpdate) downloadGradleWrapperFiles(ctx context.Context, id domain.RepositoryIdentifier) ([]domain.File, error) {
@@ -105,9 +103,14 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 			return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 		}
 		commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-		newHeadCommit, err := interactor.Commit.Create(ctx, commit, files)
+		newHeadTree, err := interactor.Tree.Create(ctx, head.RepositoryIdentifier, baseCommit.Tree, files)
 		if err != nil {
-			return domain.Branch{}, err
+			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
+		}
+		commit.Tree = newHeadTree
+		newHeadCommit, err := interactor.Commit.Create(ctx, commit)
+		if err != nil {
+			return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %v", commit)
 		}
 		newHeadBranch, err := interactor.Branch.Create(ctx, domain.Branch{
 			BranchIdentifier: head,
@@ -139,9 +142,14 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 	}
 	commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-	newHeadCommit, err := interactor.Commit.Create(ctx, commit, files)
+	newHeadTree, err := interactor.Tree.Create(ctx, head.RepositoryIdentifier, baseCommit.Tree, files)
 	if err != nil {
-		return domain.Branch{}, err
+		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
+	}
+	commit.Tree = newHeadTree
+	newHeadCommit, err := interactor.Commit.Create(ctx, commit)
+	if err != nil {
+		return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %v", commit)
 	}
 	newHeadBranch, err := interactor.Branch.UpdateForce(ctx, domain.Branch{
 		BranchIdentifier: head,

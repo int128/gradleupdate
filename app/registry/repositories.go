@@ -13,6 +13,7 @@ type Repositories interface {
 	PullRequest(context.Context) repositories.PullRequest
 	Branch(context.Context) repositories.Branch
 	Commit(context.Context) repositories.Commit
+	Tree(context.Context) repositories.Tree
 }
 
 type defaultRepositories struct{}
@@ -31,6 +32,10 @@ func (*defaultRepositories) Branch(ctx context.Context) repositories.Branch {
 
 func (*defaultRepositories) Commit(ctx context.Context) repositories.Commit {
 	return &impl.Commit{GitHub: infrastructure.GitHubClient(ctx)}
+}
+
+func (*defaultRepositories) Tree(ctx context.Context) repositories.Tree {
+	return &impl.Tree{GitHub: infrastructure.GitHubClient(ctx)}
 }
 
 func NewRepositoriesRegistry() Repositories {

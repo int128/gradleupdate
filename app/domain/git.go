@@ -5,6 +5,10 @@ type BranchIdentifier struct {
 	Branch string
 }
 
+func (b *BranchIdentifier) String() string {
+	return b.RepositoryIdentifier.String() + ":" + b.Branch
+}
+
 type Branch struct {
 	BranchIdentifier
 	Commit CommitIdentifier

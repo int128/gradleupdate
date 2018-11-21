@@ -23,6 +23,7 @@ func (h *sendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Repository:  h.repositories.Repository(ctx),
 		PullRequest: h.repositories.PullRequest(ctx),
 		Branch:      h.repositories.Branch(ctx),
+		Tree:        h.repositories.Tree(ctx),
 		Commit:      h.repositories.Commit(ctx),
 	}
 	if err := u.Do(ctx, owner, repo); err != nil {
