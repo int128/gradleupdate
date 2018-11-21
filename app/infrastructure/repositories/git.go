@@ -16,7 +16,7 @@ type Branch struct {
 
 func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Branch, error) {
 	payload, resp, err := r.GitHub.Git.GetRef(ctx, b.Owner, b.Repo, "refs/heads/"+b.Branch)
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		return domain.Branch{}, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
@@ -80,7 +80,7 @@ type Commit struct {
 
 func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Commit, error) {
 	payload, resp, err := r.GitHub.Git.GetCommit(ctx, c.Owner, c.Repo, c.SHA)
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		return domain.Commit{}, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {

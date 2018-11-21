@@ -15,7 +15,7 @@ type Repository struct {
 
 func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
 	repository, resp, err := r.GitHub.Repositories.Get(ctx, id.Owner, id.Repo)
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
@@ -38,7 +38,7 @@ func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (d
 
 func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.File, error) {
 	fc, _, resp, err := r.GitHub.Repositories.GetContents(ctx, id.Owner, id.Repo, path, nil)
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		return domain.File{}, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
@@ -67,7 +67,7 @@ func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier
 
 func (r *Repository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
 	fork, resp, err := r.GitHub.Repositories.CreateFork(ctx, id.Owner, id.Repo, &github.RepositoryCreateForkOptions{})
-	if resp.StatusCode == 404 {
+	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
