@@ -62,35 +62,35 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 }
 
 var gradleWrapperFiles = []domain.File{
-	domain.File{
+	{
 		Path: "gradle/wrapper/gradle-wrapper.properties",
 		Mode: "100644",
 	},
-	domain.File{
+	{
 		Path: "gradle/wrapper/gradle-wrapper.jar",
 		Mode: "100644",
 	},
-	domain.File{
+	{
 		Path: "gradlew",
 		Mode: "100755",
 	},
-	domain.File{
+	{
 		Path: "gradlew.bat",
 		Mode: "100644",
 	},
 }
 
 func (interactor *SendPullRequestForUpdate) downloadGradleWrapperFiles(ctx context.Context, id domain.RepositoryIdentifier) ([]domain.File, error) {
-	r := make([]domain.File, len(gradleWrapperFiles))
-	for i, f := range gradleWrapperFiles {
-		resp, err := interactor.Repository.GetFile(ctx, id, f.Path)
+	files := make([]domain.File, len(gradleWrapperFiles))
+	for i, source := range gradleWrapperFiles {
+		file, err := interactor.Repository.GetFile(ctx, id, source.Path)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Could not get file %s", f.Path)
+			return nil, errors.Wrapf(err, "Could not get file %s", source.Path)
 		}
-		r[i] = f
-		r[i].Content = resp.Content
+		files[i] = source
+		files[i].Content = file.Content
 	}
-	return r, nil
+	return files, nil
 }
 
 func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, base, head domain.BranchIdentifier, commit domain.Commit, files []domain.File) (domain.Branch, error) {

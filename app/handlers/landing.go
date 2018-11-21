@@ -18,7 +18,7 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not parse form", 400)
 		return
 	}
-	url := domain.GitHubRepositoryURL(r.FormValue("url"))
+	url := domain.RepositoryURL(r.FormValue("url"))
 	owner, repo := url.ExtractOwnerAndRepo()
 	if owner == "" || repo == "" {
 		http.Redirect(w, r, "/", http.StatusFound)

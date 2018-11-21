@@ -18,11 +18,11 @@ type Repository struct {
 	DefaultBranch BranchIdentifier
 }
 
-// GitHubRepositoryURL represents URL for a GitHub repository.
-type GitHubRepositoryURL string
+// RepositoryURL represents URL for a GitHub repository.
+type RepositoryURL string
 
 // ExtractOwnerAndRepo returns owner and repo for the repository.
-func (url GitHubRepositoryURL) ExtractOwnerAndRepo() (string, string) {
+func (url RepositoryURL) ExtractOwnerAndRepo() (string, string) {
 	s := strings.Split(string(url), "/")
 	if len(s) < 2 {
 		return "", ""
