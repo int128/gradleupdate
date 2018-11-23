@@ -59,20 +59,22 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	log.Debugf(ctx, "Pushed a commit to branch %v", newHeadBranch)
 
 	pull := domain.PullRequest{
-		Head: headBranch,
-		Base: baseBranch,
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: head.RepositoryIdentifier,
+			RepositoryIdentifier: base.RepositoryIdentifier,
 		},
+		Head:  headBranch,
+		Base:  baseBranch,
 		Title: fmt.Sprintf("Gradle %s", version),
 		Body: fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
 
 This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
 `, version),
 	}
-	newPull, err := interactor.openPullRequest(ctx, pull)
+
+	pullRequestService := pullRequestService{interactor.PullRequest}
+	newPull, err := pullRequestService.createOrUpdatePullRequest(ctx, pull)
 	if err != nil {
-		return errors.Wrapf(err, "Could not open a pull request %s", pull)
+		return errors.Wrapf(err, "Could not open a pull request %s", pull.String())
 	}
 	log.Debugf(ctx, "Opened a pull request %v", newPull.PullRequestIdentifier)
 	return nil
@@ -161,8 +163,12 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 	return newHeadBranch, nil
 }
 
-func (interactor *SendPullRequestForUpdate) openPullRequest(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	pulls, err := interactor.PullRequest.Query(ctx, repositories.PullRequestQuery{
+type pullRequestService struct {
+	PullRequest repositories.PullRequest
+}
+
+func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+	pulls, err := service.PullRequest.Query(ctx, repositories.PullRequestQuery{
 		Head:      pull.Head,
 		Base:      pull.Base,
 		State:     "open",
@@ -172,7 +178,7 @@ func (interactor *SendPullRequestForUpdate) openPullRequest(ctx context.Context,
 		PerPage:   1,
 	})
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "Could not find the pull request %s", pull.PullRequestIdentifier)
+		return domain.PullRequest{}, errors.Wrapf(err, "Could not find the pull request %s", pull.PullRequestIdentifier.String())
 	}
 	if len(pulls) > 1 {
 		return domain.PullRequest{}, errors.Errorf("Expect single but got %d pull requests", len(pulls))
@@ -181,16 +187,15 @@ func (interactor *SendPullRequestForUpdate) openPullRequest(ctx context.Context,
 		existent := pulls[0]
 		existent.Body = pull.Body
 		existent.Title = pull.Title
-		updated, err := interactor.PullRequest.Update(ctx, existent)
+		updated, err := service.PullRequest.Update(ctx, existent)
 		if err != nil {
-			return domain.PullRequest{}, errors.Wrapf(err, "Could not update the pull request %s", pull.PullRequestIdentifier)
+			return domain.PullRequest{}, errors.Wrapf(err, "Could not update the pull request %s", pull.PullRequestIdentifier.String())
 		}
 		return updated, err
 	}
-
-	created, err := interactor.PullRequest.Create(ctx, pull)
+	created, err := service.PullRequest.Create(ctx, pull)
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.RepositoryIdentifier)
+		return domain.PullRequest{}, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.RepositoryIdentifier.String())
 	}
 	return created, nil
 }
