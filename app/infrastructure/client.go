@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"google.golang.org/appengine/urlfetch"
 	"net/http"
 	"os"
 
@@ -14,31 +15,36 @@ import (
 
 // GitHubClient creates a client.
 func GitHubClient(ctx context.Context) *github.Client {
+	appengineTransport := &urlfetch.Transport{Context: ctx}
+
+	loggingTransport := &loggingTransport{ctx, appengineTransport}
+
+	oauth2Transport := oauth2Transport(ctx, loggingTransport)
+
+	cachedTransport := &httpcache.Transport{Cache: memcache.New(ctx), Transport: oauth2Transport}
+
+	return github.NewClient(&http.Client{Transport: cachedTransport})
+}
+
+func oauth2Transport(ctx context.Context, base http.RoundTripper) http.RoundTripper {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		log.Warningf(ctx, "GITHUB_TOKEN is not set")
 	}
-	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	oauth2Client := oauth2.NewClient(ctx, tokenSource)
-	oauth2Transport := oauth2Client.Transport
-
-	cachedTransport := httpcache.Transport{
-		Transport: oauth2Transport,
-		Cache:     memcache.New(ctx),
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	return &oauth2.Transport{
+		Base:   base,
+		Source: ts,
 	}
-
-	return github.NewClient(&http.Client{
-		Transport: loggingTransport{ctx, &cachedTransport},
-	})
 }
 
 type loggingTransport struct {
-	ctx       context.Context
-	transport http.RoundTripper
+	ctx  context.Context
+	base http.RoundTripper
 }
 
 func (t loggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	res, err := t.transport.RoundTrip(req)
+	res, err := t.base.RoundTrip(req)
 	if res != nil {
 		log.Debugf(t.ctx, "[GitHubClient] %d %s %s", res.StatusCode, req.Method, req.URL)
 	}
