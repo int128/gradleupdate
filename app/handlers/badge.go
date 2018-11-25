@@ -11,7 +11,7 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type getBadge struct{
+type getBadge struct {
 	repositories registry.Repositories
 }
 
@@ -20,7 +20,7 @@ func (h *getBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	u := usecases.GetGradleWrapperStatus{
+	u := usecases.GetStatus{
 		Repository: h.repositories.Repository(ctx),
 	}
 	status, err := u.Do(ctx, owner, repo)

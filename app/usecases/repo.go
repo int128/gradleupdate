@@ -7,20 +7,20 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Status represents whether the wrapper is up-to-date or out-of-date.
-type Status struct {
-	TargetVersion domain.GradleVersion
-	LatestVersion domain.GradleVersion
-	UpToDate      bool
+type RepositoryAndStatus struct {
+	Status     Status
+	Repository domain.Repository
 }
 
-// GetStatus provides a usecase to get status of Gradle wrapper in a repository.
-type GetStatus struct {
+type GetRepositoryAndStatus struct {
 	Repository repositories.Repository
 }
 
-// Do performs the usecase.
-func (interactor *GetStatus) Do(ctx context.Context, owner, repo string) (*Status, error) {
+func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo string) (*RepositoryAndStatus, error) {
+	repository, err := interactor.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Repo: repo})
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
+	}
 	targetVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{owner, repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
@@ -29,14 +29,18 @@ func (interactor *GetStatus) Do(ctx context.Context, owner, repo string) (*Statu
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the latest version")
 	}
-	return &Status{
-		TargetVersion: targetVersion,
-		LatestVersion: latestVersion,
-		UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
+	return &RepositoryAndStatus{
+		Status: Status{
+			TargetVersion: targetVersion,
+			LatestVersion: latestVersion,
+			UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
+		},
+		Repository: repository,
 	}, nil
+	return nil, nil
 }
 
-func (interactor *GetStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
+func (interactor *GetRepositoryAndStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
 	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)

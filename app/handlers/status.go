@@ -21,10 +21,10 @@ func (h *getStatus) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	u := usecases.GetGradleWrapperStatus{
+	u := usecases.GetRepositoryAndStatus{
 		Repository: h.repositories.Repository(ctx),
 	}
-	status, err := u.Do(ctx, owner, repo)
+	out, err := u.Do(ctx, owner, repo)
 	if err != nil {
 		log.Warningf(ctx, "Could not get the repository: %s/%s: %s", owner, repo, err)
 		http.Error(w, "Could not get the repository", 500)
@@ -38,8 +38,8 @@ func (h *getStatus) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	templates.WriteRepository(w,
 		owner,
 		repo,
-		string(status.LatestVersion), //FIXME
-		"TODO",
+		out.Repository.Description,
+		out.Repository.AvatarURL,
 		thisURL,
 		badgeURL)
 }

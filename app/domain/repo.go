@@ -16,6 +16,8 @@ func (r *RepositoryIdentifier) String() string {
 type Repository struct {
 	RepositoryIdentifier
 	DefaultBranch BranchIdentifier
+	Description   string
+	AvatarURL     string
 }
 
 // RepositoryURL represents URL for a GitHub repository.
