@@ -123,8 +123,8 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
 			Branch:     "b",
 		},
-		Title: "t2",
-		Body:  "b2",
+		Title: "t",
+		Body:  "b",
 	}).Return(domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
