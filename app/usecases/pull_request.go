@@ -19,8 +19,8 @@ type SendPullRequestForUpdate struct {
 }
 
 func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo string) error {
-	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Repo: "latest-gradle-wrapper"}
-	targetRepository := domain.RepositoryIdentifier{Owner: owner, Repo: repo}
+	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"}
+	targetRepository := domain.RepositoryIdentifier{Owner: owner, Name: repo}
 
 	files, err := interactor.downloadGradleWrapperFiles(ctx, latestRepository)
 	if err != nil {
@@ -50,7 +50,7 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	}
 	headBranch := domain.BranchIdentifier{
 		Repository: head.RepositoryIdentifier,
-		Branch:     fmt.Sprintf("gradle-%s-%s", version, owner),
+		Name:       fmt.Sprintf("gradle-%s-%s", version, owner),
 	}
 	newHeadBranch, err := interactor.commitAndPush(ctx, baseBranch, headBranch, commit, files)
 	if err != nil {
@@ -62,9 +62,9 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository: base.RepositoryIdentifier,
 		},
-		Head:  headBranch,
-		Base:  baseBranch,
-		Title: fmt.Sprintf("Gradle %s", version),
+		HeadBranch: headBranch,
+		BaseBranch: baseBranch,
+		Title:      fmt.Sprintf("Gradle %s", version),
 		Body: fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
 
 This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
@@ -169,8 +169,8 @@ type pullRequestService struct {
 
 func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
 	pulls, err := service.PullRequest.Query(ctx, repositories.PullRequestQuery{
-		Head:      pull.Head,
-		Base:      pull.Base,
+		Head:      pull.HeadBranch,
+		Base:      pull.BaseBranch,
 		State:     "open",
 		Direction: "desc",
 		Sort:      "updated",

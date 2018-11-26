@@ -24,6 +24,6 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-	to := fmt.Sprintf("/%s/%s/status", id.Owner, id.Repo)
+	to := fmt.Sprintf("/%s/%s/status", id.Owner, id.Name)
 	http.Redirect(w, r, to, http.StatusFound)
 }

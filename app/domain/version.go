@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -49,4 +50,15 @@ func minInt(a, b int) int {
 // IsUpToDate returns true if target => latest.
 func IsUpToDate(target GradleVersion, latest GradleVersion) bool {
 	return target.Compare(latest) >= 0
+}
+
+var regexpGradleWrapperVersion = regexp.MustCompile("distributionUrl=.+?/gradle-(.+?)-.+?\\.zip")
+
+// FindGradleWrapperVersion returns Gradle version in a properties file.
+func FindGradleWrapperVersion(gradleWrapperProperties string) GradleVersion {
+	m := regexpGradleWrapperVersion.FindStringSubmatch(gradleWrapperProperties)
+	if len(m) != 2 {
+		return ""
+	}
+	return GradleVersion(m[1])
 }

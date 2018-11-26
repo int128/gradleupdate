@@ -14,7 +14,7 @@ type Repository struct {
 }
 
 func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	repository, resp, err := r.GitHub.Repositories.Get(ctx, id.Owner, id.Repo)
+	repository, resp, err := r.GitHub.Repositories.Get(ctx, id.Owner, id.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}
@@ -24,22 +24,22 @@ func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (d
 	return domain.Repository{
 		RepositoryIdentifier: domain.RepositoryIdentifier{
 			Owner: repository.GetOwner().GetLogin(),
-			Repo:  repository.GetName(),
+			Name:  repository.GetName(),
 		},
 		Description: repository.GetDescription(),
 		AvatarURL:   repository.GetOwner().GetAvatarURL(),
 		DefaultBranch: domain.BranchIdentifier{
 			Repository: domain.RepositoryIdentifier{
 				Owner: repository.GetOwner().GetLogin(),
-				Repo:  repository.GetName(),
+				Name:  repository.GetName(),
 			},
-			Branch: repository.GetDefaultBranch(),
+			Name: repository.GetDefaultBranch(),
 		},
 	}, nil
 }
 
 func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.File, error) {
-	fc, _, resp, err := r.GitHub.Repositories.GetContents(ctx, id.Owner, id.Repo, path, nil)
+	fc, _, resp, err := r.GitHub.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.File{}, domain.NotFoundError{Cause: err}
 	}
@@ -68,7 +68,7 @@ func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier
 }
 
 func (r *Repository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	fork, resp, err := r.GitHub.Repositories.CreateFork(ctx, id.Owner, id.Repo, &github.RepositoryCreateForkOptions{})
+	fork, resp, err := r.GitHub.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}
@@ -82,16 +82,16 @@ func (r *Repository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (
 	return domain.Repository{
 		RepositoryIdentifier: domain.RepositoryIdentifier{
 			Owner: fork.GetOwner().GetLogin(),
-			Repo:  fork.GetName(),
+			Name:  fork.GetName(),
 		},
 		Description: fork.GetDescription(),
 		AvatarURL:   fork.GetOwner().GetAvatarURL(),
 		DefaultBranch: domain.BranchIdentifier{
 			Repository: domain.RepositoryIdentifier{
 				Owner: fork.GetOwner().GetLogin(),
-				Repo:  fork.GetName(),
+				Name:  fork.GetName(),
 			},
-			Branch: fork.GetDefaultBranch(),
+			Name: fork.GetDefaultBranch(),
 		},
 	}, nil
 }

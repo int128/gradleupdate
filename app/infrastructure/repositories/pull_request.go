@@ -14,9 +14,9 @@ type PullRequest struct {
 }
 
 func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery) ([]domain.PullRequest, error) {
-	payloads, _, err := r.GitHub.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Repo, &github.PullRequestListOptions{
-		Base:        q.Base.Branch,
-		Head:        q.Head.Branch,
+	payloads, _, err := r.GitHub.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Name, &github.PullRequestListOptions{
+		Base:        q.Base.Name,
+		Head:        q.Head.Name,
 		State:       q.State,
 		Direction:   q.Direction,
 		Sort:        q.Sort,
@@ -31,16 +31,16 @@ func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery
 		base := payload.GetBase()
 		pulls[i] = domain.PullRequest{
 			PullRequestIdentifier: domain.PullRequestIdentifier{
-				Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
+				Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 				PullRequestNumber: payload.GetNumber(),
 			},
-			Head: domain.BranchIdentifier{
-				Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Repo: head.GetRepo().GetName()},
-				Branch:     head.GetRef(),
+			HeadBranch: domain.BranchIdentifier{
+				Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
+				Name:       head.GetRef(),
 			},
-			Base: domain.BranchIdentifier{
-				Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
-				Branch:     base.GetRef(),
+			BaseBranch: domain.BranchIdentifier{
+				Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+				Name:       base.GetRef(),
 			},
 			Title: payload.GetTitle(),
 			Body:  payload.GetBody(),
@@ -50,9 +50,9 @@ func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery
 }
 
 func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	payload, _, err := r.GitHub.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Repo, &github.NewPullRequest{
-		Base:  github.String(pull.Base.Branch),
-		Head:  github.String(pull.Head.Branch),
+	payload, _, err := r.GitHub.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
+		Base:  github.String(pull.BaseBranch.Name),
+		Head:  github.String(pull.HeadBranch.Name),
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})
@@ -63,16 +63,16 @@ func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (doma
 	base := payload.GetBase()
 	return domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
+			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			PullRequestNumber: payload.GetNumber(),
 		},
-		Head: domain.BranchIdentifier{
-			Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Repo: head.GetRepo().GetName()},
-			Branch:     head.GetRef(),
+		HeadBranch: domain.BranchIdentifier{
+			Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
+			Name:       head.GetRef(),
 		},
-		Base: domain.BranchIdentifier{
-			Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
-			Branch:     base.GetRef(),
+		BaseBranch: domain.BranchIdentifier{
+			Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+			Name:       base.GetRef(),
 		},
 		Title: payload.GetTitle(),
 		Body:  payload.GetBody(),
@@ -80,7 +80,7 @@ func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (doma
 }
 
 func (r *PullRequest) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	payload, _, err := r.GitHub.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Repo, pull.PullRequestNumber, &github.PullRequest{
+	payload, _, err := r.GitHub.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})
@@ -91,16 +91,16 @@ func (r *PullRequest) Update(ctx context.Context, pull domain.PullRequest) (doma
 	base := payload.GetBase()
 	return domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
+			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			PullRequestNumber: payload.GetNumber(),
 		},
-		Head: domain.BranchIdentifier{
-			Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Repo: head.GetRepo().GetName()},
-			Branch:     head.GetRef(),
+		HeadBranch: domain.BranchIdentifier{
+			Repository: domain.RepositoryIdentifier{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
+			Name:       head.GetRef(),
 		},
-		Base: domain.BranchIdentifier{
-			Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Repo: base.GetRepo().GetName()},
-			Branch:     base.GetRef(),
+		BaseBranch: domain.BranchIdentifier{
+			Repository: domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+			Name:       base.GetRef(),
 		},
 		Title: payload.GetTitle(),
 		Body:  payload.GetBody(),

@@ -17,7 +17,7 @@ type GetRepositoryAndStatus struct {
 }
 
 func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo string) (*RepositoryAndStatus, error) {
-	repository, err := interactor.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Repo: repo})
+	repository, err := interactor.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
 	}
@@ -25,7 +25,7 @@ func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo st
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
 	}
-	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Repo: "latest-gradle-wrapper"})
+	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the latest version")
 	}
@@ -37,7 +37,6 @@ func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo st
 		},
 		Repository: repository,
 	}, nil
-	return nil, nil
 }
 
 func (interactor *GetRepositoryAndStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {

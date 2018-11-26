@@ -25,7 +25,7 @@ func (interactor *GetStatus) Do(ctx context.Context, owner, repo string) (*Statu
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
 	}
-	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Repo: "latest-gradle-wrapper"})
+	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the latest version")
 	}
