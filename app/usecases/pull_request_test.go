@@ -18,30 +18,30 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 	r.EXPECT().Query(ctx, gomock.Any()).Return([]domain.PullRequest{}, nil)
 	r.EXPECT().Create(ctx, domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t",
 		Body:  "b",
 	}).Return(domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			PullRequestNumber:    3,
+			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			PullRequestNumber: 3,
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t",
 		Body:  "b",
@@ -50,15 +50,15 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 	s := pullRequestService{r}
 	created, err := s.createOrUpdatePullRequest(ctx, domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t",
 		Body:  "b",
@@ -68,16 +68,16 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 	}
 	if !reflect.DeepEqual(&created, &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			PullRequestNumber:    3,
+			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			PullRequestNumber: 3,
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t",
 		Body:  "b",
@@ -95,16 +95,16 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	r.EXPECT().Query(ctx, gomock.Any()).Return([]domain.PullRequest{
 		{
 			PullRequestIdentifier: domain.PullRequestIdentifier{
-				RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-				PullRequestNumber:    5,
+				Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+				PullRequestNumber: 5,
 			},
 			Head: domain.BranchIdentifier{
-				RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-				Branch:               "h",
+				Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+				Branch:     "h",
 			},
 			Base: domain.BranchIdentifier{
-				RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-				Branch:               "b",
+				Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+				Branch:     "b",
 			},
 			Title: "t",
 			Body:  "b",
@@ -112,31 +112,31 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	}, nil)
 	r.EXPECT().Update(ctx, domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			PullRequestNumber:    5,
+			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			PullRequestNumber: 5,
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t2",
 		Body:  "b2",
 	}).Return(domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			PullRequestNumber:    3,
+			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			PullRequestNumber: 3,
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t2",
 		Body:  "b2",
@@ -145,15 +145,15 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	s := pullRequestService{r}
 	updated, err := s.createOrUpdatePullRequest(ctx, domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t",
 		Body:  "b",
@@ -163,16 +163,16 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	}
 	if !reflect.DeepEqual(&updated, &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			PullRequestNumber:    3,
+			Repository:        domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			PullRequestNumber: 3,
 		},
 		Head: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
-			Branch:               "h",
+			Repository: domain.RepositoryIdentifier{Owner: "ho", Repo: "hr"},
+			Branch:     "h",
 		},
 		Base: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
-			Branch:               "b",
+			Repository: domain.RepositoryIdentifier{Owner: "bo", Repo: "br"},
+			Branch:     "b",
 		},
 		Title: "t2",
 		Body:  "b2",

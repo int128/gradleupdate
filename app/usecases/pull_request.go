@@ -45,12 +45,12 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	log.Debugf(ctx, "Forked the repository %v into %v", targetRepository, head.RepositoryIdentifier)
 
 	commit := domain.Commit{
-		CommitIdentifier: domain.CommitIdentifier{RepositoryIdentifier: head.RepositoryIdentifier},
+		CommitIdentifier: domain.CommitIdentifier{Repository: head.RepositoryIdentifier},
 		Message:          fmt.Sprintf("Gradle %s", version),
 	}
 	headBranch := domain.BranchIdentifier{
-		RepositoryIdentifier: head.RepositoryIdentifier,
-		Branch:               fmt.Sprintf("gradle-%s-%s", version, owner),
+		Repository: head.RepositoryIdentifier,
+		Branch:     fmt.Sprintf("gradle-%s-%s", version, owner),
 	}
 	newHeadBranch, err := interactor.commitAndPush(ctx, baseBranch, headBranch, commit, files)
 	if err != nil {
@@ -60,7 +60,7 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 
 	pull := domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
-			RepositoryIdentifier: base.RepositoryIdentifier,
+			Repository: base.RepositoryIdentifier,
 		},
 		Head:  headBranch,
 		Base:  baseBranch,
@@ -105,7 +105,7 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 			return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 		}
 		commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-		newHeadTree, err := interactor.Tree.Create(ctx, head.RepositoryIdentifier, baseCommit.Tree, files)
+		newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 		if err != nil {
 			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
 		}
@@ -144,7 +144,7 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 	}
 	commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-	newHeadTree, err := interactor.Tree.Create(ctx, head.RepositoryIdentifier, baseCommit.Tree, files)
+	newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
 	}
@@ -195,7 +195,7 @@ func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context
 	}
 	created, err := service.PullRequest.Create(ctx, pull)
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.RepositoryIdentifier.String())
+		return domain.PullRequest{}, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.Repository.String())
 	}
 	return created, nil
 }

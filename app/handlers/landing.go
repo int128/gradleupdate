@@ -19,11 +19,11 @@ func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	url := domain.RepositoryURL(r.FormValue("url"))
-	owner, repo := url.ExtractOwnerAndRepo()
-	if owner == "" || repo == "" {
+	id := url.Parse()
+	if id == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-	to := fmt.Sprintf("/%s/%s/status", owner, repo)
+	to := fmt.Sprintf("/%s/%s/status", id.Owner, id.Repo)
 	http.Redirect(w, r, to, http.StatusFound)
 }

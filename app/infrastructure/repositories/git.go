@@ -15,7 +15,7 @@ type Branch struct {
 }
 
 func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Branch, error) {
-	payload, resp, err := r.GitHub.Git.GetRef(ctx, b.Owner, b.Repo, "refs/heads/"+b.Branch)
+	payload, resp, err := r.GitHub.Git.GetRef(ctx, b.Repository.Owner, b.Repository.Repo, "refs/heads/"+b.Branch)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Branch{}, domain.NotFoundError{Cause: err}
 	}
@@ -24,18 +24,18 @@ func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Bra
 	}
 	return domain.Branch{
 		BranchIdentifier: domain.BranchIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			Branch:               strings.TrimLeft(payload.GetRef(), "refs/heads/"),
+			Repository: b.Repository,
+			Branch:     strings.TrimLeft(payload.GetRef(), "refs/heads/"),
 		},
 		Commit: domain.CommitIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			SHA:                  payload.GetObject().GetSHA(),
+			Repository: b.Repository,
+			SHA:        payload.GetObject().GetSHA(),
 		},
 	}, nil
 }
 
 func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	payload, _, err := r.GitHub.Git.CreateRef(ctx, b.Owner, b.Repo, &github.Reference{
+	payload, _, err := r.GitHub.Git.CreateRef(ctx, b.Repository.Owner, b.Repository.Repo, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Branch),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
 	})
@@ -44,18 +44,18 @@ func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, er
 	}
 	return domain.Branch{
 		BranchIdentifier: domain.BranchIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			Branch:               strings.TrimLeft(payload.GetRef(), "refs/heads/"),
+			Repository: b.Repository,
+			Branch:     strings.TrimLeft(payload.GetRef(), "refs/heads/"),
 		},
 		Commit: domain.CommitIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			SHA:                  payload.GetObject().GetSHA(),
+			Repository: b.Repository,
+			SHA:        payload.GetObject().GetSHA(),
 		},
 	}, nil
 }
 
 func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	payload, _, err := r.GitHub.Git.UpdateRef(ctx, b.Owner, b.Repo, &github.Reference{
+	payload, _, err := r.GitHub.Git.UpdateRef(ctx, b.Repository.Owner, b.Repository.Repo, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Branch),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
 	}, true)
@@ -64,12 +64,12 @@ func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branc
 	}
 	return domain.Branch{
 		BranchIdentifier: domain.BranchIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			Branch:               strings.TrimLeft(payload.GetRef(), "refs/heads/"),
+			Repository: b.Repository,
+			Branch:     strings.TrimLeft(payload.GetRef(), "refs/heads/"),
 		},
 		Commit: domain.CommitIdentifier{
-			RepositoryIdentifier: b.RepositoryIdentifier,
-			SHA:                  payload.GetObject().GetSHA(),
+			Repository: b.Repository,
+			SHA:        payload.GetObject().GetSHA(),
 		},
 	}, nil
 }
@@ -79,7 +79,7 @@ type Commit struct {
 }
 
 func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Commit, error) {
-	payload, resp, err := r.GitHub.Git.GetCommit(ctx, c.Owner, c.Repo, c.SHA)
+	payload, resp, err := r.GitHub.Git.GetCommit(ctx, c.Repository.Owner, c.Repository.Repo, c.SHA)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Commit{}, domain.NotFoundError{Cause: err}
 	}
@@ -89,20 +89,20 @@ func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Com
 	parents := make([]domain.CommitIdentifier, len(payload.Parents))
 	for i, parent := range payload.Parents {
 		parents[i] = domain.CommitIdentifier{
-			RepositoryIdentifier: c.RepositoryIdentifier,
-			SHA:                  parent.GetSHA(),
+			Repository: c.Repository,
+			SHA:        parent.GetSHA(),
 		}
 	}
 	return domain.Commit{
 		CommitIdentifier: domain.CommitIdentifier{
-			RepositoryIdentifier: c.RepositoryIdentifier,
-			SHA:                  payload.GetSHA(),
+			Repository: c.Repository,
+			SHA:        payload.GetSHA(),
 		},
 		Message: payload.GetMessage(),
 		Parents: parents,
 		Tree: domain.TreeIdentifier{
-			RepositoryIdentifier: c.RepositoryIdentifier,
-			SHA:                  payload.GetTree().GetSHA(),
+			Repository: c.Repository,
+			SHA:        payload.GetTree().GetSHA(),
 		},
 	}, nil
 }
@@ -112,7 +112,7 @@ func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commi
 	for i, parent := range commit.Parents {
 		ghParents[i] = github.Commit{SHA: github.String(parent.SHA)}
 	}
-	ghCommit, _, err := r.GitHub.Git.CreateCommit(ctx, commit.Owner, commit.Repo, &github.Commit{
+	ghCommit, _, err := r.GitHub.Git.CreateCommit(ctx, commit.Repository.Owner, commit.Repository.Repo, &github.Commit{
 		Message: github.String(commit.Message),
 		Tree:    &github.Tree{SHA: github.String(commit.Tree.SHA)},
 		Parents: ghParents,
@@ -123,20 +123,20 @@ func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commi
 	parents := make([]domain.CommitIdentifier, len(ghCommit.Parents))
 	for i, ghParent := range ghCommit.Parents {
 		parents[i] = domain.CommitIdentifier{
-			RepositoryIdentifier: commit.RepositoryIdentifier,
-			SHA:                  ghParent.GetSHA(),
+			Repository: commit.Repository,
+			SHA:        ghParent.GetSHA(),
 		}
 	}
 	return domain.Commit{
 		CommitIdentifier: domain.CommitIdentifier{
-			RepositoryIdentifier: commit.RepositoryIdentifier,
-			SHA:                  ghCommit.GetSHA(),
+			Repository: commit.Repository,
+			SHA:        ghCommit.GetSHA(),
 		},
 		Message: ghCommit.GetMessage(),
 		Parents: parents,
 		Tree: domain.TreeIdentifier{
-			RepositoryIdentifier: commit.RepositoryIdentifier,
-			SHA:                  ghCommit.GetTree().GetSHA(),
+			Repository: commit.Repository,
+			SHA:        ghCommit.GetTree().GetSHA(),
 		},
 	}, nil
 }
@@ -167,7 +167,7 @@ func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base 
 		return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
 	}
 	return domain.TreeIdentifier{
-		RepositoryIdentifier: id,
-		SHA:                  ghTree.GetSHA(),
+		Repository: id,
+		SHA:        ghTree.GetSHA(),
 	}, nil
 }

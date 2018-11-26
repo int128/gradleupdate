@@ -3,12 +3,12 @@ package domain
 import "fmt"
 
 type PullRequestIdentifier struct {
-	RepositoryIdentifier
+	Repository        RepositoryIdentifier
 	PullRequestNumber int
 }
 
 func (p *PullRequestIdentifier) String() string {
-	return fmt.Sprintf("%s/pulls#%d", p.RepositoryIdentifier, p.PullRequestNumber)
+	return fmt.Sprintf("%s/pulls#%d", p.Repository.String(), p.PullRequestNumber)
 }
 
 type PullRequest struct {

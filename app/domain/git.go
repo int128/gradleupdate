@@ -1,12 +1,12 @@
 package domain
 
 type BranchIdentifier struct {
-	RepositoryIdentifier
-	Branch string
+	Repository RepositoryIdentifier
+	Branch     string
 }
 
 func (b *BranchIdentifier) String() string {
-	return b.RepositoryIdentifier.String() + ":" + b.Branch
+	return b.Repository.String() + ":" + b.Branch
 }
 
 type Branch struct {
@@ -15,8 +15,8 @@ type Branch struct {
 }
 
 type CommitIdentifier struct {
-	RepositoryIdentifier
-	SHA string
+	Repository RepositoryIdentifier
+	SHA        string
 }
 
 type Commit struct {
@@ -31,6 +31,6 @@ func (c *Commit) GetSingleParent() *CommitIdentifier {
 }
 
 type TreeIdentifier struct {
-	RepositoryIdentifier
-	SHA string
+	Repository RepositoryIdentifier
+	SHA        string
 }

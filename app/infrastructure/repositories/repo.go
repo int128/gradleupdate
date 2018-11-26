@@ -29,7 +29,7 @@ func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (d
 		Description: repository.GetDescription(),
 		AvatarURL:   repository.GetOwner().GetAvatarURL(),
 		DefaultBranch: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{
+			Repository: domain.RepositoryIdentifier{
 				Owner: repository.GetOwner().GetLogin(),
 				Repo:  repository.GetName(),
 			},
@@ -87,7 +87,7 @@ func (r *Repository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (
 		Description: fork.GetDescription(),
 		AvatarURL:   fork.GetOwner().GetAvatarURL(),
 		DefaultBranch: domain.BranchIdentifier{
-			RepositoryIdentifier: domain.RepositoryIdentifier{
+			Repository: domain.RepositoryIdentifier{
 				Owner: fork.GetOwner().GetLogin(),
 				Repo:  fork.GetName(),
 			},

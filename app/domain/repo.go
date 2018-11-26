@@ -23,13 +23,13 @@ type Repository struct {
 // RepositoryURL represents URL for a GitHub repository.
 type RepositoryURL string
 
-// ExtractOwnerAndRepo returns owner and repo for the repository.
-func (url RepositoryURL) ExtractOwnerAndRepo() (string, string) {
+// Parse returns owner and repo for the repository.
+func (url RepositoryURL) Parse() *RepositoryIdentifier {
 	s := strings.Split(string(url), "/")
 	if len(s) < 2 {
-		return "", ""
+		return nil
 	}
-	return s[len(s)-2], s[len(s)-1]
+	return &RepositoryIdentifier{s[len(s)-2], s[len(s)-1]}
 }
 
 // File represents a file in a commit.
