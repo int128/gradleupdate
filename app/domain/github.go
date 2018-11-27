@@ -11,11 +11,11 @@ type RepositoryIdentifier struct {
 	Name  string
 }
 
-func (r *RepositoryIdentifier) FullName() string {
+func (r RepositoryIdentifier) FullName() string {
 	return r.Owner + "/" + r.Name
 }
 
-func (r *RepositoryIdentifier) String() string {
+func (r RepositoryIdentifier) String() string {
 	return r.FullName()
 }
 
@@ -52,8 +52,8 @@ type PullRequestIdentifier struct {
 	PullRequestNumber int
 }
 
-func (p *PullRequestIdentifier) String() string {
-	return fmt.Sprintf("%s/pulls#%d", p.Repository.String(), p.PullRequestNumber)
+func (p PullRequestIdentifier) String() string {
+	return fmt.Sprintf("%s/pulls#%d", p.Repository, p.PullRequestNumber)
 }
 
 // PullRequest represents a pull request.
@@ -71,7 +71,7 @@ type BranchIdentifier struct {
 	Name       string
 }
 
-func (b *BranchIdentifier) String() string {
+func (b BranchIdentifier) String() string {
 	return b.Repository.String() + ":" + b.Name
 }
 
@@ -85,6 +85,10 @@ type Branch struct {
 type CommitIdentifier struct {
 	Repository RepositoryIdentifier
 	SHA        string
+}
+
+func (c CommitIdentifier) String() string {
+	return c.Repository.String() + "/commit@" + c.SHA
 }
 
 // Commit represents a commit in a repository.
@@ -103,4 +107,8 @@ func (c *Commit) GetSingleParent() *CommitIdentifier {
 type TreeIdentifier struct {
 	Repository RepositoryIdentifier
 	SHA        string
+}
+
+func (t TreeIdentifier) String() string {
+	return t.Repository.String() + "/tree@" + t.SHA
 }

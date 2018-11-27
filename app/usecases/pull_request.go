@@ -28,21 +28,21 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	}
 	version := findGradleWrapperVersion(files)
 	if version == "" {
-		return errors.Errorf("Could not find Gradle wrapper version from files %v", files)
+		return errors.Errorf("Could not find Gradle wrapper version from files %s", files)
 	}
-	log.Debugf(ctx, "Found Gradle wrapper %s in the repository %v", version, latestRepository)
+	log.Debugf(ctx, "Found Gradle wrapper %s in the repository %s", version, latestRepository)
 
 	base, err := interactor.Repository.Get(ctx, targetRepository)
 	if err != nil {
-		return errors.Wrapf(err, "Could not get the repository %v", targetRepository)
+		return errors.Wrapf(err, "Could not get the repository %s", targetRepository)
 	}
 	baseBranch := base.DefaultBranch
 
 	head, err := interactor.Repository.Fork(ctx, targetRepository)
 	if err != nil {
-		return errors.Wrapf(err, "Could not fork the repository %v", targetRepository)
+		return errors.Wrapf(err, "Could not fork the repository %s", targetRepository)
 	}
-	log.Debugf(ctx, "Forked the repository %v into %v", targetRepository, head.RepositoryIdentifier)
+	log.Debugf(ctx, "Forked the repository %s into %s", targetRepository, head.RepositoryIdentifier)
 
 	commit := domain.Commit{
 		CommitIdentifier: domain.CommitIdentifier{Repository: head.RepositoryIdentifier},
@@ -56,7 +56,7 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	if err != nil {
 		return errors.Wrapf(err, "Could not commit and push a branch %s", headBranch)
 	}
-	log.Debugf(ctx, "Pushed a commit to branch %v", newHeadBranch)
+	log.Debugf(ctx, "Pushed a commit to branch %s", newHeadBranch)
 
 	pull := domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
@@ -76,7 +76,7 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 	if err != nil {
 		return errors.Wrapf(err, "Could not open a pull request %s", pull.String())
 	}
-	log.Debugf(ctx, "Opened a pull request %v", newPull.PullRequestIdentifier)
+	log.Debugf(ctx, "Opened a pull request %s", newPull.PullRequestIdentifier)
 	return nil
 }
 
@@ -107,12 +107,12 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 		commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
 		newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
+			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 		}
 		commit.Tree = newHeadTree
 		newHeadCommit, err := interactor.Commit.Create(ctx, commit)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %v", commit)
+			return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
 		}
 		newHeadBranch, err := interactor.Branch.Create(ctx, domain.Branch{
 			BranchIdentifier: head,
@@ -146,12 +146,12 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 	commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
 	newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %v", baseCommit.Tree)
+		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 	}
 	commit.Tree = newHeadTree
 	newHeadCommit, err := interactor.Commit.Create(ctx, commit)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %v", commit)
+		return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
 	}
 	newHeadBranch, err := interactor.Branch.UpdateForce(ctx, domain.Branch{
 		BranchIdentifier: head,
