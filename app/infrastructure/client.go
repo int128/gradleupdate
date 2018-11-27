@@ -2,7 +2,6 @@ package infrastructure
 
 import (
 	"context"
-	"google.golang.org/appengine/urlfetch"
 	"net/http"
 	"os"
 
@@ -11,31 +10,25 @@ import (
 	"github.com/int128/gradleupdate/app/infrastructure/memcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/log"
+	"google.golang.org/appengine/urlfetch"
 )
 
 // GitHubClient creates a client.
 func GitHubClient(ctx context.Context) *github.Client {
-	appengineTransport := &urlfetch.Transport{Context: ctx}
-
-	loggingTransport := &loggingTransport{ctx, appengineTransport}
-
-	oauth2Transport := oauth2Transport(ctx, loggingTransport)
-
-	cachedTransport := &httpcache.Transport{Cache: memcache.New(ctx), Transport: oauth2Transport}
-
-	return github.NewClient(&http.Client{Transport: cachedTransport})
+	var transport http.RoundTripper
+	transport = &urlfetch.Transport{Context: ctx}
+	transport = &loggingTransport{ctx, transport}
+	transport = &oauth2.Transport{Source: oauth2TokenSource(ctx), Base: transport}
+	transport = &httpcache.Transport{Cache: memcache.New(ctx), Transport: transport}
+	return github.NewClient(&http.Client{Transport: transport})
 }
 
-func oauth2Transport(ctx context.Context, base http.RoundTripper) http.RoundTripper {
+func oauth2TokenSource(ctx context.Context) oauth2.TokenSource {
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		log.Warningf(ctx, "GITHUB_TOKEN is not set")
 	}
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	return &oauth2.Transport{
-		Base:   base,
-		Source: ts,
-	}
+	return oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 }
 
 type loggingTransport struct {
