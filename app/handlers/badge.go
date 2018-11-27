@@ -20,22 +20,23 @@ func (h *getBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	u := usecases.GetStatus{
-		Repository: h.repositories.Repository(ctx),
+	u := usecases.GetBadge{
+		Repository:      h.repositories.Repository(ctx),
+		BadgeLastAccess: h.repositories.BadgeAccess(),
 	}
-	status, err := u.Do(ctx, owner, repo)
+	badge, err := u.Do(ctx, owner, repo)
 	switch {
 	case err != nil:
 		log.Warningf(ctx, "Could not get gradle wrapper version: %s", err)
 		w.Header().Set("Content-Type", "image/svg+xml")
 		templates.DarkBadge("unknown").WriteSVG(w)
 
-	case status.UpToDate:
+	case badge.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.GreenBadge(string(status.TargetVersion)).WriteSVG(w)
+		templates.GreenBadge(string(badge.TargetVersion)).WriteSVG(w)
 
-	case !status.UpToDate:
+	case !badge.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.RedBadge(string(status.TargetVersion)).WriteSVG(w)
+		templates.RedBadge(string(badge.TargetVersion)).WriteSVG(w)
 	}
 }

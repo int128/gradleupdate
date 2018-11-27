@@ -14,6 +14,8 @@ type Repositories interface {
 	Branch(context.Context) repositories.Branch
 	Commit(context.Context) repositories.Commit
 	Tree(context.Context) repositories.Tree
+
+	BadgeAccess() repositories.BadgeLastAccess
 }
 
 type defaultRepositories struct{}
@@ -36,6 +38,10 @@ func (*defaultRepositories) Commit(ctx context.Context) repositories.Commit {
 
 func (*defaultRepositories) Tree(ctx context.Context) repositories.Tree {
 	return &impl.Tree{GitHub: infrastructure.GitHubClient(ctx)}
+}
+
+func (*defaultRepositories) BadgeAccess() repositories.BadgeLastAccess {
+	return &impl.BadgeLastAccess{}
 }
 
 func NewRepositoriesRegistry() Repositories {

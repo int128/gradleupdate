@@ -11,8 +11,12 @@ type RepositoryIdentifier struct {
 	Name  string
 }
 
-func (r *RepositoryIdentifier) String() string {
+func (r *RepositoryIdentifier) FullName() string {
 	return r.Owner + "/" + r.Name
+}
+
+func (r *RepositoryIdentifier) String() string {
+	return r.FullName()
 }
 
 // Repository represents a GitHub repository.

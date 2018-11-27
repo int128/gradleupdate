@@ -21,7 +21,7 @@ func (h *getStatus) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	u := usecases.GetRepositoryAndStatus{
+	u := usecases.GetRepositoryStatus{
 		Repository: h.repositories.Repository(ctx),
 	}
 	out, err := u.Do(ctx, owner, repo)

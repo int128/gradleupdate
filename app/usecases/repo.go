@@ -7,16 +7,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-type RepositoryAndStatus struct {
-	Status     Status
+type RepositoryStatus struct {
+	Badge      Badge
 	Repository domain.Repository
 }
 
-type GetRepositoryAndStatus struct {
+type GetRepositoryStatus struct {
 	Repository repositories.Repository
 }
 
-func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo string) (*RepositoryAndStatus, error) {
+func (interactor *GetRepositoryStatus) Do(ctx context.Context, owner, repo string) (*RepositoryStatus, error) {
 	repository, err := interactor.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
@@ -29,8 +29,8 @@ func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo st
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the latest version")
 	}
-	return &RepositoryAndStatus{
-		Status: Status{
+	return &RepositoryStatus{
+		Badge: Badge{
 			TargetVersion: targetVersion,
 			LatestVersion: latestVersion,
 			UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
@@ -39,7 +39,7 @@ func (interactor *GetRepositoryAndStatus) Do(ctx context.Context, owner, repo st
 	}, nil
 }
 
-func (interactor *GetRepositoryAndStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
+func (interactor *GetRepositoryStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
 	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
