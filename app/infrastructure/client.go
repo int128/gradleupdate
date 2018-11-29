@@ -6,8 +6,7 @@ import (
 	"os"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/gregjones/httpcache"
-	"github.com/int128/gradleupdate/app/infrastructure/memcache"
+	"github.com/int128/gradleupdate/app/infrastructure/httpcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
@@ -18,8 +17,8 @@ func GitHubClient(ctx context.Context) *github.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
 	transport = &loggingTransport{ctx, transport}
+	transport = &httpcache.Transport{Cache: &httpcache.AppEngineMemcache{Context: ctx}, Transport: transport}
 	transport = &oauth2.Transport{Source: oauth2TokenSource(ctx), Base: transport}
-	transport = &httpcache.Transport{Cache: memcache.New(ctx), Transport: transport}
 	return github.NewClient(&http.Client{Transport: transport})
 }
 
