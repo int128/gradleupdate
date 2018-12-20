@@ -1,6 +1,6 @@
 package usecases
 
-import "github.com/int128/gradleupdate/app/domain"
+import "github.com/int128/gradleupdate/domain"
 
 const gradleWrapperPropertiesPath = "gradle/wrapper/gradle-wrapper.properties"
 

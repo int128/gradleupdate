@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
 )
 

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/int128/gradleupdate/app/registry"
+	"github.com/int128/gradleupdate/registry"
 )
 
 // New returns a handler for all paths.

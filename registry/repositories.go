@@ -3,9 +3,9 @@ package registry
 import (
 	"context"
 
-	"github.com/int128/gradleupdate/app/domain/repositories"
-	"github.com/int128/gradleupdate/app/infrastructure"
-	impl "github.com/int128/gradleupdate/app/infrastructure/repositories"
+	"github.com/int128/gradleupdate/domain/repositories"
+	"github.com/int128/gradleupdate/infrastructure"
+	impl "github.com/int128/gradleupdate/infrastructure/repositories"
 )
 
 type Repositories interface {

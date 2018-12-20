@@ -2,11 +2,11 @@ package infrastructure
 
 import (
 	"context"
+	"github.com/int128/gradleupdate/infrastructure/httpcache"
 	"net/http"
 	"os"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/app/infrastructure/httpcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"

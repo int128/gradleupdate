@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/domain"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )

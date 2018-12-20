@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/int128/gradleupdate/app/handlers"
+	"github.com/int128/gradleupdate/handlers"
 	"google.golang.org/appengine"
 )
 

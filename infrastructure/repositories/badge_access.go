@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/datastore"
 	"time"

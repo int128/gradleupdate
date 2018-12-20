@@ -7,8 +7,8 @@ package mock_repositories
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	domain "github.com/int128/gradleupdate/app/domain"
-	repositories "github.com/int128/gradleupdate/app/domain/repositories"
+	domain "github.com/int128/gradleupdate/domain"
+	repositories "github.com/int128/gradleupdate/domain/repositories"
 	reflect "reflect"
 )
 

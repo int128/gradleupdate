@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/int128/gradleupdate/app/domain"
+	"github.com/int128/gradleupdate/domain"
 )
 
 type Repository interface {

@@ -2,8 +2,8 @@ package usecases
 
 import (
 	"context"
-	"github.com/int128/gradleupdate/app/domain"
-	"github.com/int128/gradleupdate/app/domain/repositories"
+	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/repositories"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/log"
 	"time"

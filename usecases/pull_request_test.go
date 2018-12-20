@@ -3,8 +3,8 @@ package usecases
 import (
 	"context"
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/app/domain"
-	"github.com/int128/gradleupdate/app/usecases/mock_repositories"
+	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/usecases/mock_repositories"
 	"reflect"
 	"testing"
 )
