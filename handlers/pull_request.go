@@ -4,29 +4,21 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/int128/gradleupdate/registry"
 	"github.com/int128/gradleupdate/usecases"
-	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
 
-type sendPullRequest struct {
-	repositories registry.Repositories
+type SendPullRequest struct {
+	ContextProvider          ContextProvider
+	SendPullRequestForUpdate usecases.SendPullRequestForUpdate
 }
 
-func (h *sendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (h *SendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := h.ContextProvider(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 
-	u := usecases.SendPullRequestForUpdate{
-		Repository:  h.repositories.Repository(ctx),
-		PullRequest: h.repositories.PullRequest(ctx),
-		Branch:      h.repositories.Branch(ctx),
-		Tree:        h.repositories.Tree(ctx),
-		Commit:      h.repositories.Commit(ctx),
-	}
-	if err := u.Do(ctx, owner, repo); err != nil {
+	if err := h.SendPullRequestForUpdate.Do(ctx, owner, repo); err != nil {
 		log.Errorf(ctx, "Error while usecases.SendPullRequestForUpdate: %+v", err)
 		http.Error(w, err.Error(), 500)
 	}

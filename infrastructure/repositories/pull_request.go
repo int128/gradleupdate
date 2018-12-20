@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"github.com/int128/gradleupdate/infrastructure"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
@@ -9,12 +10,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-type PullRequest struct {
-	GitHub *github.Client
-}
+type PullRequest struct{}
 
 func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery) ([]domain.PullRequest, error) {
-	payloads, _, err := r.GitHub.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Name, &github.PullRequestListOptions{
+	client := infrastructure.GitHubClient(ctx)
+	payloads, _, err := client.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Name, &github.PullRequestListOptions{
 		Base:        q.Base.Name,
 		Head:        q.Head.Name,
 		State:       q.State,
@@ -50,7 +50,8 @@ func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery
 }
 
 func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	payload, _, err := r.GitHub.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
+	client := infrastructure.GitHubClient(ctx)
+	payload, _, err := client.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
 		Head:  github.String(pull.HeadBranch.Name),
 		Title: github.String(pull.Title),
@@ -80,7 +81,8 @@ func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (doma
 }
 
 func (r *PullRequest) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	payload, _, err := r.GitHub.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
+	client := infrastructure.GitHubClient(ctx)
+	payload, _, err := client.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})

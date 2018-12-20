@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"encoding/base64"
+	"github.com/int128/gradleupdate/infrastructure"
 	"strings"
 
 	"github.com/google/go-github/v18/github"
@@ -10,12 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Branch struct {
-	GitHub *github.Client
-}
+type Branch struct{}
 
 func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Branch, error) {
-	payload, resp, err := r.GitHub.Git.GetRef(ctx, b.Repository.Owner, b.Repository.Name, "refs/heads/"+b.Name)
+	client := infrastructure.GitHubClient(ctx)
+	payload, resp, err := client.Git.GetRef(ctx, b.Repository.Owner, b.Repository.Name, "refs/heads/"+b.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Branch{}, domain.NotFoundError{Cause: err}
 	}
@@ -35,7 +35,8 @@ func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Bra
 }
 
 func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	payload, _, err := r.GitHub.Git.CreateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
+	client := infrastructure.GitHubClient(ctx)
+	payload, _, err := client.Git.CreateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Name),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
 	})
@@ -55,7 +56,8 @@ func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, er
 }
 
 func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	payload, _, err := r.GitHub.Git.UpdateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
+	client := infrastructure.GitHubClient(ctx)
+	payload, _, err := client.Git.UpdateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Name),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
 	}, true)
@@ -74,12 +76,11 @@ func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branc
 	}, nil
 }
 
-type Commit struct {
-	GitHub *github.Client
-}
+type Commit struct{}
 
 func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Commit, error) {
-	payload, resp, err := r.GitHub.Git.GetCommit(ctx, c.Repository.Owner, c.Repository.Name, c.SHA)
+	client := infrastructure.GitHubClient(ctx)
+	payload, resp, err := client.Git.GetCommit(ctx, c.Repository.Owner, c.Repository.Name, c.SHA)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Commit{}, domain.NotFoundError{Cause: err}
 	}
@@ -108,11 +109,12 @@ func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Com
 }
 
 func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commit, error) {
+	client := infrastructure.GitHubClient(ctx)
 	ghParents := make([]github.Commit, len(commit.Parents))
 	for i, parent := range commit.Parents {
 		ghParents[i] = github.Commit{SHA: github.String(parent.SHA)}
 	}
-	ghCommit, _, err := r.GitHub.Git.CreateCommit(ctx, commit.Repository.Owner, commit.Repository.Name, &github.Commit{
+	ghCommit, _, err := client.Git.CreateCommit(ctx, commit.Repository.Owner, commit.Repository.Name, &github.Commit{
 		Message: github.String(commit.Message),
 		Tree:    &github.Tree{SHA: github.String(commit.Tree.SHA)},
 		Parents: ghParents,
@@ -141,15 +143,14 @@ func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commi
 	}, nil
 }
 
-type Tree struct {
-	GitHub *github.Client
-}
+type Tree struct{}
 
 func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base domain.TreeIdentifier, files []domain.File) (domain.TreeIdentifier, error) {
+	client := infrastructure.GitHubClient(ctx)
 	ghEntries := make([]github.TreeEntry, len(files))
 	for i, file := range files {
 		content := base64.StdEncoding.EncodeToString(file.Content)
-		ghBlob, _, err := r.GitHub.Git.CreateBlob(ctx, id.Owner, id.Name, &github.Blob{
+		ghBlob, _, err := client.Git.CreateBlob(ctx, id.Owner, id.Name, &github.Blob{
 			Content:  github.String(content),
 			Encoding: github.String("base64"),
 		})
@@ -162,7 +163,7 @@ func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base 
 			SHA:  ghBlob.SHA,
 		}
 	}
-	ghTree, _, err := r.GitHub.Git.CreateTree(ctx, id.Owner, id.Name, base.SHA, ghEntries)
+	ghTree, _, err := client.Git.CreateTree(ctx, id.Owner, id.Name, base.SHA, ghEntries)
 	if err != nil {
 		return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
 	}

@@ -3,18 +3,18 @@ package repositories
 import (
 	"context"
 	"encoding/base64"
+	"github.com/int128/gradleupdate/infrastructure"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
 )
 
-type Repository struct {
-	GitHub *github.Client
-}
+type Repository struct{}
 
 func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	repository, resp, err := r.GitHub.Repositories.Get(ctx, id.Owner, id.Name)
+	client := infrastructure.GitHubClient(ctx)
+	repository, resp, err := client.Repositories.Get(ctx, id.Owner, id.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}
@@ -39,7 +39,8 @@ func (r *Repository) Get(ctx context.Context, id domain.RepositoryIdentifier) (d
 }
 
 func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.File, error) {
-	fc, _, resp, err := r.GitHub.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
+	client := infrastructure.GitHubClient(ctx)
+	fc, _, resp, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.File{}, domain.NotFoundError{Cause: err}
 	}
@@ -68,7 +69,8 @@ func (r *Repository) GetFile(ctx context.Context, id domain.RepositoryIdentifier
 }
 
 func (r *Repository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	fork, resp, err := r.GitHub.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
+	client := infrastructure.GitHubClient(ctx)
+	fork, resp, err := client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
 	}

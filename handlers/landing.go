@@ -5,14 +5,15 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/domain"
-	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
 
-type landing struct{}
+type Landing struct {
+	ContextProvider ContextProvider
+}
 
-func (h *landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := h.ContextProvider(r)
 	if err := r.ParseForm(); err != nil {
 		log.Infof(ctx, "Could not parse form: %s", err)
 		http.Error(w, "Could not parse form", 400)
