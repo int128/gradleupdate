@@ -10,12 +10,12 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type GetStatus struct {
+type GetRepository struct {
 	ContextProvider     ContextProvider
-	GetRepositoryStatus usecases.GetRepositoryStatus
+	GetRepositoryStatus usecases.GetRepository
 }
 
-func (h *GetStatus) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := h.ContextProvider(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]

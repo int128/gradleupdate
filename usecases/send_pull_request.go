@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type SendPullRequestForUpdate struct {
+type SendPullRequest struct {
 	Repository  repositories.Repository
 	Branch      repositories.Branch
 	Commit      repositories.Commit
@@ -18,11 +18,11 @@ type SendPullRequestForUpdate struct {
 	PullRequest repositories.PullRequest
 }
 
-func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo string) error {
+func (usecase *SendPullRequest) Do(ctx context.Context, owner, repo string) error {
 	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"}
 	targetRepository := domain.RepositoryIdentifier{Owner: owner, Name: repo}
 
-	files, err := interactor.downloadGradleWrapperFiles(ctx, latestRepository)
+	files, err := usecase.downloadGradleWrapperFiles(ctx, latestRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not find files of the latest Gradle wrapper")
 	}
@@ -32,13 +32,13 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 	}
 	log.Debugf(ctx, "Found Gradle wrapper %s in the repository %s", version, latestRepository)
 
-	base, err := interactor.Repository.Get(ctx, targetRepository)
+	base, err := usecase.Repository.Get(ctx, targetRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not get the repository %s", targetRepository)
 	}
 	baseBranch := base.DefaultBranch
 
-	head, err := interactor.Repository.Fork(ctx, targetRepository)
+	head, err := usecase.Repository.Fork(ctx, targetRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not fork the repository %s", targetRepository)
 	}
@@ -52,7 +52,7 @@ func (interactor *SendPullRequestForUpdate) Do(ctx context.Context, owner, repo 
 		Repository: head.RepositoryIdentifier,
 		Name:       fmt.Sprintf("gradle-%s-%s", version, owner),
 	}
-	newHeadBranch, err := interactor.commitAndPush(ctx, baseBranch, headBranch, commit, files)
+	newHeadBranch, err := usecase.commitAndPush(ctx, baseBranch, headBranch, commit, files)
 	if err != nil {
 		return errors.Wrapf(err, "Could not commit and push a branch %s", headBranch)
 	}
@@ -71,7 +71,7 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 `, version),
 	}
 
-	pullRequestService := pullRequestService{interactor.PullRequest}
+	pullRequestService := pullRequestService{usecase.PullRequest}
 	newPull, err := pullRequestService.createOrUpdatePullRequest(ctx, pull)
 	if err != nil {
 		return errors.Wrapf(err, "Could not open a pull request %s", pull.String())
@@ -80,10 +80,10 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 	return nil
 }
 
-func (interactor *SendPullRequestForUpdate) downloadGradleWrapperFiles(ctx context.Context, id domain.RepositoryIdentifier) ([]domain.File, error) {
+func (usecase *SendPullRequest) downloadGradleWrapperFiles(ctx context.Context, id domain.RepositoryIdentifier) ([]domain.File, error) {
 	files := make([]domain.File, len(gradleWrapperFiles))
 	for i, source := range gradleWrapperFiles {
-		file, err := interactor.Repository.GetFile(ctx, id, source.Path)
+		file, err := usecase.Repository.GetFile(ctx, id, source.Path)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Could not get file %s", source.Path)
 		}
@@ -93,28 +93,28 @@ func (interactor *SendPullRequestForUpdate) downloadGradleWrapperFiles(ctx conte
 	return files, nil
 }
 
-func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, base, head domain.BranchIdentifier, commit domain.Commit, files []domain.File) (domain.Branch, error) {
-	headBranch, err := interactor.Branch.Get(ctx, head)
+func (usecase *SendPullRequest) commitAndPush(ctx context.Context, base, head domain.BranchIdentifier, commit domain.Commit, files []domain.File) (domain.Branch, error) {
+	headBranch, err := usecase.Branch.Get(ctx, head)
 	if domain.IsNotFoundError(err) {
-		baseBranch, err := interactor.Branch.Get(ctx, base)
+		baseBranch, err := usecase.Branch.Get(ctx, base)
 		if err != nil {
 			return domain.Branch{}, errors.Wrapf(err, "Could not get the base branch %s", base)
 		}
-		baseCommit, err := interactor.Commit.Get(ctx, baseBranch.Commit)
+		baseCommit, err := usecase.Commit.Get(ctx, baseBranch.Commit)
 		if err != nil {
 			return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 		}
 		commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-		newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
+		newHeadTree, err := usecase.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 		if err != nil {
 			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 		}
 		commit.Tree = newHeadTree
-		newHeadCommit, err := interactor.Commit.Create(ctx, commit)
+		newHeadCommit, err := usecase.Commit.Create(ctx, commit)
 		if err != nil {
 			return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
 		}
-		newHeadBranch, err := interactor.Branch.Create(ctx, domain.Branch{
+		newHeadBranch, err := usecase.Branch.Create(ctx, domain.Branch{
 			BranchIdentifier: head,
 			Commit:           newHeadCommit.CommitIdentifier,
 		})
@@ -127,11 +127,11 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the head branch %s", head)
 	}
 
-	baseBranch, err := interactor.Branch.Get(ctx, base)
+	baseBranch, err := usecase.Branch.Get(ctx, base)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the base branch %s", base)
 	}
-	headCommit, err := interactor.Commit.Get(ctx, headBranch.Commit)
+	headCommit, err := usecase.Commit.Get(ctx, headBranch.Commit)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the commit %s of head branch %s", headBranch.Commit, headBranch)
 	}
@@ -139,21 +139,21 @@ func (interactor *SendPullRequestForUpdate) commitAndPush(ctx context.Context, b
 	if parent != nil && parent.SHA == baseBranch.Commit.SHA {
 		return headBranch, nil
 	}
-	baseCommit, err := interactor.Commit.Get(ctx, baseBranch.Commit)
+	baseCommit, err := usecase.Commit.Get(ctx, baseBranch.Commit)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 	}
 	commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
-	newHeadTree, err := interactor.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
+	newHeadTree, err := usecase.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 	}
 	commit.Tree = newHeadTree
-	newHeadCommit, err := interactor.Commit.Create(ctx, commit)
+	newHeadCommit, err := usecase.Commit.Create(ctx, commit)
 	if err != nil {
 		return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
 	}
-	newHeadBranch, err := interactor.Branch.UpdateForce(ctx, domain.Branch{
+	newHeadBranch, err := usecase.Branch.UpdateForce(ctx, domain.Branch{
 		BranchIdentifier: head,
 		Commit:           newHeadCommit.CommitIdentifier,
 	})

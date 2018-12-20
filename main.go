@@ -19,9 +19,9 @@ func main() {
 		Landing: handlers.Landing{
 			ContextProvider: contextProvider,
 		},
-		GetStatus: handlers.GetStatus{
+		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
-			GetRepositoryStatus: usecases.GetRepositoryStatus{
+			GetRepositoryStatus: usecases.GetRepository{
 				Repository: &repositories.Repository{},
 			},
 		},
@@ -34,7 +34,7 @@ func main() {
 		},
 		SendPullRequest: handlers.SendPullRequest{
 			ContextProvider: contextProvider,
-			SendPullRequestForUpdate: usecases.SendPullRequestForUpdate{
+			SendPullRequest: usecases.SendPullRequest{
 				Repository:  &repositories.Repository{},
 				PullRequest: &repositories.PullRequest{},
 				Branch:      &repositories.Branch{},

@@ -11,7 +11,7 @@ type ContextProvider func(*http.Request) context.Context
 
 type Handlers struct {
 	Landing         Landing
-	GetStatus       GetStatus
+	GetRepository   GetRepository
 	GetBadge        GetBadge
 	SendPullRequest SendPullRequest
 }
@@ -19,7 +19,7 @@ type Handlers struct {
 func (h *Handlers) NewRouter() http.Handler {
 	m := mux.NewRouter()
 	m.Handle("/landing", &h.Landing).Methods("POST")
-	m.Handle("/{owner}/{repo}/status", &h.GetStatus).Methods("GET")
+	m.Handle("/{owner}/{repo}/status", &h.GetRepository).Methods("GET")
 	m.Handle("/{owner}/{repo}/status.svg", &h.GetBadge).Methods("GET")
 	m.Handle("/{owner}/{repo}/pull", &h.SendPullRequest).Methods("POST")
 	return m

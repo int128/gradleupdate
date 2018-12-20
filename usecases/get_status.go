@@ -12,20 +12,20 @@ type RepositoryStatus struct {
 	Repository domain.Repository
 }
 
-type GetRepositoryStatus struct {
+type GetRepository struct {
 	Repository repositories.Repository
 }
 
-func (interactor *GetRepositoryStatus) Do(ctx context.Context, owner, repo string) (*RepositoryStatus, error) {
-	repository, err := interactor.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
+func (usecase *GetRepository) Do(ctx context.Context, owner, repo string) (*RepositoryStatus, error) {
+	repository, err := usecase.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
 	}
-	targetVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{owner, repo})
+	targetVersion, err := usecase.getVersion(ctx, domain.RepositoryIdentifier{owner, repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
 	}
-	latestVersion, err := interactor.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"})
+	latestVersion, err := usecase.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the latest version")
 	}
@@ -39,8 +39,8 @@ func (interactor *GetRepositoryStatus) Do(ctx context.Context, owner, repo strin
 	}, nil
 }
 
-func (interactor *GetRepositoryStatus) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
-	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
+func (usecase *GetRepository) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
+	file, err := usecase.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
 	}

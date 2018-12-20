@@ -23,18 +23,18 @@ type GetBadge struct {
 }
 
 // Do performs the usecase.
-func (interactor *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, error) {
+func (usecase *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, error) {
 	targetRepository := domain.RepositoryIdentifier{Owner: owner, Name: repo}
-	targetVersion, err := interactor.getVersion(ctx, targetRepository)
+	targetVersion, err := usecase.getVersion(ctx, targetRepository)
 	if err != nil {
 		return Badge{}, errors.Wrapf(err, "Could not get Gradle version of repository %s", targetRepository)
 	}
 	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"}
-	latestVersion, err := interactor.getVersion(ctx, latestRepository)
+	latestVersion, err := usecase.getVersion(ctx, latestRepository)
 	if err != nil {
 		return Badge{}, errors.Wrapf(err, "Could not get Gradle version of repository %s", latestRepository)
 	}
-	if err := interactor.BadgeLastAccess.Put(ctx, domain.BadgeLastAccess{
+	if err := usecase.BadgeLastAccess.Put(ctx, domain.BadgeLastAccess{
 		Repository:     targetRepository,
 		LastAccessTime: time.Now(),
 		TargetVersion:  targetVersion,
@@ -49,8 +49,8 @@ func (interactor *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, 
 	}, nil
 }
 
-func (interactor *GetBadge) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
-	file, err := interactor.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
+func (usecase *GetBadge) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
+	file, err := usecase.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
 	}
