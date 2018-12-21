@@ -2,8 +2,9 @@ package usecases
 
 import (
 	"context"
+
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/repositories"
+	"github.com/int128/gradleupdate/domain/gateways"
 	"github.com/pkg/errors"
 )
 
@@ -13,11 +14,11 @@ type RepositoryStatus struct {
 }
 
 type GetRepository struct {
-	Repository repositories.Repository
+	RepositoryRepository gateways.RepositoryRepository
 }
 
 func (usecase *GetRepository) Do(ctx context.Context, owner, repo string) (*RepositoryStatus, error) {
-	repository, err := usecase.Repository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
+	repository, err := usecase.RepositoryRepository.Get(ctx, domain.RepositoryIdentifier{Owner: owner, Name: repo})
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get the repository %s/%s", owner, repo)
 	}
@@ -40,7 +41,7 @@ func (usecase *GetRepository) Do(ctx context.Context, owner, repo string) (*Repo
 }
 
 func (usecase *GetRepository) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
-	file, err := usecase.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
+	file, err := usecase.RepositoryRepository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
 	}

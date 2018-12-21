@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/int128/gradleupdate/templates"
+	"github.com/int128/gradleupdate/presenters/templates"
 	"github.com/int128/gradleupdate/usecases"
 	"google.golang.org/appengine/log"
 )

@@ -3,19 +3,20 @@ package usecases
 import (
 	"context"
 	"fmt"
+
 	"google.golang.org/appengine/log"
 
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/repositories"
+	"github.com/int128/gradleupdate/domain/gateways"
 	"github.com/pkg/errors"
 )
 
 type SendPullRequest struct {
-	Repository  repositories.Repository
-	Branch      repositories.Branch
-	Commit      repositories.Commit
-	Tree        repositories.Tree
-	PullRequest repositories.PullRequest
+	RepositoryRepository  gateways.RepositoryRepository
+	PullRequestRepository gateways.PullRequestRepository
+	Branch                gateways.Branch
+	Commit                gateways.Commit
+	Tree                  gateways.Tree
 }
 
 func (usecase *SendPullRequest) Do(ctx context.Context, owner, repo string) error {
@@ -32,13 +33,13 @@ func (usecase *SendPullRequest) Do(ctx context.Context, owner, repo string) erro
 	}
 	log.Debugf(ctx, "Found Gradle wrapper %s in the repository %s", version, latestRepository)
 
-	base, err := usecase.Repository.Get(ctx, targetRepository)
+	base, err := usecase.RepositoryRepository.Get(ctx, targetRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not get the repository %s", targetRepository)
 	}
 	baseBranch := base.DefaultBranch
 
-	head, err := usecase.Repository.Fork(ctx, targetRepository)
+	head, err := usecase.RepositoryRepository.Fork(ctx, targetRepository)
 	if err != nil {
 		return errors.Wrapf(err, "Could not fork the repository %s", targetRepository)
 	}
@@ -71,7 +72,7 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 `, version),
 	}
 
-	pullRequestService := pullRequestService{usecase.PullRequest}
+	pullRequestService := pullRequestService{usecase.PullRequestRepository}
 	newPull, err := pullRequestService.createOrUpdatePullRequest(ctx, pull)
 	if err != nil {
 		return errors.Wrapf(err, "Could not open a pull request %s", pull.String())
@@ -83,7 +84,7 @@ This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wr
 func (usecase *SendPullRequest) downloadGradleWrapperFiles(ctx context.Context, id domain.RepositoryIdentifier) ([]domain.File, error) {
 	files := make([]domain.File, len(gradleWrapperFiles))
 	for i, source := range gradleWrapperFiles {
-		file, err := usecase.Repository.GetFile(ctx, id, source.Path)
+		file, err := usecase.RepositoryRepository.GetFile(ctx, id, source.Path)
 		if err != nil {
 			return nil, errors.Wrapf(err, "Could not get file %s", source.Path)
 		}
@@ -164,11 +165,11 @@ func (usecase *SendPullRequest) commitAndPush(ctx context.Context, base, head do
 }
 
 type pullRequestService struct {
-	PullRequest repositories.PullRequest
+	PullRequest gateways.PullRequestRepository
 }
 
 func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	pulls, err := service.PullRequest.Query(ctx, repositories.PullRequestQuery{
+	pulls, err := service.PullRequest.Query(ctx, gateways.PullRequestQuery{
 		Head:      pull.HeadBranch,
 		Base:      pull.BaseBranch,
 		State:     "open",

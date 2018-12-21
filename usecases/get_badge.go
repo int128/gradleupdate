@@ -2,11 +2,12 @@ package usecases
 
 import (
 	"context"
+	"time"
+
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/repositories"
+	"github.com/int128/gradleupdate/domain/gateways"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/log"
-	"time"
 )
 
 // Badge represents whether the wrapper is up-to-date or out-of-date.
@@ -18,8 +19,8 @@ type Badge struct {
 
 // GetBadge provides a usecase to get status of Gradle wrapper in a repository.
 type GetBadge struct {
-	Repository      repositories.Repository
-	BadgeLastAccess repositories.BadgeLastAccess
+	RepositoryRepository      gateways.RepositoryRepository
+	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 }
 
 // Do performs the usecase.
@@ -34,7 +35,7 @@ func (usecase *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, err
 	if err != nil {
 		return Badge{}, errors.Wrapf(err, "Could not get Gradle version of repository %s", latestRepository)
 	}
-	if err := usecase.BadgeLastAccess.Put(ctx, domain.BadgeLastAccess{
+	if err := usecase.BadgeLastAccessRepository.Put(ctx, domain.BadgeLastAccess{
 		Repository:     targetRepository,
 		LastAccessTime: time.Now(),
 		TargetVersion:  targetVersion,
@@ -50,7 +51,7 @@ func (usecase *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, err
 }
 
 func (usecase *GetBadge) getVersion(ctx context.Context, id domain.RepositoryIdentifier) (domain.GradleVersion, error) {
-	file, err := usecase.Repository.GetFile(ctx, id, gradleWrapperPropertiesPath)
+	file, err := usecase.RepositoryRepository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "File not found: %s", gradleWrapperPropertiesPath)
 	}

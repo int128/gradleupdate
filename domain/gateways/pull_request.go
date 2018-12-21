@@ -1,4 +1,4 @@
-package repositories
+package gateways
 
 import (
 	"context"
@@ -6,7 +6,9 @@ import (
 	"github.com/int128/gradleupdate/domain"
 )
 
-type PullRequest interface {
+//go:generate mockgen -destination mock_gateways/pull_request.go github.com/int128/gradleupdate/domain/gateways PullRequestRepository
+
+type PullRequestRepository interface {
 	Query(context.Context, PullRequestQuery) ([]domain.PullRequest, error)
 	Create(context.Context, domain.PullRequest) (domain.PullRequest, error)
 	Update(context.Context, domain.PullRequest) (domain.PullRequest, error)

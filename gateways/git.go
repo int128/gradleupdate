@@ -1,10 +1,11 @@
-package repositories
+package gateways
 
 import (
 	"context"
 	"encoding/base64"
-	"github.com/int128/gradleupdate/infrastructure"
 	"strings"
+
+	"github.com/int128/gradleupdate/infrastructure"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"

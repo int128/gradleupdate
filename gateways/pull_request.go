@@ -1,18 +1,19 @@
-package repositories
+package gateways
 
 import (
 	"context"
+
 	"github.com/int128/gradleupdate/infrastructure"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/repositories"
+	"github.com/int128/gradleupdate/domain/gateways"
 	"github.com/pkg/errors"
 )
 
-type PullRequest struct{}
+type PullRequestRepository struct{}
 
-func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery) ([]domain.PullRequest, error) {
+func (r *PullRequestRepository) Query(ctx context.Context, q gateways.PullRequestQuery) ([]domain.PullRequest, error) {
 	client := infrastructure.GitHubClient(ctx)
 	payloads, _, err := client.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Name, &github.PullRequestListOptions{
 		Base:        q.Base.Name,
@@ -49,7 +50,7 @@ func (r *PullRequest) Query(ctx context.Context, q repositories.PullRequestQuery
 	return pulls, nil
 }
 
-func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
 	client := infrastructure.GitHubClient(ctx)
 	payload, _, err := client.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
@@ -80,7 +81,7 @@ func (r *PullRequest) Create(ctx context.Context, pull domain.PullRequest) (doma
 	}, nil
 }
 
-func (r *PullRequest) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+func (r *PullRequestRepository) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
 	client := infrastructure.GitHubClient(ctx)
 	payload, _, err := client.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
 		Title: github.String(pull.Title),

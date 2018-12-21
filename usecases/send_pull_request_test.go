@@ -2,19 +2,20 @@ package usecases
 
 import (
 	"context"
-	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/usecases/mock_repositories"
 	"reflect"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/gateways/mock_gateways"
 )
 
 func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 	ctx := context.Background()
-	mc := gomock.NewController(t)
-	defer mc.Finish()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	r := mock_repositories.NewMockPullRequest(mc)
+	r := mock_gateways.NewMockPullRequestRepository(ctrl)
 	r.EXPECT().Query(ctx, gomock.Any()).Return([]domain.PullRequest{}, nil)
 	r.EXPECT().Create(ctx, domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
@@ -88,10 +89,10 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 
 func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	ctx := context.Background()
-	mc := gomock.NewController(t)
-	defer mc.Finish()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-	r := mock_repositories.NewMockPullRequest(mc)
+	r := mock_gateways.NewMockPullRequestRepository(ctrl)
 	r.EXPECT().Query(ctx, gomock.Any()).Return([]domain.PullRequest{
 		{
 			PullRequestIdentifier: domain.PullRequestIdentifier{

@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/int128/gradleupdate/infrastructure/repositories"
-	"github.com/int128/gradleupdate/usecases"
 	"net/http"
 
+	"github.com/int128/gradleupdate/gateways"
 	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/usecases"
 	"google.golang.org/appengine"
 )
 
@@ -22,24 +22,24 @@ func main() {
 		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
 			GetRepositoryStatus: usecases.GetRepository{
-				Repository: &repositories.Repository{},
+				RepositoryRepository: &gateways.RepositoryRepository{},
 			},
 		},
 		GetBadge: handlers.GetBadge{
 			ContextProvider: contextProvider,
 			GetBadge: usecases.GetBadge{
-				Repository:      &repositories.Repository{},
-				BadgeLastAccess: &repositories.BadgeLastAccess{},
+				RepositoryRepository:      &gateways.RepositoryRepository{},
+				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
 			},
 		},
 		SendPullRequest: handlers.SendPullRequest{
 			ContextProvider: contextProvider,
 			SendPullRequest: usecases.SendPullRequest{
-				Repository:  &repositories.Repository{},
-				PullRequest: &repositories.PullRequest{},
-				Branch:      &repositories.Branch{},
-				Commit:      &repositories.Commit{},
-				Tree:        &repositories.Tree{},
+				RepositoryRepository:  &gateways.RepositoryRepository{},
+				PullRequestRepository: &gateways.PullRequestRepository{},
+				Branch:                &gateways.Branch{},
+				Commit:                &gateways.Commit{},
+				Tree:                  &gateways.Tree{},
 			},
 		},
 	}

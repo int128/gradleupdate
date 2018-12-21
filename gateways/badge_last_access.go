@@ -1,11 +1,12 @@
-package repositories
+package gateways
 
 import (
 	"context"
+	"time"
+
 	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/datastore"
-	"time"
 )
 
 const badgeLastAccessKind = "BadgeLastAccess"
@@ -16,9 +17,9 @@ type badgeLastAccessEntity struct {
 	LatestVersion  string
 }
 
-type BadgeLastAccess struct{}
+type BadgeLastAccessRepository struct{}
 
-func (r *BadgeLastAccess) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.BadgeLastAccess, error) {
+func (r *BadgeLastAccessRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.BadgeLastAccess, error) {
 	k := datastore.NewKey(ctx, badgeLastAccessKind, id.FullName(), 0, nil)
 	var e badgeLastAccessEntity
 	err := datastore.Get(ctx, k, &e)
@@ -33,7 +34,7 @@ func (r *BadgeLastAccess) Get(ctx context.Context, id domain.RepositoryIdentifie
 	}, nil
 }
 
-func (r *BadgeLastAccess) Put(ctx context.Context, a domain.BadgeLastAccess) error {
+func (r *BadgeLastAccessRepository) Put(ctx context.Context, a domain.BadgeLastAccess) error {
 	k := datastore.NewKey(ctx, badgeLastAccessKind, a.Repository.FullName(), 0, nil)
 	_, err := datastore.Put(ctx, k, &badgeLastAccessEntity{
 		LastAccessTime: a.LastAccessTime,

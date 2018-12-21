@@ -1,4 +1,4 @@
-package repositories
+package gateways
 
 import (
 	"context"
