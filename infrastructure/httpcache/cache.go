@@ -1,12 +1,15 @@
 package httpcache
 
 import (
+	"bytes"
 	"crypto/sha512"
-	"encoding/hex"
+	"encoding/base64"
 	"net/http"
 )
 
+// CacheKey represents a key in base64 () of sha512 (64 bytes).
 type CacheKey string
+
 type CacheValue []byte
 
 type Cache interface {
@@ -19,14 +22,16 @@ type Cache interface {
 }
 
 func computeCacheKey(req *http.Request) CacheKey {
-	sha := sha512.New()
+	var b bytes.Buffer
 	for key, values := range req.Header {
-		sha.Write([]byte(key))
+		b.Write([]byte(key))
 		for _, value := range values {
-			sha.Write([]byte(value))
+			b.Write([]byte(value))
 		}
 	}
-	sha.Write([]byte(req.Method))
-	h := sha.Sum([]byte(req.URL.String()))
-	return CacheKey(hex.EncodeToString(h))
+	b.Write([]byte(req.Method))
+	b.Write([]byte(req.URL.String()))
+	h := sha512.Sum512(b.Bytes())
+	e := base64.StdEncoding.EncodeToString(h[:])
+	return CacheKey(e)
 }
