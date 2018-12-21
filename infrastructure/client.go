@@ -2,15 +2,23 @@ package infrastructure
 
 import (
 	"context"
-	"github.com/int128/gradleupdate/infrastructure/httpcache"
 	"net/http"
 	"os"
 
 	"github.com/google/go-github/v18/github"
+	"github.com/int128/gradleupdate/infrastructure/httpcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 )
+
+func NewClient(ctx context.Context) *http.Client {
+	var transport http.RoundTripper
+	transport = &urlfetch.Transport{Context: ctx}
+	transport = &loggingTransport{ctx, transport}
+	transport = &httpcache.Transport{Cache: &httpcache.AppEngineMemcache{Context: ctx}, Transport: transport}
+	return &http.Client{Transport: transport}
+}
 
 // GitHubClient creates a client.
 func GitHubClient(ctx context.Context) *github.Client {

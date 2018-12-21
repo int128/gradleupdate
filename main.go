@@ -22,12 +22,14 @@ func main() {
 		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
 			GetRepositoryStatus: usecases.GetRepository{
+				GradleService:        &gateways.GradleService{},
 				RepositoryRepository: &gateways.RepositoryRepository{},
 			},
 		},
 		GetBadge: handlers.GetBadge{
 			ContextProvider: contextProvider,
 			GetBadge: usecases.GetBadge{
+				GradleService:             &gateways.GradleService{},
 				RepositoryRepository:      &gateways.RepositoryRepository{},
 				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
 			},

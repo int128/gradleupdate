@@ -19,6 +19,7 @@ type Badge struct {
 
 // GetBadge provides a usecase to get status of Gradle wrapper in a repository.
 type GetBadge struct {
+	GradleService             gateways.GradleService
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 }
@@ -30,10 +31,9 @@ func (usecase *GetBadge) Do(ctx context.Context, owner, repo string) (Badge, err
 	if err != nil {
 		return Badge{}, errors.Wrapf(err, "Could not get Gradle version of repository %s", targetRepository)
 	}
-	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"}
-	latestVersion, err := usecase.getVersion(ctx, latestRepository)
+	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
 	if err != nil {
-		return Badge{}, errors.Wrapf(err, "Could not get Gradle version of repository %s", latestRepository)
+		return Badge{}, errors.Wrapf(err, "Could not get the latest Gradle version")
 	}
 	if err := usecase.BadgeLastAccessRepository.Put(ctx, domain.BadgeLastAccess{
 		Repository:     targetRepository,

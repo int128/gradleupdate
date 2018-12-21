@@ -14,6 +14,7 @@ type RepositoryStatus struct {
 }
 
 type GetRepository struct {
+	GradleService        gateways.GradleService
 	RepositoryRepository gateways.RepositoryRepository
 }
 
@@ -26,9 +27,9 @@ func (usecase *GetRepository) Do(ctx context.Context, owner, repo string) (*Repo
 	if err != nil {
 		return nil, errors.Wrapf(err, "Could not get version of %s/%s", owner, repo)
 	}
-	latestVersion, err := usecase.getVersion(ctx, domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"})
+	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Could not get the latest version")
+		return nil, errors.Wrapf(err, "Could not get the latest Gradle version")
 	}
 	return &RepositoryStatus{
 		Badge: Badge{
