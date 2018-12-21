@@ -21,7 +21,7 @@ func main() {
 		},
 		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
-			GetRepositoryStatus: usecases.GetRepository{
+			GetRepository: usecases.GetRepository{
 				GradleService:        &gateways.GradleService{},
 				RepositoryRepository: &gateways.RepositoryRepository{},
 			},

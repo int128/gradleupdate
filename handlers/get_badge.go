@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/presenters/templates"
 	"github.com/int128/gradleupdate/usecases"
 	"google.golang.org/appengine/log"
@@ -18,20 +19,21 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := h.ContextProvider(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
+	id := domain.RepositoryIdentifier{Owner: owner, Name: repo}
 
-	badge, err := h.GetBadge.Do(ctx, owner, repo)
+	resp, err := h.GetBadge.Do(ctx, id)
 	switch {
 	case err != nil:
-		log.Warningf(ctx, "Could not get gradle wrapper version: %s", err)
+		log.Warningf(ctx, "could not get a badge for repository %s: %s", id, err)
 		w.Header().Set("Content-Type", "image/svg+xml")
 		templates.DarkBadge("unknown").WriteSVG(w)
 
-	case badge.UpToDate:
+	case resp.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.GreenBadge(string(badge.TargetVersion)).WriteSVG(w)
+		templates.GreenBadge(string(resp.TargetVersion)).WriteSVG(w)
 
-	case !badge.UpToDate:
+	case !resp.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.RedBadge(string(badge.TargetVersion)).WriteSVG(w)
+		templates.RedBadge(string(resp.TargetVersion)).WriteSVG(w)
 	}
 }

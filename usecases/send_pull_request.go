@@ -19,9 +19,8 @@ type SendPullRequest struct {
 	Tree                  gateways.Tree
 }
 
-func (usecase *SendPullRequest) Do(ctx context.Context, owner, repo string) error {
+func (usecase *SendPullRequest) Do(ctx context.Context, targetRepository domain.RepositoryIdentifier) error {
 	latestRepository := domain.RepositoryIdentifier{Owner: "int128", Name: "latest-gradle-wrapper"}
-	targetRepository := domain.RepositoryIdentifier{Owner: owner, Name: repo}
 
 	files, err := usecase.downloadGradleWrapperFiles(ctx, latestRepository)
 	if err != nil {
@@ -51,7 +50,7 @@ func (usecase *SendPullRequest) Do(ctx context.Context, owner, repo string) erro
 	}
 	headBranch := domain.BranchIdentifier{
 		Repository: head.RepositoryIdentifier,
-		Name:       fmt.Sprintf("gradle-%s-%s", version, owner),
+		Name:       fmt.Sprintf("gradle-%s-%s", version, targetRepository.Owner),
 	}
 	newHeadBranch, err := usecase.commitAndPush(ctx, baseBranch, headBranch, commit, files)
 	if err != nil {

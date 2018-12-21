@@ -5,25 +5,27 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/presenters/templates"
 	"github.com/int128/gradleupdate/usecases"
 	"google.golang.org/appengine/log"
 )
 
 type GetRepository struct {
-	ContextProvider     ContextProvider
-	GetRepositoryStatus usecases.GetRepository
+	ContextProvider ContextProvider
+	GetRepository   usecases.GetRepository
 }
 
 func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := h.ContextProvider(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
+	id := domain.RepositoryIdentifier{Owner: owner, Name: repo}
 
-	out, err := h.GetRepositoryStatus.Do(ctx, owner, repo)
+	resp, err := h.GetRepository.Do(ctx, id)
 	if err != nil {
-		log.Warningf(ctx, "Could not get the repository: %s/%s: %s", owner, repo, err)
-		http.Error(w, "Could not get the repository", 500)
+		log.Warningf(ctx, "could not get the repository %s: %s", id, err)
+		http.Error(w, "could not get the repository", 500)
 		return
 	}
 
@@ -34,8 +36,8 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	templates.WriteRepository(w,
 		owner,
 		repo,
-		out.Repository.Description,
-		out.Repository.AvatarURL,
+		resp.Repository.Description,
+		resp.Repository.AvatarURL,
 		thisURL,
 		badgeURL)
 }
