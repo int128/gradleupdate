@@ -1,2 +1,0 @@
-*.qtpl.go: *.qtpl
-	qtc
