@@ -2,47 +2,50 @@
 package httpcache
 
 import (
-	"bufio"
-	"bytes"
-	"github.com/pkg/errors"
 	"net/http"
-	"net/http/httputil"
+
+	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/pkg/errors"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/log"
 )
 
 type Transport struct {
-	Transport http.RoundTripper // Default to http.DefaultTransport
-	Cache     Cache
+	Transport               http.RoundTripper
+	ResponseCacheRepository gateways.ResponseCacheRepository
 }
 
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if t.Cache == nil {
-		return nil, errors.Errorf("Transport.Cache is nil")
+	if t.Transport == nil {
+		return nil, errors.Errorf("given Transport is nil")
 	}
-	transport := t.Transport
-	if transport == nil {
-		transport = http.DefaultTransport
+	if t.ResponseCacheRepository == nil {
+		return nil, errors.Errorf("given ResponseCacheRepository is nil")
 	}
 	if !isRequestCacheable(req) {
-		return transport.RoundTrip(req)
+		return t.Transport.RoundTrip(req)
 	}
 
-	repository := responseCacheRepository{t.Cache}
-	k := computeCacheKey(req)
-	cachedResp, _ := repository.getByKey(k, req) /* ignore error */
+	ctx := appengine.NewContext(req)
+	cachedResp, err := t.ResponseCacheRepository.Find(ctx, req)
+	if err != nil {
+		log.Debugf(ctx, "error while finding response cache: %s", err)
+	}
 	if cachedResp == nil {
-		resp, err := transport.RoundTrip(req)
+		resp, err := t.Transport.RoundTrip(req)
 		if err != nil {
 			return nil, err
 		}
 		if isResponseCacheable(resp) {
-			if err := repository.save(k, resp); err != nil { /* ignore error */
+			if err := t.ResponseCacheRepository.Save(ctx, req, resp); err != nil {
+				log.Debugf(ctx, "error while saving response cache: %s", err)
 			}
 		}
 		return resp, err
 	}
 
-	req = addCacheValidationHeaders(req, cachedResp)
-	resp, err := transport.RoundTrip(req)
+	reqWithValidation := addCacheValidationHeaders(req, cachedResp)
+	resp, err := t.Transport.RoundTrip(reqWithValidation)
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +53,12 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return cachedResp, nil
 	}
 	if isResponseCacheable(resp) {
-		if err := repository.save(k, resp); err != nil { /* ignore error */
+		if err := t.ResponseCacheRepository.Save(ctx, req, resp); err != nil {
+			log.Debugf(ctx, "error while saving response cache: %s", err)
 		}
 	} else {
-		if err := repository.delete(k); err != nil { /* ignore error */
+		if err := t.ResponseCacheRepository.Remove(ctx, req); err != nil {
+			log.Debugf(ctx, "error while removing response cache: %s", err)
 		}
 	}
 	return resp, nil
@@ -79,40 +84,4 @@ func addCacheValidationHeaders(req *http.Request, resp *http.Response) *http.Req
 	}
 	cloneReq.Header.Set("if-none-match", resp.Header.Get("etag"))
 	return cloneReq
-}
-
-type responseCacheRepository struct {
-	cache Cache
-}
-
-func (r *responseCacheRepository) getByKey(k CacheKey, req *http.Request) (*http.Response, error) {
-	v, err := r.cache.Get(k)
-	if err != nil {
-		return nil, err
-	}
-	if v == nil {
-		return nil, nil
-	}
-	b := bufio.NewReader(bytes.NewBuffer(v))
-	resp, err := http.ReadResponse(b, req)
-	if err != nil {
-		return nil, errors.Wrapf(err, "Error while decoding response cache")
-	}
-	return resp, nil
-}
-
-func (r *responseCacheRepository) save(k CacheKey, resp *http.Response) error {
-	b, err := httputil.DumpResponse(resp, true) // DumpResponse preserves Body
-	if err != nil {
-		return errors.Wrapf(err, "Error while encoding response cache")
-	}
-	v := CacheValue(b)
-	return r.cache.Set(k, v)
-}
-
-func (r *responseCacheRepository) delete(k CacheKey) error {
-	if err := r.cache.Delete(k); err != nil {
-		return errors.Wrapf(err, "Error while deleting response cache")
-	}
-	return nil
 }

@@ -11,10 +11,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type PullRequestRepository struct{}
+type PullRequestRepository struct {
+	GitHubClient *infrastructure.GitHubClient
+}
 
 func (r *PullRequestRepository) Query(ctx context.Context, q gateways.PullRequestQuery) ([]domain.PullRequest, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payloads, _, err := client.PullRequests.List(ctx, q.Base.Repository.Owner, q.Base.Repository.Name, &github.PullRequestListOptions{
 		Base:        q.Base.Name,
 		Head:        q.Head.Name,
@@ -51,7 +53,7 @@ func (r *PullRequestRepository) Query(ctx context.Context, q gateways.PullReques
 }
 
 func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
 		Head:  github.String(pull.HeadBranch.Name),
@@ -82,7 +84,7 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 }
 
 func (r *PullRequestRepository) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),

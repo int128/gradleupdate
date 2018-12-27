@@ -12,10 +12,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Branch struct{}
+type Branch struct {
+	GitHubClient *infrastructure.GitHubClient
+}
 
 func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Branch, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, resp, err := client.Git.GetRef(ctx, b.Repository.Owner, b.Repository.Name, "refs/heads/"+b.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Branch{}, domain.NotFoundError{Cause: err}
@@ -36,7 +38,7 @@ func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Bra
 }
 
 func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.Git.CreateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Name),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
@@ -57,7 +59,7 @@ func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, er
 }
 
 func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.Git.UpdateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
 		Ref:    github.String("refs/heads/" + b.Name),
 		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
@@ -77,10 +79,12 @@ func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branc
 	}, nil
 }
 
-type Commit struct{}
+type Commit struct {
+	GitHubClient *infrastructure.GitHubClient
+}
 
 func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Commit, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	payload, resp, err := client.Git.GetCommit(ctx, c.Repository.Owner, c.Repository.Name, c.SHA)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Commit{}, domain.NotFoundError{Cause: err}
@@ -110,7 +114,7 @@ func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Com
 }
 
 func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commit, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	ghParents := make([]github.Commit, len(commit.Parents))
 	for i, parent := range commit.Parents {
 		ghParents[i] = github.Commit{SHA: github.String(parent.SHA)}
@@ -144,10 +148,12 @@ func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commi
 	}, nil
 }
 
-type Tree struct{}
+type Tree struct {
+	GitHubClient *infrastructure.GitHubClient
+}
 
 func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base domain.TreeIdentifier, files []domain.File) (domain.TreeIdentifier, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	ghEntries := make([]github.TreeEntry, len(files))
 	for i, file := range files {
 		content := base64.StdEncoding.EncodeToString(file.Content)

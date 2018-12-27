@@ -11,10 +11,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type RepositoryRepository struct{}
+type RepositoryRepository struct {
+	GitHubClient *infrastructure.GitHubClient
+}
 
 func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	repository, resp, err := client.Repositories.Get(ctx, id.Owner, id.Name)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
@@ -40,7 +42,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIden
 }
 
 func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.File, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	fc, _, resp, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.File{}, domain.NotFoundError{Cause: err}
@@ -70,7 +72,7 @@ func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.Repository
 }
 
 func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
-	client := infrastructure.GitHubClient(ctx)
+	client := r.GitHubClient.New(ctx)
 	fork, resp, err := client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if resp != nil && resp.StatusCode == 404 {
 		return domain.Repository{}, domain.NotFoundError{Cause: err}
