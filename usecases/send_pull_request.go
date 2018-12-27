@@ -93,81 +93,81 @@ func (usecase *SendPullRequest) downloadGradleWrapperFiles(ctx context.Context, 
 	return files, nil
 }
 
-func (usecase *SendPullRequest) commitAndPush(ctx context.Context, base, head domain.BranchIdentifier, commit domain.Commit, files []domain.File) (domain.Branch, error) {
+func (usecase *SendPullRequest) commitAndPush(ctx context.Context, base, head domain.BranchIdentifier, commit domain.Commit, files []domain.File) (*domain.Branch, error) {
 	headBranch, err := usecase.Branch.Get(ctx, head)
 	if domain.IsNotFoundError(err) {
 		baseBranch, err := usecase.Branch.Get(ctx, base)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not get the base branch %s", base)
+			return nil, errors.Wrapf(err, "Could not get the base branch %s", base)
 		}
 		baseCommit, err := usecase.Commit.Get(ctx, baseBranch.Commit)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
+			return nil, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 		}
 		commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
 		newHeadTree, err := usecase.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
+			return nil, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 		}
 		commit.Tree = newHeadTree
 		newHeadCommit, err := usecase.Commit.Create(ctx, commit)
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
+			return nil, errors.Wrapf(err, "Could not create a commit %s", commit)
 		}
 		newHeadBranch, err := usecase.Branch.Create(ctx, domain.Branch{
 			BranchIdentifier: head,
 			Commit:           newHeadCommit.CommitIdentifier,
 		})
 		if err != nil {
-			return domain.Branch{}, errors.Wrapf(err, "Could not create a branch %s", head)
+			return nil, errors.Wrapf(err, "Could not create a branch %s", head)
 		}
-		return newHeadBranch, nil
+		return &newHeadBranch, nil
 	}
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not get the head branch %s", head)
+		return nil, errors.Wrapf(err, "Could not get the head branch %s", head)
 	}
 
 	baseBranch, err := usecase.Branch.Get(ctx, base)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not get the base branch %s", base)
+		return nil, errors.Wrapf(err, "Could not get the base branch %s", base)
 	}
 	headCommit, err := usecase.Commit.Get(ctx, headBranch.Commit)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not get the commit %s of head branch %s", headBranch.Commit, headBranch)
+		return nil, errors.Wrapf(err, "Could not get the commit %s of head branch %s", headBranch.Commit, headBranch)
 	}
 	parent := headCommit.GetSingleParent()
 	if parent != nil && parent.SHA == baseBranch.Commit.SHA {
-		return headBranch, nil
+		return &headBranch, nil
 	}
 	baseCommit, err := usecase.Commit.Get(ctx, baseBranch.Commit)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
+		return nil, errors.Wrapf(err, "Could not get the base commit %s", baseBranch.Commit)
 	}
 	commit.Parents = []domain.CommitIdentifier{baseCommit.CommitIdentifier}
 	newHeadTree, err := usecase.Tree.Create(ctx, head.Repository, baseCommit.Tree, files)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
+		return nil, errors.Wrapf(err, "Could not create a tree on %s", baseCommit.Tree)
 	}
 	commit.Tree = newHeadTree
 	newHeadCommit, err := usecase.Commit.Create(ctx, commit)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not create a commit %s", commit)
+		return nil, errors.Wrapf(err, "Could not create a commit %s", commit)
 	}
 	newHeadBranch, err := usecase.Branch.UpdateForce(ctx, domain.Branch{
 		BranchIdentifier: head,
 		Commit:           newHeadCommit.CommitIdentifier,
 	})
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "Could not update the branch %s", head)
+		return nil, errors.Wrapf(err, "Could not update the branch %s", head)
 	}
-	return newHeadBranch, nil
+	return &newHeadBranch, nil
 }
 
 type pullRequestService struct {
 	PullRequest gateways.PullRequestRepository
 }
 
-func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
 	pulls, err := service.PullRequest.Query(ctx, gateways.PullRequestQuery{
 		Head:      pull.HeadBranch,
 		Base:      pull.BaseBranch,
@@ -178,10 +178,10 @@ func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context
 		PerPage:   1,
 	})
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "Could not find the pull request %s", pull.PullRequestIdentifier.String())
+		return nil, errors.Wrapf(err, "Could not find the pull request %s", pull.PullRequestIdentifier.String())
 	}
 	if len(pulls) > 1 {
-		return domain.PullRequest{}, errors.Errorf("Expect single but got %d pull requests", len(pulls))
+		return nil, errors.Errorf("Expect single but got %d pull requests", len(pulls))
 	}
 	if len(pulls) == 1 {
 		existent := pulls[0]
@@ -189,13 +189,13 @@ func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context
 		existent.Title = pull.Title
 		updated, err := service.PullRequest.Update(ctx, existent)
 		if err != nil {
-			return domain.PullRequest{}, errors.Wrapf(err, "Could not update the pull request %s", pull.PullRequestIdentifier.String())
+			return nil, errors.Wrapf(err, "Could not update the pull request %s", pull.PullRequestIdentifier.String())
 		}
 		return updated, err
 	}
 	created, err := service.PullRequest.Create(ctx, pull)
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.Repository.String())
+		return nil, errors.Wrapf(err, "Could not create a pull request on the repository %s", pull.Repository.String())
 	}
 	return created, nil
 }

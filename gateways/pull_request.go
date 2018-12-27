@@ -52,7 +52,7 @@ func (r *PullRequestRepository) Query(ctx context.Context, q gateways.PullReques
 	return pulls, nil
 }
 
-func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
 	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.PullRequests.Create(ctx, pull.Repository.Owner, pull.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
@@ -61,11 +61,11 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 		Body:  github.String(pull.Body),
 	})
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "GitHub API returned error")
 	}
 	head := payload.GetHead()
 	base := payload.GetBase()
-	return domain.PullRequest{
+	return &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			PullRequestNumber: payload.GetNumber(),
@@ -83,18 +83,18 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 	}, nil
 }
 
-func (r *PullRequestRepository) Update(ctx context.Context, pull domain.PullRequest) (domain.PullRequest, error) {
+func (r *PullRequestRepository) Update(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
 	client := r.GitHubClient.New(ctx)
 	payload, _, err := client.PullRequests.Edit(ctx, pull.Repository.Owner, pull.Repository.Name, pull.PullRequestNumber, &github.PullRequest{
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})
 	if err != nil {
-		return domain.PullRequest{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "GitHub API returned error")
 	}
 	head := payload.GetHead()
 	base := payload.GetBase()
-	return domain.PullRequest{
+	return &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			PullRequestNumber: payload.GetNumber(),

@@ -21,18 +21,18 @@ type GetBadge struct {
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 }
 
-func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier) (GetBadgeResponse, error) {
+func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier) (*GetBadgeResponse, error) {
 	file, err := usecase.RepositoryRepository.GetFile(ctx, id, gradleWrapperPropertiesPath)
 	if err != nil {
-		return GetBadgeResponse{}, errors.Wrapf(err, "could not get the properties file in %s", id)
+		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
 	targetVersion := domain.FindGradleWrapperVersion(string(file.Content))
 	if targetVersion == "" {
-		return GetBadgeResponse{}, errors.Errorf("could not find version from properties file in %s", id)
+		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
 	if err != nil {
-		return GetBadgeResponse{}, errors.Wrapf(err, "could not get the latest Gradle version")
+		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
 
 	if err := usecase.BadgeLastAccessRepository.Put(ctx, domain.BadgeLastAccess{
@@ -43,7 +43,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier)
 	}); err != nil {
 		log.Errorf(ctx, "could not save badge access")
 	}
-	return GetBadgeResponse{
+	return &GetBadgeResponse{
 		TargetVersion: targetVersion,
 		UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
 	}, nil

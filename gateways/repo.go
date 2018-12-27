@@ -15,16 +15,16 @@ type RepositoryRepository struct {
 	GitHubClient *infrastructure.GitHubClient
 }
 
-func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
+func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (*domain.Repository, error) {
 	client := r.GitHubClient.New(ctx)
 	repository, resp, err := client.Repositories.Get(ctx, id.Owner, id.Name)
 	if resp != nil && resp.StatusCode == 404 {
-		return domain.Repository{}, domain.NotFoundError{Cause: err}
+		return nil, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
-		return domain.Repository{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "GitHub API returned error")
 	}
-	return domain.Repository{
+	return &domain.Repository{
 		RepositoryIdentifier: domain.RepositoryIdentifier{
 			Owner: repository.GetOwner().GetLogin(),
 			Name:  repository.GetName(),
@@ -41,17 +41,17 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIden
 	}, nil
 }
 
-func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.File, error) {
+func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (*domain.File, error) {
 	client := r.GitHubClient.New(ctx)
 	fc, _, resp, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if resp != nil && resp.StatusCode == 404 {
-		return domain.File{}, domain.NotFoundError{Cause: err}
+		return nil, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
-		return domain.File{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "GitHub API returned error")
 	}
 	if fc == nil {
-		return domain.File{}, errors.Errorf("Expected file but found directory %s", path)
+		return nil, errors.Errorf("Expected file but found directory %s", path)
 	}
 	var content []byte
 	switch fc.GetEncoding() {
@@ -59,32 +59,32 @@ func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.Repository
 		buf := make([]byte, base64.StdEncoding.DecodedLen(len(*fc.Content)))
 		n, err := base64.StdEncoding.Decode(buf, []byte(*fc.Content))
 		if err != nil {
-			return domain.File{}, errors.Wrapf(err, "Could not decode content")
+			return nil, errors.Wrapf(err, "Could not decode content")
 		}
 		content = buf[:n]
 	default:
 		content = []byte(*fc.Content)
 	}
-	return domain.File{
+	return &domain.File{
 		Path:    path,
 		Content: content,
 	}, nil
 }
 
-func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (domain.Repository, error) {
+func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (*domain.Repository, error) {
 	client := r.GitHubClient.New(ctx)
 	fork, resp, err := client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if resp != nil && resp.StatusCode == 404 {
-		return domain.Repository{}, domain.NotFoundError{Cause: err}
+		return nil, domain.NotFoundError{Cause: err}
 	}
 	if err != nil {
 		if _, ok := err.(*github.AcceptedError); ok {
 			// Fork in progress
 		} else {
-			return domain.Repository{}, errors.Wrapf(err, "GitHub API returned error")
+			return nil, errors.Wrapf(err, "GitHub API returned error")
 		}
 	}
-	return domain.Repository{
+	return &domain.Repository{
 		RepositoryIdentifier: domain.RepositoryIdentifier{
 			Owner: fork.GetOwner().GetLogin(),
 			Name:  fork.GetName(),

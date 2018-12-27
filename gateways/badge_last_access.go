@@ -19,14 +19,14 @@ type badgeLastAccessEntity struct {
 
 type BadgeLastAccessRepository struct{}
 
-func (r *BadgeLastAccessRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (domain.BadgeLastAccess, error) {
+func (r *BadgeLastAccessRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (*domain.BadgeLastAccess, error) {
 	k := datastore.NewKey(ctx, badgeLastAccessKind, id.FullName(), 0, nil)
 	var e badgeLastAccessEntity
 	err := datastore.Get(ctx, k, &e)
 	if err != nil {
-		return domain.BadgeLastAccess{}, errors.Wrapf(err, "Could not get the entity")
+		return nil, errors.Wrapf(err, "Could not get the entity")
 	}
-	return domain.BadgeLastAccess{
+	return &domain.BadgeLastAccess{
 		Repository:     id,
 		LastAccessTime: e.LastAccessTime,
 		TargetVersion:  domain.GradleVersion(e.TargetVersion),

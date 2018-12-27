@@ -31,7 +31,7 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 		},
 		Title: "t",
 		Body:  "b",
-	}).Return(domain.PullRequest{
+	}).Return(&domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: "bo", Name: "br"},
 			PullRequestNumber: 3,
@@ -67,7 +67,7 @@ func TestPullRequestService_createOrUpdatePullRequest_IfNotExist(t *testing.T) {
 	if err != nil {
 		t.Fatalf("createOrUpdatePullRequest returned error %s", err)
 	}
-	if !reflect.DeepEqual(&created, &domain.PullRequest{
+	if !reflect.DeepEqual(created, &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: "bo", Name: "br"},
 			PullRequestNumber: 3,
@@ -126,7 +126,7 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 		},
 		Title: "t",
 		Body:  "b",
-	}).Return(domain.PullRequest{
+	}).Return(&domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: "bo", Name: "br"},
 			PullRequestNumber: 3,
@@ -162,7 +162,7 @@ func TestPullRequestService_createOrUpdatePullRequest_IfExists(t *testing.T) {
 	if err != nil {
 		t.Fatalf("createOrUpdatePullRequest returned error %s", err)
 	}
-	if !reflect.DeepEqual(&updated, &domain.PullRequest{
+	if !reflect.DeepEqual(updated, &domain.PullRequest{
 		PullRequestIdentifier: domain.PullRequestIdentifier{
 			Repository:        domain.RepositoryIdentifier{Owner: "bo", Name: "br"},
 			PullRequestNumber: 3,

@@ -10,8 +10,8 @@ import (
 
 type PullRequestRepository interface {
 	Query(context.Context, PullRequestQuery) ([]domain.PullRequest, error)
-	Create(context.Context, domain.PullRequest) (domain.PullRequest, error)
-	Update(context.Context, domain.PullRequest) (domain.PullRequest, error)
+	Create(context.Context, domain.PullRequest) (*domain.PullRequest, error)
+	Update(context.Context, domain.PullRequest) (*domain.PullRequest, error)
 }
 
 type PullRequestQuery struct {

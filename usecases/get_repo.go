@@ -39,7 +39,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
 	return &GetRepositoryResponse{
-		Repository:    repository,
+		Repository:    *repository,
 		TargetVersion: targetVersion,
 		LatestVersion: latestVersion,
 		UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
