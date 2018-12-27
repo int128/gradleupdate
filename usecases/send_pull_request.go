@@ -199,3 +199,31 @@ func (service *pullRequestService) createOrUpdatePullRequest(ctx context.Context
 	}
 	return created, nil
 }
+
+var gradleWrapperFiles = []domain.File{
+	{
+		Path: domain.GradleWrapperPropertiesPath,
+		Mode: "100644",
+	},
+	{
+		Path: "gradle/wrapper/gradle-wrapper.jar",
+		Mode: "100644",
+	},
+	{
+		Path: "gradlew",
+		Mode: "100755",
+	},
+	{
+		Path: "gradlew.bat",
+		Mode: "100644",
+	},
+}
+
+func findGradleWrapperVersion(files []domain.File) domain.GradleVersion {
+	for _, file := range files {
+		if file.Path == domain.GradleWrapperPropertiesPath {
+			return domain.FindGradleWrapperVersion(string(file.Content))
+		}
+	}
+	return ""
+}

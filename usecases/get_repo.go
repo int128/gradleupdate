@@ -26,7 +26,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 		return nil, errors.Wrapf(err, "could not get the repository %s", id)
 	}
 
-	file, err := usecase.RepositoryRepository.GetFile(ctx, id, gradleWrapperPropertiesPath)
+	file, err := usecase.RepositoryRepository.GetFile(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
