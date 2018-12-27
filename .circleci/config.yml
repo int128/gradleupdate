@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: mercari/appengine-go:1.11-alpine
+    steps:
+      - checkout
+      - run: go get -u golang.org/x/lint/golint
+      - run: golint
+      - run: go vet
+      - run: go build -v
+      - run: go test -v ./...
+
+workflows:
+  version: 2
+  all:
+    jobs:
+      - build
