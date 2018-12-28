@@ -21,7 +21,7 @@ type GetBadge struct {
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 }
 
-func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier) (*GetBadgeResponse, error) {
+func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*GetBadgeResponse, error) {
 	props, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)

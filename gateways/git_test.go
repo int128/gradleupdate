@@ -13,14 +13,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var sandboxRepository = domain.RepositoryIdentifier{Owner: "octocat", Name: "Spoon-Knife"}
+var sandboxRepository = domain.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
 
 func TestGitService_ForkBranch(t *testing.T) {
 	client := newGitHubClient(t)
 	service := GitService{GitHubClientFactory: &factory{client}}
 	ctx := context.Background()
 	req := gateways.ForkBranchRequest{
-		Base: domain.BranchIdentifier{
+		Base: domain.BranchID{
 			Repository: sandboxRepository,
 			Name:       "master",
 		},
@@ -52,8 +52,8 @@ func TestGitService_ForkBranch(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error from ForkBranch: %s", err)
 		}
-		if branch.Name != req.HeadBranchName {
-			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.Name)
+		if branch.ID.Name != req.HeadBranchName {
+			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.ID.Name)
 		}
 		if branch.CommitSHA == "" {
 			t.Errorf("branch.CommitSHA wants non-empty but empty")
@@ -64,8 +64,8 @@ func TestGitService_ForkBranch(t *testing.T) {
 		if err != nil {
 			t.Fatalf("error from ForkBranch: %s", err)
 		}
-		if branch.Name != req.HeadBranchName {
-			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.Name)
+		if branch.ID.Name != req.HeadBranchName {
+			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.ID.Name)
 		}
 		if branch.CommitSHA == "" {
 			t.Errorf("branch.CommitSHA wants non-empty but empty")

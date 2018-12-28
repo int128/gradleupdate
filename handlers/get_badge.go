@@ -19,7 +19,7 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := h.ContextProvider(r)
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
-	id := domain.RepositoryIdentifier{Owner: owner, Name: repo}
+	id := domain.RepositoryID{Owner: owner, Name: repo}
 
 	resp, err := h.GetBadge.Do(ctx, id)
 	switch {

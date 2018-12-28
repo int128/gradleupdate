@@ -23,7 +23,7 @@ type SendPullRequest struct {
 // - Fork the repository and create a branch with the new file.
 // - Create a pull request for the branch.
 //
-func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryIdentifier) error {
+func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) error {
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
@@ -59,10 +59,10 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryIden
 
 	//TODO: if the pull request already exists?
 	pull := domain.PullRequest{
-		PullRequestIdentifier: domain.PullRequestIdentifier{Repository: id},
-		HeadBranch:            head.BranchIdentifier,
-		BaseBranch:            base.DefaultBranch,
-		Title:                 fmt.Sprintf("Gradle %s", latestVersion),
+		ID:         domain.PullRequestID{Repository: id},
+		HeadBranch: head.ID,
+		BaseBranch: base.DefaultBranch,
+		Title:      fmt.Sprintf("Gradle %s", latestVersion),
 		Body: fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
 
 This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).

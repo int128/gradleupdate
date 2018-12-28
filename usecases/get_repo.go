@@ -20,7 +20,7 @@ type GetRepository struct {
 	RepositoryRepository gateways.RepositoryRepository
 }
 
-func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdentifier) (*GetRepositoryResponse, error) {
+func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*GetRepositoryResponse, error) {
 	repository, err := usecase.RepositoryRepository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the repository %s", id)

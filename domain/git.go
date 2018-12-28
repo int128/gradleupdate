@@ -5,38 +5,42 @@ import (
 	"strings"
 )
 
-// RepositoryIdentifier points to a repository.
-type RepositoryIdentifier struct {
+// RepositoryID points to a repository.
+type RepositoryID struct {
 	Owner string
 	Name  string
 }
 
-func (r RepositoryIdentifier) FullName() string {
+func (r RepositoryID) FullName() string {
 	return r.Owner + "/" + r.Name
 }
 
-func (r RepositoryIdentifier) String() string {
+func (r RepositoryID) String() string {
 	return r.FullName()
 }
 
 // Repository represents a GitHub repository.
 type Repository struct {
-	RepositoryIdentifier
-	DefaultBranch BranchIdentifier
+	ID            RepositoryID
+	DefaultBranch BranchID
 	Description   string
 	AvatarURL     string
+}
+
+func (r Repository) String() string {
+	return r.ID.String()
 }
 
 // RepositoryURL represents URL for a GitHub repository.
 type RepositoryURL string
 
 // Parse returns owner and repo for the repository.
-func (url RepositoryURL) Parse() *RepositoryIdentifier {
+func (url RepositoryURL) Parse() *RepositoryID {
 	s := strings.Split(string(url), "/")
 	if len(s) < 2 {
 		return nil
 	}
-	return &RepositoryIdentifier{s[len(s)-2], s[len(s)-1]}
+	return &RepositoryID{s[len(s)-2], s[len(s)-1]}
 }
 
 // FileContent represents content of a file.
@@ -52,37 +56,45 @@ type File struct {
 	Content FileContent
 }
 
-// PullRequestIdentifier points to a pull request.
-type PullRequestIdentifier struct {
-	Repository        RepositoryIdentifier
-	PullRequestNumber int
+// PullRequestID points to a pull request.
+type PullRequestID struct {
+	Repository RepositoryID
+	Number     int
 }
 
-func (p PullRequestIdentifier) String() string {
-	return fmt.Sprintf("%s/pulls#%d", p.Repository, p.PullRequestNumber)
+func (p PullRequestID) String() string {
+	return fmt.Sprintf("%s/pulls#%d", p.Repository, p.Number)
 }
 
 // PullRequest represents a pull request.
 type PullRequest struct {
-	PullRequestIdentifier
-	BaseBranch BranchIdentifier
-	HeadBranch BranchIdentifier
+	ID         PullRequestID
+	BaseBranch BranchID
+	HeadBranch BranchID
 	Title      string
 	Body       string
 }
 
-// BranchIdentifier points to a branch in a repository.
-type BranchIdentifier struct {
-	Repository RepositoryIdentifier
+func (p PullRequest) String() string {
+	return p.ID.String()
+}
+
+// BranchID points to a branch in a repository.
+type BranchID struct {
+	Repository RepositoryID
 	Name       string
 }
 
-func (b BranchIdentifier) String() string {
+func (b BranchID) String() string {
 	return b.Repository.String() + ":" + b.Name
 }
 
 // Name represents a branch in a repository.
 type Branch struct {
-	BranchIdentifier
+	ID        BranchID
 	CommitSHA string
+}
+
+func (b Branch) String() string {
+	return b.ID.String()
 }

@@ -91,8 +91,8 @@ func (r *GitService) ForkBranch(ctx context.Context, req gateways.ForkBranchRequ
 		return nil, errors.Wrapf(err, "could not create a ref %s in the head repository %s", "refs/heads/"+req.HeadBranchName, head.GetFullName())
 	}
 	return &domain.Branch{
-		BranchIdentifier: domain.BranchIdentifier{
-			Repository: domain.RepositoryIdentifier{
+		ID: domain.BranchID{
+			Repository: domain.RepositoryID{
 				Owner: head.GetOwner().GetLogin(),
 				Name:  head.GetName(),
 			},

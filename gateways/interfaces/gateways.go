@@ -8,12 +8,12 @@ import (
 )
 
 type BadgeLastAccessRepository interface {
-	Get(context.Context, domain.RepositoryIdentifier) (*domain.BadgeLastAccess, error)
+	Get(context.Context, domain.RepositoryID) (*domain.BadgeLastAccess, error)
 	Put(context.Context, domain.BadgeLastAccess) error
 }
 
 type ForkBranchRequest struct {
-	Base           domain.BranchIdentifier
+	Base           domain.BranchID
 	HeadBranchName string
 	CommitMessage  string
 	Files          []domain.File
@@ -38,8 +38,8 @@ type PullRequestRepository interface {
 }
 
 type PullRequestQuery struct {
-	Head      domain.BranchIdentifier
-	Base      domain.BranchIdentifier
+	Head      domain.BranchID
+	Base      domain.BranchID
 	State     string
 	Direction string
 	Sort      string
@@ -48,9 +48,9 @@ type PullRequestQuery struct {
 }
 
 type RepositoryRepository interface {
-	Get(context.Context, domain.RepositoryIdentifier) (*domain.Repository, error)
-	GetFileContent(context.Context, domain.RepositoryIdentifier, string) (domain.FileContent, error)
-	Fork(context.Context, domain.RepositoryIdentifier) (*domain.Repository, error)
+	Get(context.Context, domain.RepositoryID) (*domain.Repository, error)
+	GetFileContent(context.Context, domain.RepositoryID, string) (domain.FileContent, error)
+	Fork(context.Context, domain.RepositoryID) (*domain.Repository, error)
 }
 
 type ResponseCacheRepository interface {
