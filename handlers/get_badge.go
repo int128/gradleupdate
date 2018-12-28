@@ -30,10 +30,10 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case resp.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.GreenBadge(string(resp.TargetVersion)).WriteSVG(w)
+		templates.GreenBadge(string(resp.CurrentVersion)).WriteSVG(w)
 
 	case !resp.UpToDate:
 		w.Header().Set("Content-Type", "image/svg+xml")
-		templates.RedBadge(string(resp.TargetVersion)).WriteSVG(w)
+		templates.RedBadge(string(resp.CurrentVersion)).WriteSVG(w)
 	}
 }

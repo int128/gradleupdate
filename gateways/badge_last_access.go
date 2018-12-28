@@ -29,7 +29,7 @@ func (r *BadgeLastAccessRepository) Get(ctx context.Context, id domain.Repositor
 	return &domain.BadgeLastAccess{
 		Repository:     id,
 		LastAccessTime: e.LastAccessTime,
-		TargetVersion:  domain.GradleVersion(e.TargetVersion),
+		CurrentVersion: domain.GradleVersion(e.TargetVersion),
 		LatestVersion:  domain.GradleVersion(e.LatestVersion),
 	}, nil
 }
@@ -38,7 +38,7 @@ func (r *BadgeLastAccessRepository) Put(ctx context.Context, a domain.BadgeLastA
 	k := datastore.NewKey(ctx, badgeLastAccessKind, a.Repository.FullName(), 0, nil)
 	_, err := datastore.Put(ctx, k, &badgeLastAccessEntity{
 		LastAccessTime: a.LastAccessTime,
-		TargetVersion:  string(a.TargetVersion),
+		TargetVersion:  string(a.CurrentVersion),
 		LatestVersion:  string(a.LatestVersion),
 	})
 	if err != nil {

@@ -6,6 +6,6 @@ import "time"
 type BadgeLastAccess struct {
 	Repository     RepositoryIdentifier
 	LastAccessTime time.Time
-	TargetVersion  GradleVersion
+	CurrentVersion GradleVersion
 	LatestVersion  GradleVersion
 }

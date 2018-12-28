@@ -11,8 +11,8 @@ import (
 )
 
 type GetBadgeResponse struct {
-	TargetVersion domain.GradleVersion
-	UpToDate      bool
+	CurrentVersion domain.GradleVersion
+	UpToDate       bool
 }
 
 type GetBadge struct {
@@ -26,8 +26,8 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
-	targetVersion := domain.FindGradleWrapperVersion(props.String())
-	if targetVersion == "" {
+	currentVersion := domain.FindGradleWrapperVersion(props.String())
+	if currentVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
@@ -38,13 +38,13 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier)
 	if err := usecase.BadgeLastAccessRepository.Put(ctx, domain.BadgeLastAccess{
 		Repository:     id,
 		LastAccessTime: time.Now(),
-		TargetVersion:  targetVersion,
+		CurrentVersion: currentVersion,
 		LatestVersion:  latestVersion,
 	}); err != nil {
 		log.Errorf(ctx, "could not save badge access")
 	}
 	return &GetBadgeResponse{
-		TargetVersion: targetVersion,
-		UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
+		CurrentVersion: currentVersion,
+		UpToDate:       domain.IsUpToDate(currentVersion, latestVersion),
 	}, nil
 }

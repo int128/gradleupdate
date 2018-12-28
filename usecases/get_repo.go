@@ -9,10 +9,10 @@ import (
 )
 
 type GetRepositoryResponse struct {
-	Repository    domain.Repository
-	TargetVersion domain.GradleVersion
-	LatestVersion domain.GradleVersion
-	UpToDate      bool
+	Repository     domain.Repository
+	CurrentVersion domain.GradleVersion
+	LatestVersion  domain.GradleVersion
+	UpToDate       bool
 }
 
 type GetRepository struct {
@@ -30,8 +30,8 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
-	targetVersion := domain.FindGradleWrapperVersion(props.String())
-	if targetVersion == "" {
+	currentVersion := domain.FindGradleWrapperVersion(props.String())
+	if currentVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
@@ -39,9 +39,9 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
 	return &GetRepositoryResponse{
-		Repository:    *repository,
-		TargetVersion: targetVersion,
-		LatestVersion: latestVersion,
-		UpToDate:      domain.IsUpToDate(targetVersion, latestVersion),
+		Repository:     *repository,
+		CurrentVersion: currentVersion,
+		LatestVersion:  latestVersion,
+		UpToDate:       domain.IsUpToDate(currentVersion, latestVersion),
 	}, nil
 }
