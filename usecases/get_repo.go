@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
 )
 

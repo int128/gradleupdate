@@ -4,7 +4,7 @@ package httpcache
 import (
 	"net/http"
 
-	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/infrastructure/httpcache"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/urlfetch"

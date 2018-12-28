@@ -6,12 +6,13 @@ import (
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 )
 
 type GitService struct {
-	GitHubClientFactory GitHubClientFactory
+	GitHubClientFactory infrastructure.GitHubClientFactory
 }
 
 func (r *GitService) ForkBranch(ctx context.Context, req gateways.ForkBranchRequest) (*domain.Branch, error) {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/infrastructure/httpcache"
 	"golang.org/x/oauth2"
 	"google.golang.org/appengine/urlfetch"
