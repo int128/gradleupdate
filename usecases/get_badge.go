@@ -45,6 +45,6 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier)
 	}
 	return &GetBadgeResponse{
 		CurrentVersion: currentVersion,
-		UpToDate:       domain.IsUpToDate(currentVersion, latestVersion),
+		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
 	}, nil
 }

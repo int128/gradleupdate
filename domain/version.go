@@ -50,7 +50,6 @@ func (a GradleVersion) String() string {
 	return string(a)
 }
 
-// IsUpToDate returns true if target => latest.
-func IsUpToDate(target GradleVersion, latest GradleVersion) bool {
-	return target.Compare(latest) >= 0
+func (a GradleVersion) GreaterOrEqualThan(b GradleVersion) bool {
+	return a.Compare(b) >= 0
 }

@@ -52,3 +52,22 @@ func signSymbol(s int) string {
 	}
 	return "="
 }
+
+func TestGradleVersion_GreaterOrEqualThan(t *testing.T) {
+	for _, c := range []struct {
+		a        GradleVersion
+		b        GradleVersion
+		expected bool
+	}{
+		{GradleVersion("1.1"), GradleVersion("1.2"), false},
+		{GradleVersion("1.2"), GradleVersion("1.2"), true},
+		{GradleVersion("1.3"), GradleVersion("1.2"), true},
+	} {
+		t.Run(fmt.Sprintf("%s≧%s", c.a, c.b), func(t *testing.T) {
+			actual := c.a.GreaterOrEqualThan(c.b)
+			if c.expected != actual {
+				t.Errorf("(%s).GreaterOrEqualThan(%s) wants %v but %v", c.a, c.b, c.expected, actual)
+			}
+		})
+	}
+}

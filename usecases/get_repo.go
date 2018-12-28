@@ -42,6 +42,6 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 		Repository:     *repository,
 		CurrentVersion: currentVersion,
 		LatestVersion:  latestVersion,
-		UpToDate:       domain.IsUpToDate(currentVersion, latestVersion),
+		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
 	}, nil
 }
