@@ -26,11 +26,11 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryIdenti
 		return nil, errors.Wrapf(err, "could not get the repository %s", id)
 	}
 
-	file, err := usecase.RepositoryRepository.GetFile(ctx, id, domain.GradleWrapperPropertiesPath)
+	props, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
-	targetVersion := domain.FindGradleWrapperVersion(string(file.Content))
+	targetVersion := domain.FindGradleWrapperVersion(props.String())
 	if targetVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}

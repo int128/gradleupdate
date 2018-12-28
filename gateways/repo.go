@@ -12,7 +12,7 @@ import (
 )
 
 type RepositoryRepository struct {
-	GitHubClient *infrastructure.GitHubClient
+	GitHubClient *infrastructure.GitHubClientFactory
 }
 
 func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIdentifier) (*domain.Repository, error) {
@@ -41,7 +41,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryIden
 	}, nil
 }
 
-func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.RepositoryIdentifier, path string) (*domain.File, error) {
+func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.RepositoryIdentifier, path string) (domain.FileContent, error) {
 	client := r.GitHubClient.New(ctx)
 	fc, _, resp, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if resp != nil && resp.StatusCode == 404 {
@@ -53,22 +53,16 @@ func (r *RepositoryRepository) GetFile(ctx context.Context, id domain.Repository
 	if fc == nil {
 		return nil, errors.Errorf("Expected file but found directory %s", path)
 	}
-	var content []byte
-	switch fc.GetEncoding() {
-	case "base64":
-		buf := make([]byte, base64.StdEncoding.DecodedLen(len(*fc.Content)))
-		n, err := base64.StdEncoding.Decode(buf, []byte(*fc.Content))
-		if err != nil {
-			return nil, errors.Wrapf(err, "Could not decode content")
-		}
-		content = buf[:n]
-	default:
-		content = []byte(*fc.Content)
+	if fc.GetEncoding() != "base64" {
+		return domain.FileContent([]byte(*fc.Content)), nil
 	}
-	return &domain.File{
-		Path:    path,
-		Content: content,
-	}, nil
+	buf := make([]byte, base64.StdEncoding.DecodedLen(len(*fc.Content)))
+	n, err := base64.StdEncoding.Decode(buf, []byte(*fc.Content))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Could not decode content")
+	}
+	content := buf[:n]
+	return domain.FileContent(content), nil
 }
 
 func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryIdentifier) (*domain.Repository, error) {

@@ -12,7 +12,7 @@ type loggingTransport struct {
 	Transport http.RoundTripper
 }
 
-func (t loggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *loggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	res, err := t.Transport.RoundTrip(req)
 	if res != nil {
 		ctx := appengine.NewContext(req)

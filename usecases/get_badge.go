@@ -22,11 +22,11 @@ type GetBadge struct {
 }
 
 func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryIdentifier) (*GetBadgeResponse, error) {
-	file, err := usecase.RepositoryRepository.GetFile(ctx, id, domain.GradleWrapperPropertiesPath)
+	props, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
-	targetVersion := domain.FindGradleWrapperVersion(string(file.Content))
+	targetVersion := domain.FindGradleWrapperVersion(props.String())
 	if targetVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}

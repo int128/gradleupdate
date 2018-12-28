@@ -3,179 +3,100 @@ package gateways
 import (
 	"context"
 	"encoding/base64"
-	"strings"
-
-	"github.com/int128/gradleupdate/infrastructure"
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/gateways"
 	"github.com/pkg/errors"
 )
 
-type Branch struct {
-	GitHubClient *infrastructure.GitHubClient
+type GitService struct {
+	GitHubClientFactory GitHubClientFactory
 }
 
-func (r *Branch) Get(ctx context.Context, b domain.BranchIdentifier) (domain.Branch, error) {
-	client := r.GitHubClient.New(ctx)
-	payload, resp, err := client.Git.GetRef(ctx, b.Repository.Owner, b.Repository.Name, "refs/heads/"+b.Name)
-	if resp != nil && resp.StatusCode == 404 {
-		return domain.Branch{}, domain.NotFoundError{Cause: err}
-	}
+func (r *GitService) ForkBranch(ctx context.Context, req gateways.ForkBranchRequest) (*domain.Branch, error) {
+	client := r.GitHubClientFactory.New(ctx)
+
+	head, _, err := client.Repositories.CreateFork(ctx, req.Base.Repository.Owner, req.Base.Repository.Name, nil)
 	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "GitHub API returned error")
-	}
-	return domain.Branch{
-		BranchIdentifier: domain.BranchIdentifier{
-			Repository: b.Repository,
-			Name:       strings.TrimLeft(payload.GetRef(), "refs/heads/"),
-		},
-		Commit: domain.CommitIdentifier{
-			Repository: b.Repository,
-			SHA:        payload.GetObject().GetSHA(),
-		},
-	}, nil
-}
-
-func (r *Branch) Create(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	client := r.GitHubClient.New(ctx)
-	payload, _, err := client.Git.CreateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
-		Ref:    github.String("refs/heads/" + b.Name),
-		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
-	})
-	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "GitHub API returned error")
-	}
-	return domain.Branch{
-		BranchIdentifier: domain.BranchIdentifier{
-			Repository: b.Repository,
-			Name:       strings.TrimLeft(payload.GetRef(), "refs/heads/"),
-		},
-		Commit: domain.CommitIdentifier{
-			Repository: b.Repository,
-			SHA:        payload.GetObject().GetSHA(),
-		},
-	}, nil
-}
-
-func (r *Branch) UpdateForce(ctx context.Context, b domain.Branch) (domain.Branch, error) {
-	client := r.GitHubClient.New(ctx)
-	payload, _, err := client.Git.UpdateRef(ctx, b.Repository.Owner, b.Repository.Name, &github.Reference{
-		Ref:    github.String("refs/heads/" + b.Name),
-		Object: &github.GitObject{SHA: github.String(b.Commit.SHA)},
-	}, true)
-	if err != nil {
-		return domain.Branch{}, errors.Wrapf(err, "GitHub API returned error")
-	}
-	return domain.Branch{
-		BranchIdentifier: domain.BranchIdentifier{
-			Repository: b.Repository,
-			Name:       strings.TrimLeft(payload.GetRef(), "refs/heads/"),
-		},
-		Commit: domain.CommitIdentifier{
-			Repository: b.Repository,
-			SHA:        payload.GetObject().GetSHA(),
-		},
-	}, nil
-}
-
-type Commit struct {
-	GitHubClient *infrastructure.GitHubClient
-}
-
-func (r *Commit) Get(ctx context.Context, c domain.CommitIdentifier) (domain.Commit, error) {
-	client := r.GitHubClient.New(ctx)
-	payload, resp, err := client.Git.GetCommit(ctx, c.Repository.Owner, c.Repository.Name, c.SHA)
-	if resp != nil && resp.StatusCode == 404 {
-		return domain.Commit{}, domain.NotFoundError{Cause: err}
-	}
-	if err != nil {
-		return domain.Commit{}, errors.Wrapf(err, "GitHub API returned error")
-	}
-	parents := make([]domain.CommitIdentifier, len(payload.Parents))
-	for i, parent := range payload.Parents {
-		parents[i] = domain.CommitIdentifier{
-			Repository: c.Repository,
-			SHA:        parent.GetSHA(),
+		if _, ok := err.(*github.AcceptedError); !ok {
+			return nil, errors.Wrapf(err, "could not fork the base repository %s", req.Base.Repository)
 		}
 	}
-	return domain.Commit{
-		CommitIdentifier: domain.CommitIdentifier{
-			Repository: c.Repository,
-			SHA:        payload.GetSHA(),
-		},
-		Message: payload.GetMessage(),
-		Parents: parents,
-		Tree: domain.TreeIdentifier{
-			Repository: c.Repository,
-			SHA:        payload.GetTree().GetSHA(),
-		},
-	}, nil
-}
+	//TODO: wait until fork is completed
 
-func (r *Commit) Create(ctx context.Context, commit domain.Commit) (domain.Commit, error) {
-	client := r.GitHubClient.New(ctx)
-	ghParents := make([]github.Commit, len(commit.Parents))
-	for i, parent := range commit.Parents {
-		ghParents[i] = github.Commit{SHA: github.String(parent.SHA)}
-	}
-	ghCommit, _, err := client.Git.CreateCommit(ctx, commit.Repository.Owner, commit.Repository.Name, &github.Commit{
-		Message: github.String(commit.Message),
-		Tree:    &github.Tree{SHA: github.String(commit.Tree.SHA)},
-		Parents: ghParents,
-	})
+	baseRef, _, err := client.Git.GetRef(ctx,
+		req.Base.Repository.Owner,
+		req.Base.Repository.Name,
+		"refs/heads/"+req.Base.Name)
 	if err != nil {
-		return domain.Commit{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "could not get the base branch %s", req.Base)
 	}
-	parents := make([]domain.CommitIdentifier, len(ghCommit.Parents))
-	for i, ghParent := range ghCommit.Parents {
-		parents[i] = domain.CommitIdentifier{
-			Repository: commit.Repository,
-			SHA:        ghParent.GetSHA(),
-		}
+	baseCommit, _, err := client.Git.GetCommit(ctx,
+		req.Base.Repository.Owner,
+		req.Base.Repository.Name,
+		baseRef.GetObject().GetSHA())
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not get the commit %s of base branch %s", baseRef.GetObject().GetSHA(), req.Base)
 	}
-	return domain.Commit{
-		CommitIdentifier: domain.CommitIdentifier{
-			Repository: commit.Repository,
-			SHA:        ghCommit.GetSHA(),
-		},
-		Message: ghCommit.GetMessage(),
-		Parents: parents,
-		Tree: domain.TreeIdentifier{
-			Repository: commit.Repository,
-			SHA:        ghCommit.GetTree().GetSHA(),
-		},
-	}, nil
-}
 
-type Tree struct {
-	GitHubClient *infrastructure.GitHubClient
-}
-
-func (r *Tree) Create(ctx context.Context, id domain.RepositoryIdentifier, base domain.TreeIdentifier, files []domain.File) (domain.TreeIdentifier, error) {
-	client := r.GitHubClient.New(ctx)
-	ghEntries := make([]github.TreeEntry, len(files))
-	for i, file := range files {
+	headTreeEntries := make([]github.TreeEntry, len(req.Files))
+	for i, file := range req.Files {
 		content := base64.StdEncoding.EncodeToString(file.Content)
-		ghBlob, _, err := client.Git.CreateBlob(ctx, id.Owner, id.Name, &github.Blob{
-			Content:  github.String(content),
-			Encoding: github.String("base64"),
-		})
+		blob, _, err := client.Git.CreateBlob(ctx,
+			head.GetOwner().GetLogin(),
+			head.GetName(),
+			&github.Blob{
+				Content:  github.String(content),
+				Encoding: github.String("base64"),
+			})
 		if err != nil {
-			return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
+			return nil, errors.Wrapf(err, "could not create a blob in the head repository %s", head.GetFullName())
 		}
-		ghEntries[i] = github.TreeEntry{
+		headTreeEntries[i] = github.TreeEntry{
 			Path: github.String(file.Path),
-			Mode: github.String(file.Mode),
-			SHA:  ghBlob.SHA,
+			Mode: github.String("100644"),
+			SHA:  blob.SHA,
 		}
 	}
-	ghTree, _, err := client.Git.CreateTree(ctx, id.Owner, id.Name, base.SHA, ghEntries)
+	headTree, _, err := client.Git.CreateTree(ctx,
+		head.GetOwner().GetLogin(),
+		head.GetName(),
+		baseCommit.GetTree().GetSHA(),
+		headTreeEntries)
 	if err != nil {
-		return domain.TreeIdentifier{}, errors.Wrapf(err, "GitHub API returned error")
+		return nil, errors.Wrapf(err, "could not create a tree in the head repository %s", head.GetFullName())
 	}
-	return domain.TreeIdentifier{
-		Repository: id,
-		SHA:        ghTree.GetSHA(),
+	headCommit, _, err := client.Git.CreateCommit(ctx,
+		head.GetOwner().GetLogin(),
+		head.GetName(),
+		&github.Commit{
+			Parents: []github.Commit{{SHA: baseCommit.SHA}},
+			Message: github.String(req.CommitMessage),
+			Tree:    headTree,
+		})
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create a commit in the head repository %s", head.GetFullName())
+	}
+
+	headRef, _, err := client.Git.CreateRef(ctx,
+		head.GetOwner().GetLogin(),
+		head.GetName(),
+		&github.Reference{
+			Ref:    github.String("refs/heads/" + req.HeadBranchName),
+			Object: &github.GitObject{SHA: headCommit.SHA},
+		})
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create a ref %s in the head repository %s", "refs/heads/"+req.HeadBranchName, head.GetFullName())
+	}
+	return &domain.Branch{
+		BranchIdentifier: domain.BranchIdentifier{
+			Repository: domain.RepositoryIdentifier{
+				Owner: head.GetOwner().GetLogin(),
+				Name:  head.GetName(),
+			},
+			Name: req.HeadBranchName,
+		},
+		CommitSHA: headRef.GetObject().GetSHA(),
 	}, nil
 }

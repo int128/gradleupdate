@@ -11,12 +11,12 @@ import (
 	"google.golang.org/appengine/urlfetch"
 )
 
-type GitHubClient struct {
+type GitHubClientFactory struct {
 	Token                   string
 	ResponseCacheRepository gateways.ResponseCacheRepository
 }
 
-func (c *GitHubClient) New(ctx context.Context) *github.Client {
+func (c *GitHubClientFactory) New(ctx context.Context) *github.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
 	transport = &loggingTransport{Transport: transport, Name: "GitHubClient"}

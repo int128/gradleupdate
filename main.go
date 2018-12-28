@@ -17,7 +17,7 @@ func contextProvider(req *http.Request) context.Context {
 }
 
 func main() {
-	gitHubClient := &infrastructure.GitHubClient{
+	gitHubClient := &infrastructure.GitHubClientFactory{
 		Token:                   os.Getenv("GITHUB_TOKEN"),
 		ResponseCacheRepository: &gateways.ResponseCacheRepository{},
 	}
@@ -48,11 +48,9 @@ func main() {
 		SendPullRequest: handlers.SendPullRequest{
 			ContextProvider: contextProvider,
 			SendPullRequest: usecases.SendPullRequest{
+				GradleService:         gradleService,
 				RepositoryRepository:  &gateways.RepositoryRepository{GitHubClient: gitHubClient},
 				PullRequestRepository: &gateways.PullRequestRepository{GitHubClient: gitHubClient},
-				Branch:                &gateways.Branch{GitHubClient: gitHubClient},
-				Commit:                &gateways.Commit{GitHubClient: gitHubClient},
-				Tree:                  &gateways.Tree{GitHubClient: gitHubClient},
 			},
 		},
 	}

@@ -46,6 +46,10 @@ func minInt(a, b int) int {
 	return a
 }
 
+func (a GradleVersion) String() string {
+	return string(a)
+}
+
 // IsUpToDate returns true if target => latest.
 func IsUpToDate(target GradleVersion, latest GradleVersion) bool {
 	return target.Compare(latest) >= 0

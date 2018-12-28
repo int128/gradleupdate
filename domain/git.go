@@ -39,11 +39,17 @@ func (url RepositoryURL) Parse() *RepositoryIdentifier {
 	return &RepositoryIdentifier{s[len(s)-2], s[len(s)-1]}
 }
 
+// FileContent represents content of a file.
+type FileContent []byte
+
+func (fc FileContent) String() string {
+	return string(fc)
+}
+
 // File represents a file in a commit.
 type File struct {
 	Path    string
-	Mode    string
-	Content []byte
+	Content FileContent
 }
 
 // PullRequestIdentifier points to a pull request.
@@ -78,37 +84,5 @@ func (b BranchIdentifier) String() string {
 // Name represents a branch in a repository.
 type Branch struct {
 	BranchIdentifier
-	Commit CommitIdentifier
-}
-
-// CommitIdentifier points to a commit in a repository.
-type CommitIdentifier struct {
-	Repository RepositoryIdentifier
-	SHA        string
-}
-
-func (c CommitIdentifier) String() string {
-	return c.Repository.String() + "/commit@" + c.SHA
-}
-
-// Commit represents a commit in a repository.
-type Commit struct {
-	CommitIdentifier
-	Message string
-	Parents []CommitIdentifier
-	Tree    TreeIdentifier
-}
-
-func (c *Commit) GetSingleParent() *CommitIdentifier {
-	return nil
-}
-
-// TreeIdentifier points to a tree in a repository.
-type TreeIdentifier struct {
-	Repository RepositoryIdentifier
-	SHA        string
-}
-
-func (t TreeIdentifier) String() string {
-	return t.Repository.String() + "/tree@" + t.SHA
+	CommitSHA string
 }

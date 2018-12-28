@@ -12,7 +12,7 @@ import (
 )
 
 type PullRequestRepository struct {
-	GitHubClient *infrastructure.GitHubClient
+	GitHubClient *infrastructure.GitHubClientFactory
 }
 
 func (r *PullRequestRepository) Query(ctx context.Context, q gateways.PullRequestQuery) ([]domain.PullRequest, error) {
