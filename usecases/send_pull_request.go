@@ -16,12 +16,14 @@ type SendPullRequest struct {
 	GitService            gateways.GitService
 }
 
-// Do performs:
+// Do sends a pull request for updating the Gradle wrapper in the repository.
 //
-// - Get gradle-wrapper.properties in the repository.
-// - Create a file with replaced version.
-// - Fork the repository and create a branch with the new file.
-// - Create a pull request for the branch.
+// If the Gradle wrapper is up-to-date, do nothing.
+//
+// If the head branch exists, check if its parent is the base branch.
+// If not, update the head branch onto the base branch.
+//
+// If the pull request exists, do not create any more.
 //
 func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) error {
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
@@ -45,31 +47,55 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 	if err != nil {
 		return errors.Wrapf(err, "could not get the repository %s", id)
 	}
-	head, err := usecase.GitService.ForkBranch(ctx, gateways.ForkBranchRequest{
-		Base:           base.DefaultBranch,
-		HeadBranchName: fmt.Sprintf("gradle-%s-%s", latestVersion, id.Owner),
-		CommitMessage:  fmt.Sprintf("Gradle %s", latestVersion),
-		Files: []domain.File{
+	head, err := usecase.RepositoryRepository.Fork(ctx, id)
+	if err != nil {
+		return errors.Wrapf(err, "could not fork the repository %s", id)
+	}
+	baseBranch, err := usecase.RepositoryRepository.GetBranch(ctx, base.DefaultBranch)
+	if err != nil {
+		return errors.Wrapf(err, "could not get the base branch %s", base.DefaultBranch)
+	}
+
+	headBranchID := head.ID.Branch(fmt.Sprintf("gradle-%s-%s", latestVersion, id.Owner))
+	pushBranchRequest := gateways.PushBranchRequest{
+		BaseBranch:    *baseBranch,
+		HeadBranch:    headBranchID,
+		CommitMessage: fmt.Sprintf("Gradle %s", latestVersion),
+		CommitFiles: []domain.File{
 			{
 				Path:    domain.GradleWrapperPropertiesPath,
-				Content: []byte(newProps),
+				Content: domain.FileContent(newProps),
 			},
 		},
-	})
+	}
+	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, headBranchID)
+	switch {
+	case err == nil:
+		if headBranch.Commit.IsBasedOn(baseBranch.Commit.ID) {
+			return nil
+		}
+		_, err := usecase.GitService.UpdateForceBranch(ctx, pushBranchRequest)
+		if err != nil {
+			return errors.Wrapf(err, "could not push the commit to the repository %s", head)
+		}
+	case usecase.RepositoryRepository.IsNotFoundError(err):
+		_, err := usecase.GitService.CreateBranch(ctx, pushBranchRequest)
+		if err != nil {
+			return errors.Wrapf(err, "could not push the commit to the repository %s", head)
+		}
+	default:
+		return errors.Wrapf(err, "could not get the head branch %s", head)
+	}
 
-	//TODO: if the pull request already exists?
 	pull := domain.PullRequest{
 		ID:         domain.PullRequestID{Repository: id},
-		HeadBranch: head.ID,
+		HeadBranch: headBranchID,
 		BaseBranch: base.DefaultBranch,
 		Title:      fmt.Sprintf("Gradle %s", latestVersion),
-		Body: fmt.Sprintf(`This will upgrade the Gradle wrapper to the latest version %s.
-
-This pull request is sent by @gradleupdate and based on [int128/latest-gradle-wrapper](https://github.com/int128/latest-gradle-wrapper).
-`, latestVersion),
+		Body:       fmt.Sprintf(`Gradle %s is available.`, latestVersion),
 	}
 	if _, err := usecase.PullRequestRepository.Create(ctx, pull); err != nil {
-		return errors.Wrapf(err, "could not open a pull request %s", pull.String())
+		return errors.Wrapf(err, "could not create a pull request %s", pull)
 	}
 	return nil
 }

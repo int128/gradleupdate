@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"testing"
 
@@ -15,18 +16,44 @@ import (
 
 var sandboxRepository = domain.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
 
-func TestGitService_ForkBranch(t *testing.T) {
+func TestGitService_CreateBranch(t *testing.T) {
 	client := newGitHubClient(t)
 	service := GitService{GitHubClientFactory: &factory{client}}
 	ctx := context.Background()
-	req := gateways.ForkBranchRequest{
-		Base: domain.BranchID{
-			Repository: sandboxRepository,
-			Name:       "master",
+	fork, _, err := client.Repositories.CreateFork(ctx, sandboxRepository.Owner, sandboxRepository.Name, nil)
+	if err != nil {
+		if _, ok := err.(*github.AcceptedError); !ok {
+			t.Fatalf("could not fork the repository %s: %s", sandboxRepository, err)
+		}
+	}
+	base, _, err := client.Repositories.GetBranch(ctx, sandboxRepository.Owner, sandboxRepository.Name, "master")
+	if err != nil {
+		t.Fatalf("could not get the master branch: %s", err)
+	}
+	req := gateways.PushBranchRequest{
+		BaseBranch: domain.Branch{
+			ID: domain.BranchID{
+				Repository: sandboxRepository,
+				Name:       base.GetName(),
+			},
+			Commit: domain.Commit{
+				ID: domain.CommitID{
+					Repository: sandboxRepository,
+					SHA:        domain.CommitSHA(base.Commit.GetSHA()),
+				},
+				Parents: []domain.CommitID{ /* omit */ },
+				Tree: domain.TreeID{
+					Repository: sandboxRepository,
+					SHA:        domain.TreeSHA(base.Commit.Commit.Tree.GetSHA()),
+				},
+			},
 		},
-		HeadBranchName: "branch1",
-		CommitMessage:  "Test commit",
-		Files: []domain.File{
+		HeadBranch: domain.BranchID{
+			Repository: domain.RepositoryID{Owner: fork.GetOwner().GetLogin(), Name: fork.GetName()},
+			Name:       "branch1",
+		},
+		CommitMessage: "Test commit",
+		CommitFiles: []domain.File{
 			{
 				Path:    "foo/bar",
 				Content: domain.FileContent("baz"),
@@ -35,39 +62,21 @@ func TestGitService_ForkBranch(t *testing.T) {
 	}
 
 	t.Run("DeleteHeadBranchBeforeTest", func(t *testing.T) {
-		fork, _, err := client.Repositories.CreateFork(ctx, sandboxRepository.Owner, sandboxRepository.Name, nil)
-		if err != nil {
-			if _, ok := err.(*github.AcceptedError); !ok {
-				t.Fatalf("could not fork the repository %s", sandboxRepository)
-			}
-		}
-		if resp, err := client.Git.DeleteRef(ctx, fork.GetOwner().GetLogin(), fork.GetName(), "refs/heads/"+req.HeadBranchName); err != nil {
+		if resp, err := client.Git.DeleteRef(ctx, fork.GetOwner().GetLogin(), fork.GetName(), req.HeadBranch.Ref()); err != nil {
 			if resp.StatusCode != 404 {
-				t.Fatalf("could not remove the branch %s", req.HeadBranchName)
+				t.Fatalf("could not remove the branch %s", req.HeadBranch)
 			}
 		}
 	})
 	t.Run("ShouldCreateBranch", func(t *testing.T) {
-		branch, err := service.ForkBranch(ctx, req)
+		branch, err := service.CreateBranch(ctx, req)
 		if err != nil {
-			t.Fatalf("error from ForkBranch: %s", err)
+			t.Fatalf("error on CreateBranch: %s", err)
 		}
-		if branch.ID.Name != req.HeadBranchName {
-			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.ID.Name)
+		if branch.ID != req.HeadBranch {
+			t.Errorf("branch.Name wants %s but %s", req.HeadBranch, branch.ID)
 		}
-		if branch.CommitSHA == "" {
-			t.Errorf("branch.CommitSHA wants non-empty but empty")
-		}
-	})
-	t.Run("ShouldDoNothing", func(t *testing.T) {
-		branch, err := service.ForkBranch(ctx, req)
-		if err != nil {
-			t.Fatalf("error from ForkBranch: %s", err)
-		}
-		if branch.ID.Name != req.HeadBranchName {
-			t.Errorf("branch.Name wants %s but %s", req.HeadBranchName, branch.ID.Name)
-		}
-		if branch.CommitSHA == "" {
+		if branch.Commit.ID.SHA == "" {
 			t.Errorf("branch.CommitSHA wants non-empty but empty")
 		}
 	})
@@ -98,9 +107,13 @@ type loggingTransport struct {
 }
 
 func (t *loggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	res, err := t.transport.RoundTrip(req)
-	if res != nil {
-		log.Printf("%d %s %s", res.StatusCode, req.Method, req.URL)
+	resp, err := t.transport.RoundTrip(req)
+	if resp != nil {
+		dump, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			log.Printf("could not dump response: %s", err)
+		}
+		log.Printf("%s %s\n%s", req.Method, req.URL, string(dump))
 	}
-	return res, err
+	return resp, err
 }

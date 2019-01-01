@@ -12,15 +12,16 @@ type BadgeLastAccessRepository interface {
 	Put(context.Context, domain.BadgeLastAccess) error
 }
 
-type ForkBranchRequest struct {
-	Base           domain.BranchID
-	HeadBranchName string
-	CommitMessage  string
-	Files          []domain.File
+type PushBranchRequest struct {
+	BaseBranch    domain.Branch
+	HeadBranch    domain.BranchID
+	CommitMessage string
+	CommitFiles   []domain.File
 }
 
 type GitService interface {
-	ForkBranch(ctx context.Context, req ForkBranchRequest) (*domain.Branch, error)
+	CreateBranch(ctx context.Context, req PushBranchRequest) (*domain.Branch, error)
+	UpdateForceBranch(ctx context.Context, req PushBranchRequest) (*domain.Branch, error)
 }
 
 //go:generate mockgen -destination mock_gateways/gradle.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces GradleService
@@ -32,25 +33,15 @@ type GradleService interface {
 //go:generate mockgen -destination mock_gateways/pull_request.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces PullRequestRepository
 
 type PullRequestRepository interface {
-	Query(context.Context, PullRequestQuery) ([]domain.PullRequest, error)
 	Create(context.Context, domain.PullRequest) (*domain.PullRequest, error)
-	Update(context.Context, domain.PullRequest) (*domain.PullRequest, error)
-}
-
-type PullRequestQuery struct {
-	Head      domain.BranchID
-	Base      domain.BranchID
-	State     string
-	Direction string
-	Sort      string
-	PerPage   int
-	Page      int
 }
 
 type RepositoryRepository interface {
 	Get(context.Context, domain.RepositoryID) (*domain.Repository, error)
 	GetFileContent(context.Context, domain.RepositoryID, string) (domain.FileContent, error)
 	Fork(context.Context, domain.RepositoryID) (*domain.Repository, error)
+	GetBranch(ctx context.Context, branch domain.BranchID) (*domain.Branch, error)
+	IsNotFoundError(err error) bool
 }
 
 type ResponseCacheRepository interface {
