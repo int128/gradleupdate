@@ -12,11 +12,11 @@ import (
 )
 
 type RepositoryRepository struct {
-	GitHubClient *infrastructure.GitHubClientFactory
+	GitHubClientFactory *infrastructure.GitHubClientFactory
 }
 
 func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {
-	client := r.GitHubClient.New(ctx)
+	client := r.GitHubClientFactory.New(ctx)
 	repository, _, err := client.Repositories.Get(ctx, id.Owner, id.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error from GitHub API")
@@ -39,7 +39,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) 
 }
 
 func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.RepositoryID, path string) (domain.FileContent, error) {
-	client := r.GitHubClient.New(ctx)
+	client := r.GitHubClientFactory.New(ctx)
 	fc, _, _, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error from GitHub API")
@@ -60,7 +60,7 @@ func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.Rep
 }
 
 func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {
-	client := r.GitHubClient.New(ctx)
+	client := r.GitHubClientFactory.New(ctx)
 	fork, _, err := client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if err != nil {
 		if _, ok := err.(*github.AcceptedError); ok {
@@ -87,7 +87,7 @@ func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID)
 }
 
 func (r *RepositoryRepository) GetBranch(ctx context.Context, id domain.BranchID) (*domain.Branch, error) {
-	client := r.GitHubClient.New(ctx)
+	client := r.GitHubClientFactory.New(ctx)
 	branch, _, err := client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error from GitHub API")

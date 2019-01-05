@@ -19,8 +19,8 @@ type GitHubClientFactory struct {
 func (c *GitHubClientFactory) New(ctx context.Context) *github.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
-	transport = &loggingTransport{Transport: transport, Name: "GitHubClient"}
-	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: c.ResponseCacheRepository}
+	transport = &loggingTransport{Transport: transport, Context: ctx, Name: "GitHubClient"}
+	transport = &httpcache.Transport{Transport: transport, Context: ctx, ResponseCacheRepository: c.ResponseCacheRepository}
 	transport = &oauth2.Transport{Base: transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: c.Token})}
 	return github.NewClient(&http.Client{Transport: transport})
 }

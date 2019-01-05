@@ -18,8 +18,8 @@ type GradleClient struct {
 func (c *GradleClient) newClient(ctx context.Context) *http.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
-	transport = &loggingTransport{Transport: transport, Name: "GradleClient"}
-	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: c.ResponseCacheRepository}
+	transport = &loggingTransport{Transport: transport, Context: ctx, Name: "GradleClient"}
+	transport = &httpcache.Transport{Transport: transport, Context: ctx, ResponseCacheRepository: c.ResponseCacheRepository}
 	return &http.Client{Transport: transport}
 }
 

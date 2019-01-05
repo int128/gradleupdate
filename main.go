@@ -17,7 +17,7 @@ func contextProvider(req *http.Request) context.Context {
 }
 
 func main() {
-	gitHubClient := &infrastructure.GitHubClientFactory{
+	gitHubClientFactory := &infrastructure.GitHubClientFactory{
 		Token:                   os.Getenv("GITHUB_TOKEN"),
 		ResponseCacheRepository: &gateways.ResponseCacheRepository{},
 	}
@@ -34,14 +34,14 @@ func main() {
 			ContextProvider: contextProvider,
 			GetRepository: usecases.GetRepository{
 				GradleService:        gradleService,
-				RepositoryRepository: &gateways.RepositoryRepository{GitHubClient: gitHubClient},
+				RepositoryRepository: &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
 			},
 		},
 		GetBadge: handlers.GetBadge{
 			ContextProvider: contextProvider,
 			GetBadge: usecases.GetBadge{
 				GradleService:             gradleService,
-				RepositoryRepository:      &gateways.RepositoryRepository{GitHubClient: gitHubClient},
+				RepositoryRepository:      &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
 				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
 			},
 		},
@@ -49,8 +49,9 @@ func main() {
 			ContextProvider: contextProvider,
 			SendPullRequest: usecases.SendPullRequest{
 				GradleService:         gradleService,
-				RepositoryRepository:  &gateways.RepositoryRepository{GitHubClient: gitHubClient},
-				PullRequestRepository: &gateways.PullRequestRepository{GitHubClient: gitHubClient},
+				RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
+				PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
+				GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
 			},
 		},
 	}

@@ -2,22 +2,26 @@
 package httpcache
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
-	"google.golang.org/appengine"
 	"google.golang.org/appengine/log"
 )
 
 type Transport struct {
 	Transport               http.RoundTripper
+	Context                 context.Context
 	ResponseCacheRepository gateways.ResponseCacheRepository
 }
 
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if t.Transport == nil {
 		return nil, errors.Errorf("given Transport is nil")
+	}
+	if t.Context == nil {
+		return nil, errors.Errorf("given Context is nil")
 	}
 	if t.ResponseCacheRepository == nil {
 		return nil, errors.Errorf("given ResponseCacheRepository is nil")
@@ -26,7 +30,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return t.Transport.RoundTrip(req)
 	}
 
-	ctx := appengine.NewContext(req)
+	ctx := t.Context
 	cachedResp, err := t.ResponseCacheRepository.Find(ctx, req)
 	if err != nil {
 		log.Debugf(ctx, "error while finding response cache: %s", err)

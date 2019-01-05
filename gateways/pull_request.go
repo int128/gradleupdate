@@ -11,11 +11,11 @@ import (
 )
 
 type PullRequestRepository struct {
-	GitHubClient *infrastructure.GitHubClientFactory
+	GitHubClientFactory *infrastructure.GitHubClientFactory
 }
 
 func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
-	client := r.GitHubClient.New(ctx)
+	client := r.GitHubClientFactory.New(ctx)
 	payload, _, err := client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
 		Head:  github.String(pull.HeadBranch.Name),
