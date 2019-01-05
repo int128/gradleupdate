@@ -18,7 +18,7 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 	client := r.GitHubClientFactory.New(ctx)
 	payload, _, err := client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
-		Head:  github.String(pull.HeadBranch.Name),
+		Head:  github.String(pull.HeadBranch.Repository.Owner + ":" + pull.HeadBranch.Name),
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})
