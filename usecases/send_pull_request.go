@@ -71,12 +71,11 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, headBranchID)
 	switch {
 	case err == nil:
-		if headBranch.Commit.IsBasedOn(baseBranch.Commit.ID) {
-			return nil
-		}
-		_, err := usecase.GitService.UpdateForceBranch(ctx, pushBranchRequest)
-		if err != nil {
-			return errors.Wrapf(err, "could not push the commit to the repository %s", head)
+		if !headBranch.Commit.IsBasedOn(baseBranch.Commit.ID) {
+			_, err := usecase.GitService.UpdateForceBranch(ctx, pushBranchRequest)
+			if err != nil {
+				return errors.Wrapf(err, "could not push the commit to the repository %s", head)
+			}
 		}
 	case usecase.RepositoryRepository.IsNotFoundError(err):
 		_, err := usecase.GitService.CreateBranch(ctx, pushBranchRequest)
