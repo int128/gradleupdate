@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain"
@@ -33,6 +34,8 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	badgeURL := fmt.Sprintf("%s/%s/%s/status.svg", baseURL(r), owner, repo)
 
 	w.Header().Set("content-type", "text/html")
+	w.Header().Set("cache-control", "public")
+	w.Header().Set("expires", time.Now().Add(1*time.Minute).Format(http.TimeFormat))
 	templates.WriteRepository(w,
 		owner,
 		repo,
