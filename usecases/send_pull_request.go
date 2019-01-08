@@ -39,7 +39,7 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 		return errors.Errorf("could not find version in the properties")
 	}
 	if currentVersion == latestVersion {
-		return nil // already up-to-date
+		return nil // branch is already up-to-date
 	}
 	newProps := domain.ReplaceGradleWrapperVersion(props.String(), latestVersion)
 
@@ -88,10 +88,17 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 
 	pull := domain.PullRequest{
 		ID:         domain.PullRequestID{Repository: id},
-		HeadBranch: headBranchID,
 		BaseBranch: base.DefaultBranch,
+		HeadBranch: headBranchID,
 		Title:      fmt.Sprintf("Gradle %s", latestVersion),
 		Body:       fmt.Sprintf(`Gradle %s is available.`, latestVersion),
+	}
+	exist, err := usecase.PullRequestRepository.FindByBranch(ctx, pull.BaseBranch, pull.HeadBranch)
+	if err != nil {
+		return errors.Wrapf(err, "could not find existent pull request")
+	}
+	if exist != nil {
+		return nil // pull request already exists
 	}
 	if _, err := usecase.PullRequestRepository.Create(ctx, pull); err != nil {
 		return errors.Wrapf(err, "could not create a pull request %s", pull)

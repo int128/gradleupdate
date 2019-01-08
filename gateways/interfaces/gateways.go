@@ -33,7 +33,8 @@ type GradleService interface {
 //go:generate mockgen -destination mock_gateways/pull_request.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces PullRequestRepository
 
 type PullRequestRepository interface {
-	Create(context.Context, domain.PullRequest) (*domain.PullRequest, error)
+	Create(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error)
+	FindByBranch(ctx context.Context, baseBranch, headBranch domain.BranchID) (*domain.PullRequest, error)
 }
 
 type RepositoryRepository interface {

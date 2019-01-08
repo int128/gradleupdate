@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/base64"
 
-	"github.com/int128/gradleupdate/infrastructure"
-
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 )
 
 type RepositoryRepository struct {
-	GitHubClientFactory *infrastructure.GitHubClientFactory
+	GitHubClientFactory infrastructure.GitHubClientFactory
 }
 
 func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {

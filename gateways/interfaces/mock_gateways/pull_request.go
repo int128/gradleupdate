@@ -46,3 +46,16 @@ func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 domain.Pul
 func (mr *MockPullRequestRepositoryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPullRequestRepository)(nil).Create), arg0, arg1)
 }
+
+// FindByBranch mocks base method
+func (m *MockPullRequestRepository) FindByBranch(arg0 context.Context, arg1, arg2 domain.BranchID) (*domain.PullRequest, error) {
+	ret := m.ctrl.Call(m, "FindByBranch", arg0, arg1, arg2)
+	ret0, _ := ret[0].(*domain.PullRequest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByBranch indicates an expected call of FindByBranch
+func (mr *MockPullRequestRepositoryMockRecorder) FindByBranch(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByBranch", reflect.TypeOf((*MockPullRequestRepository)(nil).FindByBranch), arg0, arg1, arg2)
+}
