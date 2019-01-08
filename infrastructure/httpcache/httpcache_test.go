@@ -25,6 +25,7 @@ func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
+			Context:                 context.Background(),
 			Transport:               http.DefaultTransport,
 		},
 	}
@@ -139,6 +140,7 @@ func TestConditionalRequestIfNoneMatch_CreateDelete(t *testing.T) {
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
+			Context:                 context.Background(),
 			Transport:               http.DefaultTransport,
 		},
 	}
@@ -258,6 +260,7 @@ func TestNotCacheableRequest(t *testing.T) {
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
+			Context:                 context.Background(),
 			Transport:               http.DefaultTransport,
 		},
 	}

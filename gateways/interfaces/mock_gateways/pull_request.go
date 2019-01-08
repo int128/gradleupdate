@@ -8,7 +8,6 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/int128/gradleupdate/domain"
-	interfaces "github.com/int128/gradleupdate/gateways/interfaces"
 	reflect "reflect"
 )
 
@@ -46,30 +45,4 @@ func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 domain.Pul
 // Create indicates an expected call of Create
 func (mr *MockPullRequestRepositoryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPullRequestRepository)(nil).Create), arg0, arg1)
-}
-
-// Query mocks base method
-func (m *MockPullRequestRepository) Query(arg0 context.Context, arg1 interfaces.PullRequestQuery) ([]domain.PullRequest, error) {
-	ret := m.ctrl.Call(m, "Query", arg0, arg1)
-	ret0, _ := ret[0].([]domain.PullRequest)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Query indicates an expected call of Query
-func (mr *MockPullRequestRepositoryMockRecorder) Query(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockPullRequestRepository)(nil).Query), arg0, arg1)
-}
-
-// Update mocks base method
-func (m *MockPullRequestRepository) Update(arg0 context.Context, arg1 domain.PullRequest) (*domain.PullRequest, error) {
-	ret := m.ctrl.Call(m, "Update", arg0, arg1)
-	ret0, _ := ret[0].(*domain.PullRequest)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Update indicates an expected call of Update
-func (mr *MockPullRequestRepositoryMockRecorder) Update(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockPullRequestRepository)(nil).Update), arg0, arg1)
 }
