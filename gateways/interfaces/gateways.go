@@ -37,6 +37,8 @@ type PullRequestRepository interface {
 	FindByBranch(ctx context.Context, baseBranch, headBranch domain.BranchID) (*domain.PullRequest, error)
 }
 
+//go:generate mockgen -destination mock_gateways/repo.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces RepositoryRepository
+
 type RepositoryRepository interface {
 	Get(context.Context, domain.RepositoryID) (*domain.Repository, error)
 	GetFileContent(context.Context, domain.RepositoryID, string) (domain.FileContent, error)
