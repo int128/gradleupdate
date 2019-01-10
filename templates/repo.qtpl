@@ -1,33 +1,45 @@
-{% func Repository(owner, repo, description, avatarURL, thisURL, badgeURL string) %}
+{% func (r Repository) Page() %}
 <!DOCTYPE HTML>
 <html>
 
 <head>
-  <title>{%s owner %}/{%s repo %} - GradleUpdate</title>
+  <title>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %} - GradleUpdate</title>
   {%= Header() %}
 </head>
 <body>
 
 <div class="container">
-	<section class="text-center">
-		<div class="jumbotron">
-      <img src="{%s avatarURL %}" alt="avatar" width="160" height="160" class="img-circle"/>
-      <h2>{%s description %}</h2>
-      <p>{%s owner %}/{%s repo %}</p>
+  <section class="text-center">
+    <div class="jumbotron">
+      <img src="{%s r.Repository.AvatarURL %}" alt="avatar" width="160" height="160" class="img-circle"/>
+      <h2>{%s r.Repository.Description %}</h2>
+      <p>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %}</p>
+    </div>
+
+    <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
+    {% if r.UpToDate %}
+    <form method="POST" action="{%s r.SendPullRequestURL %}">
       <p>
-        <img src="/{%s owner %}/{%s repo %}/status.svg" alt="badge"/>
+        <button type="submit" class="btn btn-link">
+          Send a Pull Request for Gradle {%v r.LatestVersion %}
+        </button>
       </p>
-      <form>
+    </form>
+    {% else %}
+    <p>Gradle is up-to-date.</p>
+    {% endif %}
+    <form>
+      <p>
         <label class="text-uppercase" for="badge-markdown">Markdown:</label>
         <input type="text" id="badge-markdown" class="form-control input-text-monospace"
-          value="[![Gradle Status]({%s badgeURL %})]({%s thisURL %})"/>
-      </form>
-    </div>
-	</section>
+               value="[![Gradle Status]({%s r.BaseURL %}{%s r.BadgeURL %})]({%s r.BaseURL %}{%s r.ThisURL %})"/>
+      </p>
+    </form>
+  </section>
 </div>
 
 <section id="footer">
-	<p>GradleUpdate &copy; Hidetake Iwata</p>
+  <p>GradleUpdate &copy; Hidetake Iwata</p>
 </section>
 
 </body>

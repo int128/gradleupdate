@@ -21,7 +21,7 @@ func (h *Handlers) NewRouter() http.Handler {
 	m.Handle("/landing", &h.Landing).Methods("POST")
 	m.Handle("/{owner}/{repo}/status", &h.GetRepository).Methods("GET")
 	m.Handle("/{owner}/{repo}/status.svg", &h.GetBadge).Methods("GET")
-	m.Handle("/{owner}/{repo}/pull", &h.SendPullRequest).Methods("POST")
+	m.Handle("/{owner}/{repo}/send-pull-request", &h.SendPullRequest).Methods("POST")
 	return m
 }
 

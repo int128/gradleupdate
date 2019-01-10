@@ -30,17 +30,17 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	thisURL := fmt.Sprintf("%s/%s/%s/status", baseURL(r), owner, repo)
-	badgeURL := fmt.Sprintf("%s/%s/%s/status.svg", baseURL(r), owner, repo)
-
+	t := templates.Repository{
+		Repository:         resp.Repository,
+		LatestVersion:      resp.LatestVersion,
+		UpToDate:           resp.UpToDate,
+		ThisURL:            fmt.Sprintf("/%s/%s/status", owner, repo),
+		BadgeURL:           fmt.Sprintf("/%s/%s/status.svg", owner, repo),
+		SendPullRequestURL: fmt.Sprintf("/%s/%s/send-pull-request", owner, repo),
+		BaseURL:            baseURL(r),
+	}
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("cache-control", "public")
-	w.Header().Set("expires", time.Now().Add(1*time.Minute).Format(http.TimeFormat))
-	templates.WriteRepository(w,
-		owner,
-		repo,
-		resp.Repository.Description,
-		resp.Repository.AvatarURL,
-		thisURL,
-		badgeURL)
+	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
+	t.WritePage(w)
 }
