@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/golang/mock/gomock"
 )
@@ -15,19 +14,12 @@ func main() {
 	ctx := context.Background()
 	ctrl := gomock.NewController(&testReporter{})
 	defer ctrl.Finish()
-	router := newHandlers(ctx, ctrl).NewRouter()
-	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case r.URL.Path == "/":
-			http.ServeFile(w, r, "static/index.html")
-		case strings.HasPrefix(r.URL.Path, "/static"):
-			static.ServeHTTP(w, r)
-		default:
-			router.ServeHTTP(w, r)
-		}
-	})
+	router := newHandlers(ctx, ctrl).NewRouter()
+	http.Handle("/", router)
+
+	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
+	http.Handle("/static/", static)
 
 	log.Printf("Open http://%s", addr)
 	if err := http.ListenAndServe(addr, http.DefaultServeMux); err != nil {

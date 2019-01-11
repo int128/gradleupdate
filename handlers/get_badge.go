@@ -24,7 +24,7 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", "image/svg+xml")
 	w.Header().Set("cache-control", "public")
-	w.Header().Set("expires", time.Now().Add(1*time.Minute).Format(http.TimeFormat))
+	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 
 	resp, err := h.GetBadge.Do(ctx, id)
 	switch {

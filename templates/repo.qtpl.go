@@ -36,97 +36,105 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 	qw422016.N().S(` - GradleUpdate</title>
   `)
 	//line repo.qtpl:7
-	StreamHeader(qw422016)
+	StreamStylesheets(qw422016)
 	//line repo.qtpl:7
 	qw422016.N().S(`
 </head>
 <body>
 
+`)
+	//line repo.qtpl:11
+	StreamHeader(qw422016)
+	//line repo.qtpl:11
+	qw422016.N().S(`
+
 <div class="container">
   <section class="text-center">
     <div class="jumbotron">
       <img src="`)
-	//line repo.qtpl:14
+	//line repo.qtpl:16
 	qw422016.E().S(r.Repository.AvatarURL)
-	//line repo.qtpl:14
+	//line repo.qtpl:16
 	qw422016.N().S(`" alt="avatar" width="160" height="160" class="img-circle"/>
       <h2>`)
-	//line repo.qtpl:15
+	//line repo.qtpl:17
 	qw422016.E().S(r.Repository.Description)
-	//line repo.qtpl:15
+	//line repo.qtpl:17
 	qw422016.N().S(`</h2>
       <p>`)
-	//line repo.qtpl:16
+	//line repo.qtpl:18
 	qw422016.E().S(r.Repository.ID.Owner)
-	//line repo.qtpl:16
+	//line repo.qtpl:18
 	qw422016.N().S(`/`)
-	//line repo.qtpl:16
+	//line repo.qtpl:18
 	qw422016.E().S(r.Repository.ID.Name)
-	//line repo.qtpl:16
+	//line repo.qtpl:18
 	qw422016.N().S(`</p>
     </div>
 
     <p><img src="`)
-	//line repo.qtpl:19
+	//line repo.qtpl:21
 	qw422016.E().S(r.BadgeURL)
-	//line repo.qtpl:19
+	//line repo.qtpl:21
 	qw422016.N().S(`" alt="badge"/></p>
     `)
-	//line repo.qtpl:20
+	//line repo.qtpl:22
 	if r.UpToDate {
-		//line repo.qtpl:20
+		//line repo.qtpl:22
 		qw422016.N().S(`
     <p>Gradle is up-to-date.</p>
     `)
-		//line repo.qtpl:22
+		//line repo.qtpl:24
 	} else {
-		//line repo.qtpl:22
+		//line repo.qtpl:24
 		qw422016.N().S(`
     <form method="POST" action="`)
-		//line repo.qtpl:23
+		//line repo.qtpl:25
 		qw422016.E().S(r.SendPullRequestURL)
-		//line repo.qtpl:23
+		//line repo.qtpl:25
 		qw422016.N().S(`">
       <p>
         <button type="submit" class="btn btn-link">
           Send a Pull Request for Gradle `)
-		//line repo.qtpl:26
+		//line repo.qtpl:28
 		qw422016.E().V(r.LatestVersion)
-		//line repo.qtpl:26
+		//line repo.qtpl:28
 		qw422016.N().S(`
         </button>
       </p>
     </form>
     `)
-		//line repo.qtpl:30
+		//line repo.qtpl:32
 	}
-	//line repo.qtpl:30
+	//line repo.qtpl:32
 	qw422016.N().S(`
     <form>
       <p>
         <label class="text-uppercase" for="badge-markdown">Markdown:</label>
         <input type="text" id="badge-markdown" class="form-control input-text-monospace"
                value="[![Gradle Status](`)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.E().S(r.BaseURL)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.E().S(r.BadgeURL)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.N().S(`)](`)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.E().S(r.BaseURL)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.E().S(r.ThisURL)
-	//line repo.qtpl:35
+	//line repo.qtpl:37
 	qw422016.N().S(`)"/>
       </p>
     </form>
   </section>
 </div>
 
-<section id="footer">
-  <p>GradleUpdate &copy; Hidetake Iwata</p>
-</section>
+`)
+	//line repo.qtpl:43
+	StreamFooter(qw422016)
+	//line repo.qtpl:43
+	qw422016.N().S(`
 
 </body>
 </html>

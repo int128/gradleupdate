@@ -18,7 +18,7 @@ var (
 )
 
 //line base.qtpl:1
-func StreamHeader(qw422016 *qt422016.Writer) {
+func StreamStylesheets(qw422016 *qt422016.Writer) {
 	//line base.qtpl:1
 	qw422016.N().S(`
   <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
@@ -31,22 +31,22 @@ func StreamHeader(qw422016 *qt422016.Writer) {
 }
 
 //line base.qtpl:7
-func WriteHeader(qq422016 qtio422016.Writer) {
+func WriteStylesheets(qq422016 qtio422016.Writer) {
 	//line base.qtpl:7
 	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line base.qtpl:7
-	StreamHeader(qw422016)
+	StreamStylesheets(qw422016)
 	//line base.qtpl:7
 	qt422016.ReleaseWriter(qw422016)
 //line base.qtpl:7
 }
 
 //line base.qtpl:7
-func Header() string {
+func Stylesheets() string {
 	//line base.qtpl:7
 	qb422016 := qt422016.AcquireByteBuffer()
 	//line base.qtpl:7
-	WriteHeader(qb422016)
+	WriteStylesheets(qb422016)
 	//line base.qtpl:7
 	qs422016 := string(qb422016.B)
 	//line base.qtpl:7
@@ -54,4 +54,75 @@ func Header() string {
 	//line base.qtpl:7
 	return qs422016
 //line base.qtpl:7
+}
+
+//line base.qtpl:10
+func StreamHeader(qw422016 *qt422016.Writer) {
+	//line base.qtpl:10
+	qw422016.N().S(`
+`)
+//line base.qtpl:11
+}
+
+//line base.qtpl:11
+func WriteHeader(qq422016 qtio422016.Writer) {
+	//line base.qtpl:11
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	//line base.qtpl:11
+	StreamHeader(qw422016)
+	//line base.qtpl:11
+	qt422016.ReleaseWriter(qw422016)
+//line base.qtpl:11
+}
+
+//line base.qtpl:11
+func Header() string {
+	//line base.qtpl:11
+	qb422016 := qt422016.AcquireByteBuffer()
+	//line base.qtpl:11
+	WriteHeader(qb422016)
+	//line base.qtpl:11
+	qs422016 := string(qb422016.B)
+	//line base.qtpl:11
+	qt422016.ReleaseByteBuffer(qb422016)
+	//line base.qtpl:11
+	return qs422016
+//line base.qtpl:11
+}
+
+//line base.qtpl:14
+func StreamFooter(qw422016 *qt422016.Writer) {
+	//line base.qtpl:14
+	qw422016.N().S(`
+  <section id="footer">
+    <p>gradleupdate &copy; Hidetake Iwata</p>
+  </section>
+`)
+//line base.qtpl:18
+}
+
+//line base.qtpl:18
+func WriteFooter(qq422016 qtio422016.Writer) {
+	//line base.qtpl:18
+	qw422016 := qt422016.AcquireWriter(qq422016)
+	//line base.qtpl:18
+	StreamFooter(qw422016)
+	//line base.qtpl:18
+	qt422016.ReleaseWriter(qw422016)
+//line base.qtpl:18
+}
+
+//line base.qtpl:18
+func Footer() string {
+	//line base.qtpl:18
+	qb422016 := qt422016.AcquireByteBuffer()
+	//line base.qtpl:18
+	WriteFooter(qb422016)
+	//line base.qtpl:18
+	qs422016 := string(qb422016.B)
+	//line base.qtpl:18
+	qt422016.ReleaseByteBuffer(qb422016)
+	//line base.qtpl:18
+	return qs422016
+//line base.qtpl:18
 }

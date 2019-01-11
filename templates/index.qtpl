@@ -1,23 +1,22 @@
+{% func Index() %}
 <!DOCTYPE HTML>
 <html>
 
 <head>
-  <title>GradleUpdate</title>
+  <title>gradleupdate</title>
   <meta name="description"
-        content="GradleUpdate keeps the latest Gradle wrapper on your GitHub repositories by pull requests automatically"/>
-  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
-        crossorigin="anonymous"/>
-  <link href="/static/app.css" rel="stylesheet"/>
+        content="gradleupdate provides continuous update of Gradle Wrapper in your GitHub repositories"/>
+  {%= Stylesheets() %}
 </head>
 <body>
+
+{%= Header() %}
 
 <div class="container">
   <section class="text-center">
     <div class="jumbotron">
-      <h1>GradleUpdate</h1>
-      <p>Automatic Gradle Updater</p>
+      <h1>gradleupdate</h1>
+      <p>Automatic Gradle Update Service</p>
       <p>
         <img src="/int128/latest-gradle-wrapper/status.svg"/>
       </p>
@@ -33,14 +32,13 @@
                class="form-control text-center input-lg input-text-monospace"
                placeholder="https://github.com/int128/gradleupdate"/>
       </div>
-      <button type="submit" class="btn btn-primary">Get a Badge</button>
+      <button type="submit" class="btn btn-primary">Get your Badge</button>
     </form>
   </section>
 </div>
 
-<section id="footer">
-  <p>GradleUpdate &copy; Hidetake Iwata</p>
-</section>
+{%= Footer() %}
 
 </body>
 </html>
+{% endfunc %}

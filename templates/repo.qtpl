@@ -4,9 +4,11 @@
 
 <head>
   <title>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %} - GradleUpdate</title>
-  {%= Header() %}
+  {%= Stylesheets() %}
 </head>
 <body>
+
+{%= Header() %}
 
 <div class="container">
   <section class="text-center">
@@ -38,9 +40,7 @@
   </section>
 </div>
 
-<section id="footer">
-  <p>GradleUpdate &copy; Hidetake Iwata</p>
-</section>
+{%= Footer() %}
 
 </body>
 </html>

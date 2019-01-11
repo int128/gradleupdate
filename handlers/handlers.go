@@ -10,6 +10,7 @@ import (
 type ContextProvider func(*http.Request) context.Context
 
 type Handlers struct {
+	Index           Index
 	Landing         Landing
 	GetRepository   GetRepository
 	GetBadge        GetBadge
@@ -18,6 +19,7 @@ type Handlers struct {
 
 func (h *Handlers) NewRouter() http.Handler {
 	m := mux.NewRouter()
+	m.Handle("/", &h.Index).Methods("GET")
 	m.Handle("/landing", &h.Landing).Methods("POST")
 	m.Handle("/{owner}/{repo}/status", &h.GetRepository).Methods("GET")
 	m.Handle("/{owner}/{repo}/status.svg", &h.GetBadge).Methods("GET")
