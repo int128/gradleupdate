@@ -18,6 +18,8 @@
 
     <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
     {% if r.UpToDate %}
+    <p>Gradle is up-to-date.</p>
+    {% else %}
     <form method="POST" action="{%s r.SendPullRequestURL %}">
       <p>
         <button type="submit" class="btn btn-link">
@@ -25,8 +27,6 @@
         </button>
       </p>
     </form>
-    {% else %}
-    <p>Gradle is up-to-date.</p>
     {% endif %}
     <form>
       <p>

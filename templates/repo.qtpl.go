@@ -76,27 +76,27 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 	if r.UpToDate {
 		//line repo.qtpl:20
 		qw422016.N().S(`
+    <p>Gradle is up-to-date.</p>
+    `)
+		//line repo.qtpl:22
+	} else {
+		//line repo.qtpl:22
+		qw422016.N().S(`
     <form method="POST" action="`)
-		//line repo.qtpl:21
+		//line repo.qtpl:23
 		qw422016.E().S(r.SendPullRequestURL)
-		//line repo.qtpl:21
+		//line repo.qtpl:23
 		qw422016.N().S(`">
       <p>
         <button type="submit" class="btn btn-link">
           Send a Pull Request for Gradle `)
-		//line repo.qtpl:24
+		//line repo.qtpl:26
 		qw422016.E().V(r.LatestVersion)
-		//line repo.qtpl:24
+		//line repo.qtpl:26
 		qw422016.N().S(`
         </button>
       </p>
     </form>
-    `)
-		//line repo.qtpl:28
-	} else {
-		//line repo.qtpl:28
-		qw422016.N().S(`
-    <p>Gradle is up-to-date.</p>
     `)
 		//line repo.qtpl:30
 	}
