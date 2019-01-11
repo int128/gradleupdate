@@ -5,22 +5,16 @@ import (
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 )
-
-type GetRepositoryResponse struct {
-	Repository     domain.Repository
-	CurrentVersion domain.GradleVersion
-	LatestVersion  domain.GradleVersion
-	UpToDate       bool
-}
 
 type GetRepository struct {
 	GradleService        gateways.GradleService
 	RepositoryRepository gateways.RepositoryRepository
 }
 
-func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*GetRepositoryResponse, error) {
+func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetRepositoryResponse, error) {
 	repository, err := usecase.RepositoryRepository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the repository %s", id)
@@ -38,7 +32,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
-	return &GetRepositoryResponse{
+	return &usecases.GetRepositoryResponse{
 		Repository:     *repository,
 		CurrentVersion: currentVersion,
 		LatestVersion:  latestVersion,

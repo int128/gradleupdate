@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/templates"
-	"github.com/int128/gradleupdate/usecases"
+	"github.com/int128/gradleupdate/usecases/interfaces"
 	"google.golang.org/appengine/log"
 )
 

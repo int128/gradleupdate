@@ -32,14 +32,14 @@ func main() {
 		},
 		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
-			GetRepository: usecases.GetRepository{
+			GetRepository: &usecases.GetRepository{
 				GradleService:        gradleService,
 				RepositoryRepository: &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
 			},
 		},
 		GetBadge: handlers.GetBadge{
 			ContextProvider: contextProvider,
-			GetBadge: usecases.GetBadge{
+			GetBadge: &usecases.GetBadge{
 				GradleService:             gradleService,
 				RepositoryRepository:      &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
 				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
@@ -47,7 +47,7 @@ func main() {
 		},
 		SendPullRequest: handlers.SendPullRequest{
 			ContextProvider: contextProvider,
-			SendPullRequest: usecases.SendPullRequest{
+			SendPullRequest: &usecases.SendPullRequest{
 				GradleService:         gradleService,
 				RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
 				PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},

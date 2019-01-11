@@ -6,14 +6,10 @@ import (
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"google.golang.org/appengine/log"
 )
-
-type GetBadgeResponse struct {
-	CurrentVersion domain.GradleVersion
-	UpToDate       bool
-}
 
 type GetBadge struct {
 	GradleService             gateways.GradleService
@@ -21,7 +17,7 @@ type GetBadge struct {
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 }
 
-func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*GetBadgeResponse, error) {
+func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetBadgeResponse, error) {
 	props, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
@@ -43,7 +39,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*GetBa
 	}); err != nil {
 		log.Errorf(ctx, "could not save badge access")
 	}
-	return &GetBadgeResponse{
+	return &usecases.GetBadgeResponse{
 		CurrentVersion: currentVersion,
 		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
 	}, nil

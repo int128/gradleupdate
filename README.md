@@ -54,7 +54,7 @@ Run the local server:
 dev_appserver.py .
 ```
 
-Run the mock server (for development of templates):
+Run the mock server with `handlers` and `templates`:
 
 ```sh
 modd
