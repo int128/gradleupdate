@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -23,5 +24,8 @@ func (h *SendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := h.SendPullRequest.Do(ctx, id); err != nil {
 		log.Errorf(ctx, "could not send a pull request for %s: %+v", id, err)
 		http.Error(w, err.Error(), 500)
+		return
 	}
+
+	http.Redirect(w, r, fmt.Sprintf("/%s/%s/status", owner, repo), http.StatusFound)
 }

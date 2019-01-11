@@ -14,6 +14,7 @@ import (
 func newHandlers(ctx context.Context, ctrl *gomock.Controller) *handlers.Handlers {
 	getBadge := mock_usecases.NewMockGetBadge(ctrl)
 	getRepository := mock_usecases.NewMockGetRepository(ctrl)
+	sendPullRequest := mock_usecases.NewMockSendPullRequest(ctrl)
 
 	var exampleRepository = domain.RepositoryID{Owner: "int128", Name: "gradleupdate"}
 	getBadge.EXPECT().Do(ctx, exampleRepository).AnyTimes().Return(&usecases.GetBadgeResponse{
@@ -29,6 +30,7 @@ func newHandlers(ctx context.Context, ctrl *gomock.Controller) *handlers.Handler
 		LatestVersion: "5.0",
 		UpToDate:      false,
 	}, nil)
+	sendPullRequest.EXPECT().Do(ctx, exampleRepository).AnyTimes().Return(nil)
 
 	var latestRepository = domain.RepositoryID{Owner: "int128", Name: "latest-gradle-wrapper"}
 	getBadge.EXPECT().Do(ctx, latestRepository).AnyTimes().Return(&usecases.GetBadgeResponse{
@@ -45,6 +47,10 @@ func newHandlers(ctx context.Context, ctrl *gomock.Controller) *handlers.Handler
 		GetRepository: handlers.GetRepository{
 			ContextProvider: contextProvider,
 			GetRepository:   getRepository,
+		},
+		SendPullRequest: handlers.SendPullRequest{
+			ContextProvider: contextProvider,
+			SendPullRequest: sendPullRequest,
 		},
 	}
 }
