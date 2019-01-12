@@ -13,12 +13,11 @@ import (
 )
 
 type GetRepository struct {
-	ContextProvider ContextProvider
-	GetRepository   usecases.GetRepository
+	GetRepository usecases.GetRepository
 }
 
 func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := h.ContextProvider(r)
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 	id := domain.RepositoryID{Owner: owner, Name: repo}

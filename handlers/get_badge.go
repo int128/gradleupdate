@@ -12,12 +12,11 @@ import (
 )
 
 type GetBadge struct {
-	ContextProvider ContextProvider
-	GetBadge        usecases.GetBadge
+	GetBadge usecases.GetBadge
 }
 
 func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := h.ContextProvider(r)
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 	id := domain.RepositoryID{Owner: owner, Name: repo}

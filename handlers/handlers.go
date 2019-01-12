@@ -1,13 +1,10 @@
 package handlers
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
-
-type ContextProvider func(*http.Request) context.Context
 
 type Handlers struct {
 	Index           Index
@@ -19,11 +16,11 @@ type Handlers struct {
 
 func (h *Handlers) NewRouter() http.Handler {
 	m := mux.NewRouter()
-	m.Handle("/", &h.Index).Methods("GET")
-	m.Handle("/landing", &h.Landing).Methods("POST")
-	m.Handle("/{owner}/{repo}/status", &h.GetRepository).Methods("GET")
-	m.Handle("/{owner}/{repo}/status.svg", &h.GetBadge).Methods("GET")
-	m.Handle("/{owner}/{repo}/send-pull-request", &h.SendPullRequest).Methods("POST")
+	m.Methods("GET").Path("/").Handler(&h.Index)
+	m.Methods("POST").Path("/landing").Handler(&h.Landing)
+	m.Methods("GET").Path("/{owner}/{repo}/status").Handler(&h.GetRepository)
+	m.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&h.GetBadge)
+	m.Methods("POST").Path("/{owner}/{repo}/send-pull-request").Handler(&h.SendPullRequest)
 	return m
 }
 

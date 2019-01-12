@@ -15,8 +15,8 @@ func main() {
 	ctrl := gomock.NewController(&testReporter{})
 	defer ctrl.Finish()
 
-	router := newHandlers(ctx, ctrl).NewRouter()
-	http.Handle("/", router)
+	router := newHandlers(ctrl).NewRouter()
+	http.Handle("/", withContext(ctx, router))
 
 	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
 	http.Handle("/static/", static)
@@ -25,6 +25,12 @@ func main() {
 	if err := http.ListenAndServe(addr, http.DefaultServeMux); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func withContext(ctx context.Context, h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 type testReporter struct{}

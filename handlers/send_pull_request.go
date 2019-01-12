@@ -11,12 +11,11 @@ import (
 )
 
 type SendPullRequest struct {
-	ContextProvider ContextProvider
 	SendPullRequest usecases.SendPullRequest
 }
 
 func (h *SendPullRequest) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx := h.ContextProvider(r)
+	ctx := r.Context()
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 	id := domain.RepositoryID{Owner: owner, Name: repo}
