@@ -26,8 +26,9 @@ func newHandlers(ctrl *gomock.Controller) *handlers.Handlers {
 			Description: "Automatic Gradle Update Service",
 			AvatarURL:   "https://avatars0.githubusercontent.com/u/321266",
 		},
-		LatestVersion: "5.0",
-		UpToDate:      false,
+		LatestVersion:  "5.1",
+		CurrentVersion: "5.0",
+		UpToDate:       false,
 	}, nil)
 	sendPullRequest.EXPECT().Do(nonNil, exampleRepository).AnyTimes().Return(nil)
 

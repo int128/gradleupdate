@@ -2,11 +2,6 @@
   background: none;
 }
 
-.input-text-monospace {
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  text-align: center;
-}
-
 #footer {
   text-align: center;
   margin-top: 60px;

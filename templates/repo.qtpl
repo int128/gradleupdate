@@ -3,41 +3,41 @@
 <html>
 
 <head>
-  <title>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %} - GradleUpdate</title>
+  <title>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %} - gradleupdate</title>
   {%= Stylesheets() %}
 </head>
 <body>
 
 {%= Header() %}
 
-<div class="container">
-  <section class="text-center">
-    <div class="jumbotron">
-      <img src="{%s r.Repository.AvatarURL %}" alt="avatar" width="160" height="160" class="img-circle"/>
-      <h2>{%s r.Repository.Description %}</h2>
-      <p>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %}</p>
-    </div>
+<div class="container jumbotron text-center">
+  <img src="{%s r.Repository.AvatarURL %}" alt="avatar" width="96" height="96" class="img-thumbnail rounded-circle"/>
+  <h2>{%s r.Repository.ID.Owner %}/{%s r.Repository.ID.Name %}</h2>
+  <p class="lead">{%s r.Repository.Description %}</p>
+  <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
+</div>
 
-    <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
-    {% if r.UpToDate %}
-    <p>Gradle is up-to-date.</p>
-    {% else %}
-    <form method="POST" action="{%s r.SendPullRequestURL %}">
-      <p>
-        <button type="submit" class="btn btn-link">
-          Send a Pull Request for Gradle {%v r.LatestVersion %}
-        </button>
-      </p>
-    </form>
-    {% endif %}
-    <form>
-      <p>
-        <label class="text-uppercase" for="badge-markdown">Markdown:</label>
-        <input type="text" id="badge-markdown" class="form-control input-text-monospace"
-               value="[![Gradle Status]({%s r.BaseURL %}{%s r.BadgeURL %})]({%s r.BaseURL %}{%s r.ThisURL %})"/>
-      </p>
-    </form>
-  </section>
+<div class="container text-center">
+  <p>You can add the status badge.</p>
+  <form>
+    <label class="text-uppercase" for="badge-markdown">Markdown:</label>
+    <input type="text" id="badge-markdown" class="form-control text-monospace"
+           value="[![Gradle Status]({%s r.BaseURL %}{%s r.BadgeURL %})]({%s r.BaseURL %}{%s r.ThisURL %})"/>
+  </form>
+  <div class="mb-3"></div>
+
+{% if r.UpToDate %}
+  <p>Gradle is up-to-date.</p>
+{% else %}
+  <p>The repository has out-of-dated Gradle {%v r.CurrentVersion %}.</p>
+  <form method="POST" action="{%s r.SendPullRequestURL %}">
+    <p>
+      <button type="submit" class="btn btn-primary">
+        Send a Pull Request for Gradle {%v r.LatestVersion %}
+      </button>
+    </p>
+  </form>
+{% endif %}
 </div>
 
 {%= Footer() %}

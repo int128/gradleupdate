@@ -42,65 +42,60 @@ func StreamIndex(qw422016 *qt422016.Writer) {
 	//line index.qtpl:13
 	qw422016.N().S(`
 
-<div class="container">
-  <section class="text-center">
-    <div class="jumbotron">
-      <h1>gradleupdate</h1>
-      <p>Automatic Gradle Update Service</p>
-      <p>
-        <img src="/int128/latest-gradle-wrapper/status.svg"/>
-      </p>
+<div class="container jumbotron text-center">
+  <h1>gradleupdate</h1>
+  <p class="lead">Automatic Gradle Update Service</p>
+  <p>
+    <img src="/int128/latest-gradle-wrapper/status.svg"/>
+  </p>
+</div>
+
+<div class="container text-center">
+  <form method="post" action="/landing">
+    <div class="form-group">
+      <label for="github-url">Paste GitHub URL</label>
+      <input type="text" id="github-url" name="url"
+             class="form-control text-center input-lg input-text-monospace"
+             placeholder="https://github.com/int128/gradleupdate"/>
     </div>
-  </section>
-  <section class="text-center">
-    <form method="post" action="/landing">
-      <div class="form-group">
-        <label for="github-url">
-          Paste GitHub URL
-        </label>
-        <input type="text" id="github-url" name="url"
-               class="form-control text-center input-lg input-text-monospace"
-               placeholder="https://github.com/int128/gradleupdate"/>
-      </div>
-      <button type="submit" class="btn btn-primary">Get your Badge</button>
-    </form>
-  </section>
+    <button type="submit" class="btn btn-primary">Get your Badge</button>
+  </form>
 </div>
 
 `)
-	//line index.qtpl:40
+	//line index.qtpl:35
 	StreamFooter(qw422016)
-	//line index.qtpl:40
+	//line index.qtpl:35
 	qw422016.N().S(`
 
 </body>
 </html>
 `)
-//line index.qtpl:44
+//line index.qtpl:39
 }
 
-//line index.qtpl:44
+//line index.qtpl:39
 func WriteIndex(qq422016 qtio422016.Writer) {
-	//line index.qtpl:44
+	//line index.qtpl:39
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line index.qtpl:44
+	//line index.qtpl:39
 	StreamIndex(qw422016)
-	//line index.qtpl:44
+	//line index.qtpl:39
 	qt422016.ReleaseWriter(qw422016)
-//line index.qtpl:44
+//line index.qtpl:39
 }
 
-//line index.qtpl:44
+//line index.qtpl:39
 func Index() string {
-	//line index.qtpl:44
+	//line index.qtpl:39
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line index.qtpl:44
+	//line index.qtpl:39
 	WriteIndex(qb422016)
-	//line index.qtpl:44
+	//line index.qtpl:39
 	qs422016 := string(qb422016.B)
-	//line index.qtpl:44
+	//line index.qtpl:39
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line index.qtpl:44
+	//line index.qtpl:39
 	return qs422016
-//line index.qtpl:44
+//line index.qtpl:39
 }

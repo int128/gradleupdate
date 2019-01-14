@@ -12,29 +12,24 @@
 
 {%= Header() %}
 
-<div class="container">
-  <section class="text-center">
-    <div class="jumbotron">
-      <h1>gradleupdate</h1>
-      <p>Automatic Gradle Update Service</p>
-      <p>
-        <img src="/int128/latest-gradle-wrapper/status.svg"/>
-      </p>
+<div class="container jumbotron text-center">
+  <h1>gradleupdate</h1>
+  <p class="lead">Automatic Gradle Update Service</p>
+  <p>
+    <img src="/int128/latest-gradle-wrapper/status.svg"/>
+  </p>
+</div>
+
+<div class="container text-center">
+  <form method="post" action="/landing">
+    <div class="form-group">
+      <label for="github-url">Paste GitHub URL</label>
+      <input type="text" id="github-url" name="url"
+             class="form-control text-center input-lg input-text-monospace"
+             placeholder="https://github.com/int128/gradleupdate"/>
     </div>
-  </section>
-  <section class="text-center">
-    <form method="post" action="/landing">
-      <div class="form-group">
-        <label for="github-url">
-          Paste GitHub URL
-        </label>
-        <input type="text" id="github-url" name="url"
-               class="form-control text-center input-lg input-text-monospace"
-               placeholder="https://github.com/int128/gradleupdate"/>
-      </div>
-      <button type="submit" class="btn btn-primary">Get your Badge</button>
-    </form>
-  </section>
+    <button type="submit" class="btn btn-primary">Get your Badge</button>
+  </form>
 </div>
 
 {%= Footer() %}

@@ -21,108 +21,107 @@ var (
 func StreamStylesheets(qw422016 *qt422016.Writer) {
 	//line base.qtpl:1
 	qw422016.N().S(`
-  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-h21C2fcDk/eFsW9sC9h0dhokq5pDinLNklTKoxIZRUn3+hvmgQSffLLQ4G4l2eEr"
-        crossorigin="anonymous"/>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.2.1/cosmo/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmPRQ4EzBa9ifYo2LjomrSZ28x2GHvKNtv599SfxGvi39OQfRzluOw+sLUfxPOOD" crossorigin="anonymous">
   <link href="/static/app.css" rel="stylesheet"/>
 `)
-//line base.qtpl:7
+//line base.qtpl:6
 }
 
-//line base.qtpl:7
+//line base.qtpl:6
 func WriteStylesheets(qq422016 qtio422016.Writer) {
-	//line base.qtpl:7
+	//line base.qtpl:6
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line base.qtpl:7
+	//line base.qtpl:6
 	StreamStylesheets(qw422016)
-	//line base.qtpl:7
+	//line base.qtpl:6
 	qt422016.ReleaseWriter(qw422016)
-//line base.qtpl:7
+//line base.qtpl:6
 }
 
-//line base.qtpl:7
+//line base.qtpl:6
 func Stylesheets() string {
-	//line base.qtpl:7
+	//line base.qtpl:6
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line base.qtpl:7
+	//line base.qtpl:6
 	WriteStylesheets(qb422016)
-	//line base.qtpl:7
+	//line base.qtpl:6
 	qs422016 := string(qb422016.B)
-	//line base.qtpl:7
+	//line base.qtpl:6
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line base.qtpl:7
+	//line base.qtpl:6
 	return qs422016
-//line base.qtpl:7
+//line base.qtpl:6
+}
+
+//line base.qtpl:9
+func StreamHeader(qw422016 *qt422016.Writer) {
+	//line base.qtpl:9
+	qw422016.N().S(`
+`)
+//line base.qtpl:10
 }
 
 //line base.qtpl:10
-func StreamHeader(qw422016 *qt422016.Writer) {
-	//line base.qtpl:10
-	qw422016.N().S(`
-`)
-//line base.qtpl:11
-}
-
-//line base.qtpl:11
 func WriteHeader(qq422016 qtio422016.Writer) {
-	//line base.qtpl:11
+	//line base.qtpl:10
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line base.qtpl:11
+	//line base.qtpl:10
 	StreamHeader(qw422016)
-	//line base.qtpl:11
+	//line base.qtpl:10
 	qt422016.ReleaseWriter(qw422016)
-//line base.qtpl:11
+//line base.qtpl:10
 }
 
-//line base.qtpl:11
+//line base.qtpl:10
 func Header() string {
-	//line base.qtpl:11
+	//line base.qtpl:10
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line base.qtpl:11
+	//line base.qtpl:10
 	WriteHeader(qb422016)
-	//line base.qtpl:11
+	//line base.qtpl:10
 	qs422016 := string(qb422016.B)
-	//line base.qtpl:11
+	//line base.qtpl:10
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line base.qtpl:11
+	//line base.qtpl:10
 	return qs422016
-//line base.qtpl:11
+//line base.qtpl:10
 }
 
-//line base.qtpl:14
+//line base.qtpl:13
 func StreamFooter(qw422016 *qt422016.Writer) {
-	//line base.qtpl:14
+	//line base.qtpl:13
 	qw422016.N().S(`
   <section id="footer">
     <p>gradleupdate &copy; Hidetake Iwata</p>
   </section>
 `)
-//line base.qtpl:18
+//line base.qtpl:17
 }
 
-//line base.qtpl:18
+//line base.qtpl:17
 func WriteFooter(qq422016 qtio422016.Writer) {
-	//line base.qtpl:18
+	//line base.qtpl:17
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line base.qtpl:18
+	//line base.qtpl:17
 	StreamFooter(qw422016)
-	//line base.qtpl:18
+	//line base.qtpl:17
 	qt422016.ReleaseWriter(qw422016)
-//line base.qtpl:18
+//line base.qtpl:17
 }
 
-//line base.qtpl:18
+//line base.qtpl:17
 func Footer() string {
-	//line base.qtpl:18
+	//line base.qtpl:17
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line base.qtpl:18
+	//line base.qtpl:17
 	WriteFooter(qb422016)
-	//line base.qtpl:18
+	//line base.qtpl:17
 	qs422016 := string(qb422016.B)
-	//line base.qtpl:18
+	//line base.qtpl:17
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line base.qtpl:18
+	//line base.qtpl:17
 	return qs422016
-//line base.qtpl:18
+//line base.qtpl:17
 }
