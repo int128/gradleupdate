@@ -7,6 +7,8 @@ import (
 	"github.com/int128/gradleupdate/domain"
 )
 
+//go:generate mockgen -destination mock_gateways/badge_last_access.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository
+
 type BadgeLastAccessRepository interface {
 	Get(context.Context, domain.RepositoryID) (*domain.BadgeLastAccess, error)
 	Put(context.Context, domain.BadgeLastAccess) error
