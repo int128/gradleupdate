@@ -8,8 +8,8 @@ type Repository struct {
 	LatestVersion  domain.GradleVersion
 	UpToDate       bool
 
-	ThisURL            string
-	BadgeURL           string
-	SendPullRequestURL string
-	BaseURL            string
+	ThisURL          string
+	BadgeURL         string
+	RequestUpdateURL string
+	BaseURL          string
 }

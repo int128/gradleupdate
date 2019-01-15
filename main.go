@@ -35,12 +35,15 @@ func main() {
 				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
 			},
 		},
-		SendPullRequest: handlers.SendPullRequest{
-			SendPullRequest: &usecases.SendPullRequest{
-				GradleService:         gradleService,
-				RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
-				PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
-				GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
+		RequestUpdate: handlers.RequestUpdate{
+			RequestUpdate: &usecases.RequestUpdate{
+				GradleService:        gradleService,
+				RepositoryRepository: &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
+				SendPullRequest: &usecases.SendPullRequest{
+					RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
+					PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
+					GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
+				},
 			},
 		},
 	}

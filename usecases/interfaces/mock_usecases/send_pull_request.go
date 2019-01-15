@@ -7,7 +7,7 @@ package mock_usecases
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	domain "github.com/int128/gradleupdate/domain"
+	interfaces "github.com/int128/gradleupdate/usecases/interfaces"
 	reflect "reflect"
 )
 
@@ -35,7 +35,7 @@ func (m *MockSendPullRequest) EXPECT() *MockSendPullRequestMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockSendPullRequest) Do(arg0 context.Context, arg1 domain.RepositoryID) error {
+func (m *MockSendPullRequest) Do(arg0 context.Context, arg1 interfaces.SendPullRequestRequest) error {
 	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0

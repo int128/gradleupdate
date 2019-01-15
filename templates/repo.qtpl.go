@@ -114,7 +114,7 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 		qw422016.N().S(`.</p>
   <form method="POST" action="`)
 		//line repo.qtpl:33
-		qw422016.E().S(r.SendPullRequestURL)
+		qw422016.E().S(r.RequestUpdateURL)
 		//line repo.qtpl:33
 		qw422016.N().S(`">
     <p>

@@ -2,15 +2,14 @@ package usecases
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 )
 
 type SendPullRequest struct {
-	GradleService         gateways.GradleService
 	RepositoryRepository  gateways.RepositoryRepository
 	PullRequestRepository gateways.PullRequestRepository
 	GitService            gateways.GitService
@@ -25,48 +24,29 @@ type SendPullRequest struct {
 //
 // If the pull request exists, do not create any more.
 //
-func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) error {
-	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
+func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullRequestRequest) error {
+	base, err := usecase.RepositoryRepository.Get(ctx, req.Base)
 	if err != nil {
-		return errors.Wrapf(err, "could not get the latest Gradle version")
+		return errors.Wrapf(err, "could not get the repository %s", req.Base)
 	}
-	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+	head, err := usecase.RepositoryRepository.Fork(ctx, req.Base)
 	if err != nil {
-		return errors.Wrapf(err, "could not find properties file")
-	}
-	currentVersion := domain.FindGradleWrapperVersion(gradleWrapperProperties)
-	if currentVersion == "" {
-		return errors.Errorf("could not find version in the properties")
-	}
-	if currentVersion == latestVersion {
-		return nil // branch is already up-to-date
-	}
-	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestVersion)
-
-	base, err := usecase.RepositoryRepository.Get(ctx, id)
-	if err != nil {
-		return errors.Wrapf(err, "could not get the repository %s", id)
-	}
-	head, err := usecase.RepositoryRepository.Fork(ctx, id)
-	if err != nil {
-		return errors.Wrapf(err, "could not fork the repository %s", id)
+		return errors.Wrapf(err, "could not fork the repository %s", req.Base)
 	}
 	baseBranch, err := usecase.RepositoryRepository.GetBranch(ctx, base.DefaultBranch)
 	if err != nil {
 		return errors.Wrapf(err, "could not get the base branch %s", base.DefaultBranch)
 	}
 
-	headBranchID := head.ID.Branch(fmt.Sprintf("gradle-%s-%s", latestVersion, id.Owner))
+	headBranchID := domain.BranchID{
+		Repository: head.ID,
+		Name:       req.HeadBranchName,
+	}
 	pushBranchRequest := gateways.PushBranchRequest{
 		BaseBranch:    *baseBranch,
 		HeadBranch:    headBranchID,
-		CommitMessage: fmt.Sprintf("Gradle %s", latestVersion),
-		CommitFiles: []domain.File{
-			{
-				Path:    domain.GradleWrapperPropertiesPath,
-				Content: domain.FileContent(newProps),
-			},
-		},
+		CommitMessage: req.CommitMessage,
+		CommitFiles:   req.CommitFiles,
 	}
 	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, headBranchID)
 	switch {
@@ -87,11 +67,11 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 	}
 
 	pull := domain.PullRequest{
-		ID:         domain.PullRequestID{Repository: id},
+		ID:         domain.PullRequestID{Repository: req.Base},
 		BaseBranch: base.DefaultBranch,
 		HeadBranch: headBranchID,
-		Title:      fmt.Sprintf("Gradle %s", latestVersion),
-		Body:       fmt.Sprintf(`Gradle %s is available.`, latestVersion),
+		Title:      req.Title,
+		Body:       req.Body,
 	}
 	exist, err := usecase.PullRequestRepository.FindByBranch(ctx, pull.BaseBranch, pull.HeadBranch)
 	if err != nil {

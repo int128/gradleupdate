@@ -7,11 +7,11 @@ import (
 )
 
 type Handlers struct {
-	Index           Index
-	Landing         Landing
-	GetRepository   GetRepository
-	GetBadge        GetBadge
-	SendPullRequest SendPullRequest
+	Index         Index
+	Landing       Landing
+	GetRepository GetRepository
+	GetBadge      GetBadge
+	RequestUpdate RequestUpdate
 }
 
 func (h *Handlers) NewRouter() http.Handler {
@@ -20,7 +20,7 @@ func (h *Handlers) NewRouter() http.Handler {
 	m.Methods("POST").Path("/landing").Handler(&h.Landing)
 	m.Methods("GET").Path("/{owner}/{repo}/status").Handler(&h.GetRepository)
 	m.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&h.GetBadge)
-	m.Methods("POST").Path("/{owner}/{repo}/send-pull-request").Handler(&h.SendPullRequest)
+	m.Methods("POST").Path("/{owner}/{repo}/update").Handler(&h.RequestUpdate)
 	return m
 }
 

@@ -30,14 +30,14 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := templates.Repository{
-		Repository:         resp.Repository,
-		CurrentVersion:     resp.CurrentVersion,
-		LatestVersion:      resp.LatestVersion,
-		UpToDate:           resp.UpToDate,
-		ThisURL:            fmt.Sprintf("/%s/%s/status", owner, repo),
-		BadgeURL:           fmt.Sprintf("/%s/%s/status.svg", owner, repo),
-		SendPullRequestURL: fmt.Sprintf("/%s/%s/send-pull-request", owner, repo),
-		BaseURL:            baseURL(r),
+		Repository:       resp.Repository,
+		CurrentVersion:   resp.CurrentVersion,
+		LatestVersion:    resp.LatestVersion,
+		UpToDate:         resp.UpToDate,
+		ThisURL:          fmt.Sprintf("/%s/%s/status", owner, repo),
+		BadgeURL:         fmt.Sprintf("/%s/%s/status.svg", owner, repo),
+		RequestUpdateURL: fmt.Sprintf("/%s/%s/update", owner, repo),
+		BaseURL:          baseURL(r),
 	}
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("cache-control", "public")

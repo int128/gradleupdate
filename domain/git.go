@@ -19,10 +19,6 @@ func (r RepositoryID) String() string {
 	return r.FullName()
 }
 
-func (r RepositoryID) Branch(name string) BranchID {
-	return BranchID{Repository: r, Name: name}
-}
-
 // Repository represents a GitHub repository.
 type Repository struct {
 	ID            RepositoryID

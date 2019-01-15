@@ -30,7 +30,7 @@
   <p>Gradle is up-to-date.</p>
 {% else %}
   <p>The repository has out-of-dated Gradle {%v r.CurrentVersion %}.</p>
-  <form method="POST" action="{%s r.SendPullRequestURL %}">
+  <form method="POST" action="{%s r.RequestUpdateURL %}">
     <p>
       <button type="submit" class="btn btn-primary">
         Send a Pull Request for Gradle {%v r.LatestVersion %}
