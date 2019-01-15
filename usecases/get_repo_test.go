@@ -26,14 +26,14 @@ func TestGetRepository_Do(t *testing.T) {
 	}{
 		{
 			name:           "up-to-date",
-			content:        domain.FileContent(testdata.GradleWrapperProperties4102),
+			content:        testdata.GradleWrapperProperties4102,
 			currentVersion: "4.10.2",
 			latestVersion:  "4.10.2",
 			upToDate:       true,
 		},
 		{
 			name:           "out-of-date",
-			content:        domain.FileContent(testdata.GradleWrapperProperties4102),
+			content:        testdata.GradleWrapperProperties4102,
 			currentVersion: "4.10.2",
 			latestVersion:  "5.1",
 			upToDate:       false,

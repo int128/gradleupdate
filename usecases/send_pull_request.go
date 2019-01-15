@@ -30,18 +30,18 @@ func (usecase *SendPullRequest) Do(ctx context.Context, id domain.RepositoryID) 
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
 	}
-	props, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
 		return errors.Wrapf(err, "could not find properties file")
 	}
-	currentVersion := domain.FindGradleWrapperVersion(props.String())
+	currentVersion := domain.FindGradleWrapperVersion(gradleWrapperProperties)
 	if currentVersion == "" {
 		return errors.Errorf("could not find version in the properties")
 	}
 	if currentVersion == latestVersion {
 		return nil // branch is already up-to-date
 	}
-	newProps := domain.ReplaceGradleWrapperVersion(props.String(), latestVersion)
+	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestVersion)
 
 	base, err := usecase.RepositoryRepository.Get(ctx, id)
 	if err != nil {
