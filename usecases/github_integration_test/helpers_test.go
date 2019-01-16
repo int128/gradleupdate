@@ -1,4 +1,4 @@
-package github_integration_test
+package usecases_test
 
 import (
 	"context"
@@ -13,6 +13,8 @@ import (
 )
 
 var sandboxRepository = domain.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
+
+var forkedRepository = domain.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
 
 func newGitHubClient(t *testing.T) *github.Client {
 	t.Helper()
