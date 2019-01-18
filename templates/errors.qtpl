@@ -1,0 +1,35 @@
+{% func NotFoundError(message string) %}
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Not Found - gradleupdate</title>
+  {%= Stylesheets() %}
+</head>
+<body>
+{%= Header() %}
+<div class="container jumbotron text-center">
+  <h2>Not Found</h2>
+  <p class="lead">{%s message %}</p>
+</div>
+{%= Footer() %}
+</body>
+</html>
+{% endfunc %}
+
+{% func ServerError() %}
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>gradleupdate</title>
+  {%= Stylesheets() %}
+</head>
+<body>
+{%= Header() %}
+<div class="container jumbotron text-center">
+  <h2>Oops!</h2>
+  <p class="lead">Something wrong</p>
+</div>
+{%= Footer() %}
+</body>
+</html>
+{% endfunc %}

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"google.golang.org/appengine/log"
+	"github.com/pkg/errors"
 )
 
 type GetRepository struct {
@@ -24,11 +25,30 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.GetRepository.Do(ctx, id)
 	if err != nil {
-		log.Warningf(ctx, "could not get the repository %s: %s", id, err)
-		http.Error(w, "could not get the repository", 500)
+		if err, ok := errors.Cause(err).(usecases.GetRepositoryError); ok {
+			switch {
+			case err.NoSuchRepository():
+				w.Header().Set("content-type", "text/html")
+				w.WriteHeader(http.StatusNotFound)
+				templates.WriteNotFoundError(w, fmt.Sprintf("no such a repository %s", id))
+				return
+			case err.NoGradleVersion():
+				w.Header().Set("content-type", "text/html")
+				w.WriteHeader(http.StatusNotFound)
+				templates.WriteNotFoundError(w, fmt.Sprintf("Gradle not found in %s", id))
+				return
+			}
+		}
+		log.Printf("could not get the repository %s: %s", id, err)
+		w.Header().Set("content-type", "text/html")
+		w.WriteHeader(http.StatusInternalServerError)
+		templates.WriteServerError(w)
 		return
 	}
 
+	w.Header().Set("content-type", "text/html")
+	w.Header().Set("cache-control", "public")
+	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 	t := templates.Repository{
 		Repository:       resp.Repository,
 		CurrentVersion:   resp.CurrentVersion,
@@ -39,8 +59,5 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		RequestUpdateURL: fmt.Sprintf("/%s/%s/update", owner, repo),
 		BaseURL:          baseURL(r),
 	}
-	w.Header().Set("content-type", "text/html")
-	w.Header().Set("cache-control", "public")
-	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 	t.WritePage(w)
 }

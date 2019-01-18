@@ -47,6 +47,6 @@ func main() {
 			},
 		},
 	}
-	http.Handle("/", h.NewRouter())
+	http.Handle("/", handlers.NewRouter(h))
 	appengine.Main()
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/golang/mock/gomock"
+	"github.com/int128/gradleupdate/handlers"
 )
 
 const addr = "127.0.0.1:8080"
@@ -15,7 +16,7 @@ func main() {
 	ctrl := gomock.NewController(&testReporter{})
 	defer ctrl.Finish()
 
-	router := newHandlers(ctrl).NewRouter()
+	router := handlers.NewRouter(newHandlers(ctrl))
 	http.Handle("/", withContext(ctx, router))
 
 	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))

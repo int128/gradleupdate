@@ -17,7 +17,7 @@ type GetBadgeResponse struct {
 	UpToDate       bool
 }
 
-//go:generate mockgen -destination mock_usecases/get_repo.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces GetRepository
+//go:generate mockgen -destination mock_usecases/get_repo.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces GetRepository,GetRepositoryError
 
 type GetRepository interface {
 	Do(ctx context.Context, id domain.RepositoryID) (*GetRepositoryResponse, error)
@@ -28,6 +28,12 @@ type GetRepositoryResponse struct {
 	CurrentVersion domain.GradleVersion
 	LatestVersion  domain.GradleVersion
 	UpToDate       bool
+}
+
+type GetRepositoryError interface {
+	error
+	NoSuchRepository() bool
+	NoGradleVersion() bool
 }
 
 //go:generate mockgen -destination mock_usecases/request_update.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces RequestUpdate

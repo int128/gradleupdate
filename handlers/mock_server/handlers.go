@@ -10,7 +10,7 @@ import (
 
 var nonNil = gomock.Not(gomock.Nil())
 
-func newHandlers(ctrl *gomock.Controller) *handlers.Handlers {
+func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 	getBadge := mock_usecases.NewMockGetBadge(ctrl)
 	getRepository := mock_usecases.NewMockGetRepository(ctrl)
 	requestUpdate := mock_usecases.NewMockRequestUpdate(ctrl)
@@ -38,7 +38,7 @@ func newHandlers(ctrl *gomock.Controller) *handlers.Handlers {
 		UpToDate:       true,
 	}, nil)
 
-	return &handlers.Handlers{
+	return handlers.Handlers{
 		GetBadge: handlers.GetBadge{
 			GetBadge: getBadge,
 		},

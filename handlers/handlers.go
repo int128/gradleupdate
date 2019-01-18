@@ -14,7 +14,7 @@ type Handlers struct {
 	RequestUpdate RequestUpdate
 }
 
-func (h *Handlers) NewRouter() http.Handler {
+func NewRouter(h Handlers) http.Handler {
 	m := mux.NewRouter()
 	m.Methods("GET").Path("/").Handler(&h.Index)
 	m.Methods("POST").Path("/landing").Handler(&h.Landing)

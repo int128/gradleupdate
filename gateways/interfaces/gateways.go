@@ -46,11 +46,17 @@ type RepositoryRepository interface {
 	GetFileContent(context.Context, domain.RepositoryID, string) (domain.FileContent, error)
 	Fork(context.Context, domain.RepositoryID) (*domain.Repository, error)
 	GetBranch(ctx context.Context, branch domain.BranchID) (*domain.Branch, error)
-	IsNotFoundError(err error) bool
 }
 
 type ResponseCacheRepository interface {
 	Find(ctx context.Context, req *http.Request) (*http.Response, error)
 	Save(ctx context.Context, req *http.Request, resp *http.Response) error
 	Remove(ctx context.Context, req *http.Request) error
+}
+
+//go:generate mockgen -destination mock_gateways/errors.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces RepositoryError
+
+type RepositoryError interface {
+	error
+	NoSuchEntity() bool
 }

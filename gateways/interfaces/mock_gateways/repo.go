@@ -85,15 +85,3 @@ func (m *MockRepositoryRepository) GetFileContent(arg0 context.Context, arg1 dom
 func (mr *MockRepositoryRepositoryMockRecorder) GetFileContent(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileContent", reflect.TypeOf((*MockRepositoryRepository)(nil).GetFileContent), arg0, arg1, arg2)
 }
-
-// IsNotFoundError mocks base method
-func (m *MockRepositoryRepository) IsNotFoundError(arg0 error) bool {
-	ret := m.ctrl.Call(m, "IsNotFoundError", arg0)
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// IsNotFoundError indicates an expected call of IsNotFoundError
-func (mr *MockRepositoryRepositoryMockRecorder) IsNotFoundError(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNotFoundError", reflect.TypeOf((*MockRepositoryRepository)(nil).IsNotFoundError), arg0)
-}

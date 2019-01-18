@@ -1,4 +1,4 @@
-package usecases_test
+package usecases
 
 import (
 	"context"
@@ -8,7 +8,8 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/mock_gateways"
-	"github.com/int128/gradleupdate/usecases"
+	"github.com/int128/gradleupdate/usecases/interfaces"
+	"github.com/pkg/errors"
 )
 
 func TestGetRepository_Do(t *testing.T) {
@@ -50,7 +51,7 @@ func TestGetRepository_Do(t *testing.T) {
 			gradleService.EXPECT().GetCurrentVersion(ctx).
 				Return(c.latestVersion, nil)
 
-			u := usecases.GetRepository{
+			u := GetRepository{
 				RepositoryRepository: repositoryRepository,
 				GradleService:        gradleService,
 			}
@@ -68,5 +69,43 @@ func TestGetRepository_Do(t *testing.T) {
 				t.Errorf("UpToDate wants %v but %v", c.upToDate, resp.UpToDate)
 			}
 		})
+	}
+}
+
+func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	ctx := context.Background()
+	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+
+	repositoryError := mock_gateways.NewMockRepositoryError(ctrl)
+	repositoryError.EXPECT().NoSuchEntity().AnyTimes().Return(true)
+
+	repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
+	repositoryRepository.EXPECT().Get(ctx, repositoryID).
+		Return(nil, repositoryError)
+
+	gradleService := mock_gateways.NewMockGradleService(ctrl)
+
+	u := GetRepository{
+		RepositoryRepository: repositoryRepository,
+		GradleService:        gradleService,
+	}
+	resp, err := u.Do(ctx, repositoryID)
+	if resp != nil {
+		t.Errorf("resp wants nil but %+v", resp)
+	}
+	if err == nil {
+		t.Fatalf("err wants non-nil but nil")
+	}
+	cause, ok := errors.Cause(err).(usecases.GetRepositoryError)
+	if !ok {
+		t.Fatalf("cause wants GetRepositoryError but %T", cause)
+	}
+	if cause.NoGradleVersion() != false {
+		t.Errorf("NoGradleVersion wants false")
+	}
+	if cause.NoSuchRepository() != true {
+		t.Errorf("NoSuchRepository wants true")
 	}
 }

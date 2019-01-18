@@ -48,22 +48,8 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 		CommitMessage: req.CommitMessage,
 		CommitFiles:   req.CommitFiles,
 	}
-	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, headBranchID)
-	switch {
-	case err == nil:
-		if !headBranch.Commit.IsBasedOn(baseBranch.Commit.ID) {
-			_, err := usecase.GitService.UpdateForceBranch(ctx, pushBranchRequest)
-			if err != nil {
-				return errors.Wrapf(err, "could not push the commit to the repository %s", head)
-			}
-		}
-	case usecase.RepositoryRepository.IsNotFoundError(err):
-		_, err := usecase.GitService.CreateBranch(ctx, pushBranchRequest)
-		if err != nil {
-			return errors.Wrapf(err, "could not push the commit to the repository %s", head)
-		}
-	default:
-		return errors.Wrapf(err, "could not get the head branch %s", head)
+	if err := usecase.pushBranch(ctx, pushBranchRequest); err != nil {
+		return errors.Wrapf(err, "could not push the branch")
 	}
 
 	pull := domain.PullRequest{
@@ -82,6 +68,31 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 	}
 	if _, err := usecase.PullRequestRepository.Create(ctx, pull); err != nil {
 		return errors.Wrapf(err, "could not create a pull request %s", pull)
+	}
+	return nil
+}
+
+func (usecase *SendPullRequest) pushBranch(ctx context.Context, req gateways.PushBranchRequest) error {
+	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, req.HeadBranch)
+	if err != nil {
+		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+			switch {
+			case err.NoSuchEntity():
+				_, err := usecase.GitService.CreateBranch(ctx, req)
+				if err != nil {
+					return errors.Wrapf(err, "could not create a branch %s", req.HeadBranch)
+				}
+				return nil
+			}
+		}
+		return errors.Wrapf(err, "could not get the head branch %s", req.HeadBranch)
+	} else {
+		if !headBranch.Commit.IsBasedOn(req.BaseBranch.Commit.ID) {
+			_, err := usecase.GitService.UpdateForceBranch(ctx, req)
+			if err != nil {
+				return errors.Wrapf(err, "could not update the branch %s", req.HeadBranch)
+			}
+		}
 	}
 	return nil
 }

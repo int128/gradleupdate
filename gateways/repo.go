@@ -18,6 +18,11 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) 
 	client := r.GitHubClientFactory.New(ctx)
 	repository, _, err := client.Repositories.Get(ctx, id.Owner, id.Name)
 	if err != nil {
+		if err, ok := err.(*github.ErrorResponse); ok {
+			if err.Response.StatusCode == 404 {
+				return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "repository %s not found", id)
+			}
+		}
 		return nil, errors.Wrapf(err, "error from GitHub API")
 	}
 	return &domain.Repository{
@@ -41,10 +46,15 @@ func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.Rep
 	client := r.GitHubClientFactory.New(ctx)
 	fc, _, _, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if err != nil {
+		if err, ok := err.(*github.ErrorResponse); ok {
+			if err.Response.StatusCode == 404 {
+				return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "file %s not found", path)
+			}
+		}
 		return nil, errors.Wrapf(err, "error from GitHub API")
 	}
 	if fc == nil {
-		return nil, errors.Errorf("wants a file but got a directory %s", path)
+		return nil, errors.Wrapf(&repositoryError{noSuchEntity: true}, "want a file but got a directory %s", path)
 	}
 	if fc.GetEncoding() != "base64" {
 		return domain.FileContent([]byte(*fc.Content)), nil
@@ -89,6 +99,11 @@ func (r *RepositoryRepository) GetBranch(ctx context.Context, id domain.BranchID
 	client := r.GitHubClientFactory.New(ctx)
 	branch, _, err := client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name)
 	if err != nil {
+		if err, ok := err.(*github.ErrorResponse); ok {
+			if err.Response.StatusCode == 404 {
+				return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "branch %s not found", id)
+			}
+		}
 		return nil, errors.Wrapf(err, "error from GitHub API")
 	}
 	var parents []domain.CommitID
@@ -112,11 +127,4 @@ func (r *RepositoryRepository) GetBranch(ctx context.Context, id domain.BranchID
 			},
 		},
 	}, nil
-}
-
-func (r *RepositoryRepository) IsNotFoundError(err error) bool {
-	if resp, ok := errors.Cause(err).(*github.ErrorResponse); ok {
-		return resp.Response.StatusCode == 404
-	}
-	return false
 }
