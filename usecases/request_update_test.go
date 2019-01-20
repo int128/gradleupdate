@@ -22,6 +22,8 @@ func TestRequestUpdate_Do_UpToDate(t *testing.T) {
 	repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
 	repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
 		Return(testdata.GradleWrapperProperties4102, nil)
+	repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
+		Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
 
 	gradleService := mock_gateways.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentVersion(ctx).
@@ -34,7 +36,7 @@ func TestRequestUpdate_Do_UpToDate(t *testing.T) {
 		GradleService:        gradleService,
 		SendPullRequest:      sendPullRequest,
 	}
-	err := u.Do(ctx, repositoryID)
+	err := u.Do(ctx, repositoryID, "/owner/repo/status.svg")
 	if err != nil {
 		t.Fatalf("could not do usecase: %s", err)
 	}
@@ -49,6 +51,8 @@ func TestRequestUpdate_Do_OutOfDate(t *testing.T) {
 	repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
 	repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
 		Return(testdata.GradleWrapperProperties4102, nil)
+	repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
+		Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
 
 	gradleService := mock_gateways.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentVersion(ctx).
@@ -72,7 +76,7 @@ func TestRequestUpdate_Do_OutOfDate(t *testing.T) {
 		GradleService:        gradleService,
 		SendPullRequest:      sendPullRequest,
 	}
-	err := u.Do(ctx, repositoryID)
+	err := u.Do(ctx, repositoryID, "/owner/repo/status.svg")
 	if err != nil {
 		t.Fatalf("could not do usecase: %s", err)
 	}

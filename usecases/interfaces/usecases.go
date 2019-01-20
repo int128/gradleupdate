@@ -39,7 +39,11 @@ type GetRepositoryError interface {
 //go:generate mockgen -destination mock_usecases/request_update.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces RequestUpdate
 
 type RequestUpdate interface {
-	Do(ctx context.Context, id domain.RepositoryID) error
+	Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error
+}
+
+type RequestUpdateError interface {
+	NoBadgeInReadme() bool
 }
 
 //go:generate mockgen -destination mock_usecases/send_pull_request.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces SendPullRequest

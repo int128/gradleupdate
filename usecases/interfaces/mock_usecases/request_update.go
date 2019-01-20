@@ -35,13 +35,13 @@ func (m *MockRequestUpdate) EXPECT() *MockRequestUpdateMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockRequestUpdate) Do(arg0 context.Context, arg1 domain.RepositoryID) error {
-	ret := m.ctrl.Call(m, "Do", arg0, arg1)
+func (m *MockRequestUpdate) Do(arg0 context.Context, arg1 domain.RepositoryID, arg2 string) error {
+	ret := m.ctrl.Call(m, "Do", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Do indicates an expected call of Do
-func (mr *MockRequestUpdateMockRecorder) Do(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockRequestUpdate)(nil).Do), arg0, arg1)
+func (mr *MockRequestUpdateMockRecorder) Do(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockRequestUpdate)(nil).Do), arg0, arg1, arg2)
 }

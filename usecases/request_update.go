@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -10,16 +11,24 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RequestUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type RequestUpdate struct {
 	GradleService        gateways.GradleService
 	RepositoryRepository gateways.RepositoryRepository
 	SendPullRequest      usecases.SendPullRequest
 }
 
-func (usecase *RequestUpdate) Do(ctx context.Context, id domain.RepositoryID) error {
+func (usecase *RequestUpdate) Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
 	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
+	}
+	readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
+	if err != nil {
+		return errors.Wrapf(err, "could not find readme file")
+	}
+	if !bytes.Contains(readme, []byte(badgeURL)) {
+		return errors.Wrapf(&requestUpdateError{noBadgeInReadme: true}, "readme did not contain any badge URL")
 	}
 	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
 	if err != nil {
@@ -52,3 +61,10 @@ func (usecase *RequestUpdate) Do(ctx context.Context, id domain.RepositoryID) er
 	}
 	return nil
 }
+
+type requestUpdateError struct {
+	error
+	noBadgeInReadme bool
+}
+
+func (err *requestUpdateError) NoBadgeInReadme() bool { return err.noBadgeInReadme }

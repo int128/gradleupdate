@@ -85,3 +85,16 @@ func (m *MockRepositoryRepository) GetFileContent(arg0 context.Context, arg1 dom
 func (mr *MockRepositoryRepositoryMockRecorder) GetFileContent(arg0, arg1, arg2 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileContent", reflect.TypeOf((*MockRepositoryRepository)(nil).GetFileContent), arg0, arg1, arg2)
 }
+
+// GetReadme mocks base method
+func (m *MockRepositoryRepository) GetReadme(arg0 context.Context, arg1 domain.RepositoryID) (domain.FileContent, error) {
+	ret := m.ctrl.Call(m, "GetReadme", arg0, arg1)
+	ret0, _ := ret[0].(domain.FileContent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetReadme indicates an expected call of GetReadme
+func (mr *MockRepositoryRepositoryMockRecorder) GetReadme(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReadme", reflect.TypeOf((*MockRepositoryRepository)(nil).GetReadme), arg0, arg1)
+}

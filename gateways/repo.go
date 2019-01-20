@@ -64,8 +64,29 @@ func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.Rep
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not decode base64")
 	}
-	content := buf[:n]
-	return domain.FileContent(content), nil
+	return domain.FileContent(buf[:n]), nil
+}
+
+func (r *RepositoryRepository) GetReadme(ctx context.Context, id domain.RepositoryID) (domain.FileContent, error) {
+	client := r.GitHubClientFactory.New(ctx)
+	fc, _, err := client.Repositories.GetReadme(ctx, id.Owner, id.Name, nil)
+	if err != nil {
+		if err, ok := err.(*github.ErrorResponse); ok {
+			if err.Response.StatusCode == 404 {
+				return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "readme not found")
+			}
+		}
+		return nil, errors.Wrapf(err, "error from GitHub API")
+	}
+	if fc.GetEncoding() != "base64" {
+		return domain.FileContent([]byte(*fc.Content)), nil
+	}
+	buf := make([]byte, base64.StdEncoding.DecodedLen(len(*fc.Content)))
+	n, err := base64.StdEncoding.Decode(buf, []byte(*fc.Content))
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not decode base64")
+	}
+	return domain.FileContent(buf[:n]), nil
 }
 
 func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {

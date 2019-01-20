@@ -44,6 +44,7 @@ type PullRequestRepository interface {
 type RepositoryRepository interface {
 	Get(context.Context, domain.RepositoryID) (*domain.Repository, error)
 	GetFileContent(context.Context, domain.RepositoryID, string) (domain.FileContent, error)
+	GetReadme(ctx context.Context, id domain.RepositoryID) (domain.FileContent, error)
 	Fork(context.Context, domain.RepositoryID) (*domain.Repository, error)
 	GetBranch(ctx context.Context, branch domain.BranchID) (*domain.Branch, error)
 }
