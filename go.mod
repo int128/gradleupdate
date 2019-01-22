@@ -1,6 +1,8 @@
 module github.com/int128/gradleupdate
 
 require (
+	github.com/favclip/testerator v0.0.0-20181109065310-c967692c9c65
+	github.com/go-test/deep v1.0.1
 	github.com/golang/mock v1.1.1
 	github.com/google/go-github/v18 v18.2.0
 	github.com/gorilla/mux v1.6.2
