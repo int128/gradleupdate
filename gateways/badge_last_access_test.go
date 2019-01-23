@@ -10,7 +10,7 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
-func TestBadgeLastAccessRepository_Put(t *testing.T) {
+func TestBadgeLastAccessRepository_Save(t *testing.T) {
 	_, ctx, err := testerator.SpinUp()
 	if err != nil {
 		t.Fatalf("could not spin up appengine context: %s", err)
@@ -19,7 +19,7 @@ func TestBadgeLastAccessRepository_Put(t *testing.T) {
 	var r BadgeLastAccessRepository
 	baseTime := time.Now()
 
-	if err := r.Put(ctx, domain.BadgeLastAccess{
+	if err := r.Save(ctx, domain.BadgeLastAccess{
 		Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
 		LatestVersion:  "5.0",
 		CurrentVersion: "4.1",

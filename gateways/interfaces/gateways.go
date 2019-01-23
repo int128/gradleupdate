@@ -11,7 +11,7 @@ import (
 //go:generate mockgen -destination mock_gateways/badge_last_access.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository
 
 type BadgeLastAccessRepository interface {
-	Put(context.Context, domain.BadgeLastAccess) error
+	Save(ctx context.Context, a domain.BadgeLastAccess) error
 	FindBySince(ctx context.Context, since time.Time) ([]domain.BadgeLastAccess, error)
 }
 

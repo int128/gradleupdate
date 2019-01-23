@@ -29,7 +29,7 @@ type badgeLastAccessEntityOld struct {
 
 type BadgeLastAccessRepository struct{}
 
-func (r *BadgeLastAccessRepository) Put(ctx context.Context, a domain.BadgeLastAccess) error {
+func (r *BadgeLastAccessRepository) Save(ctx context.Context, a domain.BadgeLastAccess) error {
 	k := newBadgeLastAccessKey(ctx, a.Repository)
 	_, err := datastore.Put(ctx, k, &badgeLastAccessEntity{
 		LastAccessTime: a.LastAccessTime,

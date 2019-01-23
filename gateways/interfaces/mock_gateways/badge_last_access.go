@@ -48,14 +48,14 @@ func (mr *MockBadgeLastAccessRepositoryMockRecorder) FindBySince(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindBySince", reflect.TypeOf((*MockBadgeLastAccessRepository)(nil).FindBySince), arg0, arg1)
 }
 
-// Put mocks base method
-func (m *MockBadgeLastAccessRepository) Put(arg0 context.Context, arg1 domain.BadgeLastAccess) error {
-	ret := m.ctrl.Call(m, "Put", arg0, arg1)
+// Save mocks base method
+func (m *MockBadgeLastAccessRepository) Save(arg0 context.Context, arg1 domain.BadgeLastAccess) error {
+	ret := m.ctrl.Call(m, "Save", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Put indicates an expected call of Put
-func (mr *MockBadgeLastAccessRepositoryMockRecorder) Put(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Put", reflect.TypeOf((*MockBadgeLastAccessRepository)(nil).Put), arg0, arg1)
+// Save indicates an expected call of Save
+func (mr *MockBadgeLastAccessRepositoryMockRecorder) Save(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockBadgeLastAccessRepository)(nil).Save), arg0, arg1)
 }

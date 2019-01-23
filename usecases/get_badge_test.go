@@ -51,7 +51,7 @@ func TestGetBadge_Do(t *testing.T) {
 				Return(c.latestVersion, nil)
 
 			badgeLastAccessRepository := mock_gateways.NewMockBadgeLastAccessRepository(ctrl)
-			badgeLastAccessRepository.EXPECT().Put(ctx, domain.BadgeLastAccess{
+			badgeLastAccessRepository.EXPECT().Save(ctx, domain.BadgeLastAccess{
 				Repository:     repositoryID,
 				CurrentVersion: c.currentVersion,
 				LatestVersion:  c.latestVersion,

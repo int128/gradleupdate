@@ -32,7 +32,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*useca
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
 
-	if err := usecase.BadgeLastAccessRepository.Put(ctx, domain.BadgeLastAccess{
+	if err := usecase.BadgeLastAccessRepository.Save(ctx, domain.BadgeLastAccess{
 		Repository:     id,
 		LastAccessTime: usecase.Now(),
 		CurrentVersion: currentVersion,
