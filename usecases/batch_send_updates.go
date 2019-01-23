@@ -12,10 +12,10 @@ import (
 )
 
 type BatchSendUpdates struct {
+	TimeProvider
 	GradleService             gateways.GradleService
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	SendUpdate                usecases.SendUpdate
-	NowFunc                   func() time.Time
 }
 
 func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
@@ -41,11 +41,4 @@ func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
 		}
 	}
 	return nil
-}
-
-func (usecase *BatchSendUpdates) Now() time.Time {
-	if usecase.NowFunc != nil {
-		return usecase.NowFunc()
-	}
-	return time.Now()
 }

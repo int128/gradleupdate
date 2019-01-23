@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
@@ -14,11 +13,11 @@ import (
 
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
+	TimeProvider
 	GradleService                gateways.GradleService
 	RepositoryRepository         gateways.RepositoryRepository
 	RepositoryLastScanRepository gateways.RepositoryLastScanRepository
 	SendPullRequest              usecases.SendPullRequest
-	NowFunc                      func() time.Time
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
@@ -97,13 +96,6 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 		return errors.Wrapf(err, "error while sending a pull request %+v", req)
 	}
 	return nil
-}
-
-func (usecase *SendUpdate) Now() time.Time {
-	if usecase.NowFunc != nil {
-		return usecase.NowFunc()
-	}
-	return time.Now()
 }
 
 type sendUpdateError struct {

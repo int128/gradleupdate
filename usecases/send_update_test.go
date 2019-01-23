@@ -58,7 +58,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err != nil {
@@ -89,7 +89,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -127,7 +127,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -165,7 +165,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -204,7 +204,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -244,7 +244,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			NowFunc:                      func() time.Time { return now },
+			TimeProvider:                 func() time.Time { return now },
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {

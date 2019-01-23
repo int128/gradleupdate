@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"time"
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
@@ -12,10 +11,10 @@ import (
 )
 
 type GetBadge struct {
+	TimeProvider
 	GradleService             gateways.GradleService
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
-	NowFunc                   func() time.Time
 }
 
 func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetBadgeResponse, error) {
@@ -44,11 +43,4 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*useca
 		CurrentVersion: currentVersion,
 		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
 	}, nil
-}
-
-func (usecase *GetBadge) Now() time.Time {
-	if usecase.NowFunc != nil {
-		return usecase.NowFunc()
-	}
-	return time.Now()
 }

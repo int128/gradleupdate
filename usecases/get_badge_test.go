@@ -62,7 +62,7 @@ func TestGetBadge_Do(t *testing.T) {
 				RepositoryRepository:      repositoryRepository,
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
-				NowFunc:                   func() time.Time { return now },
+				TimeProvider:              func() time.Time { return now },
 			}
 			resp, err := u.Do(ctx, repositoryID)
 			if err != nil {
@@ -75,13 +75,5 @@ func TestGetBadge_Do(t *testing.T) {
 				t.Errorf("UpToDate wants %v but %v", c.upToDate, resp.UpToDate)
 			}
 		})
-	}
-}
-
-func TestGetBadge_Now(t *testing.T) {
-	u := usecases.GetBadge{}
-	now := u.Now()
-	if now.IsZero() {
-		t.Errorf("now wants non-zero but zero")
 	}
 }

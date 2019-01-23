@@ -41,17 +41,9 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		GradleService:             gradleService,
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
-		NowFunc:                   func() time.Time { return now },
+		TimeProvider:              func() time.Time { return now },
 	}
 	if err := u.Do(ctx); err != nil {
 		t.Fatalf("could not do the use case: %s", err)
-	}
-}
-
-func TestBatchSendUpdates_Now(t *testing.T) {
-	u := usecases.BatchSendUpdates{}
-	now := u.Now()
-	if now.IsZero() {
-		t.Errorf("now wants non-zero but zero")
 	}
 }
