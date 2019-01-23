@@ -36,14 +36,21 @@ type GetRepositoryError interface {
 	NoGradleVersion() bool
 }
 
-//go:generate mockgen -destination mock_usecases/request_update.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces RequestUpdate
+//go:generate mockgen -destination mock_usecases/send_update.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces SendUpdate
 
-type RequestUpdate interface {
+type SendUpdate interface {
 	Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error
 }
 
-type RequestUpdateError interface {
-	NoBadgeInReadme() bool
+type SendUpdateError interface {
+	error
+	NoGradleVersion() bool
+	NoReadmeBadge() bool
+	AlreadyHasLatestGradle() bool
+}
+
+type BatchSendUpdates interface {
+	Do(ctx context.Context) error
 }
 
 //go:generate mockgen -destination mock_usecases/send_pull_request.go -package mock_usecases github.com/int128/gradleupdate/usecases/interfaces SendPullRequest

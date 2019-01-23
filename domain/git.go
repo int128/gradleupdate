@@ -11,12 +11,12 @@ type RepositoryID struct {
 	Name  string
 }
 
-func (r RepositoryID) FullName() string {
-	return r.Owner + "/" + r.Name
+func (r RepositoryID) FullName() RepositoryFullName {
+	return RepositoryFullName(r.Owner + "/" + r.Name)
 }
 
 func (r RepositoryID) String() string {
-	return r.FullName()
+	return r.FullName().String()
 }
 
 // Repository represents a GitHub repository.
@@ -29,6 +29,18 @@ type Repository struct {
 
 func (r Repository) String() string {
 	return r.ID.String()
+}
+
+// RepositoryFullName represents full name of a repository as owner/repo.
+type RepositoryFullName string
+
+// Parse returns owner and repo for the repository.
+func (fullName RepositoryFullName) Parse() *RepositoryID {
+	return RepositoryURL(fullName).Parse()
+}
+
+func (fullName RepositoryFullName) String() string {
+	return string(fullName)
 }
 
 // RepositoryURL represents URL for a GitHub repository.

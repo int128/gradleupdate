@@ -1,8 +1,14 @@
 runtime: go111
 handlers:
-- url: /static
-  static_dir: static
-- url: /.*
-  script: auto
+  - url: /internal/.*
+    script: auto
+    login: admin
+
+  - url: /static
+    static_dir: static
+
+  - url: /.*
+    script: auto
+
 includes:
-- .env.yaml
+  - .env.yaml

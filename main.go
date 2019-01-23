@@ -21,6 +21,16 @@ func main() {
 			ResponseCacheRepository: &gateways.ResponseCacheRepository{},
 		},
 	}
+	sendUpdate := &usecases.SendUpdate{
+		GradleService:                gradleService,
+		RepositoryRepository:         &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
+		RepositoryLastScanRepository: &gateways.RepositoryLastScanRepository{},
+		SendPullRequest: &usecases.SendPullRequest{
+			RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
+			PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
+			GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
+		},
+	}
 	h := handlers.Handlers{
 		GetRepository: handlers.GetRepository{
 			GetRepository: &usecases.GetRepository{
@@ -35,15 +45,14 @@ func main() {
 				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
 			},
 		},
-		RequestUpdate: handlers.RequestUpdate{
-			RequestUpdate: &usecases.RequestUpdate{
-				GradleService:        gradleService,
-				RepositoryRepository: &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
-				SendPullRequest: &usecases.SendPullRequest{
-					RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
-					PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
-					GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
-				},
+		SendUpdate: handlers.SendUpdate{
+			SendUpdate: sendUpdate,
+		},
+		BatchSendUpdates: handlers.BatchSendUpdates{
+			BatchSendUpdates: &usecases.BatchSendUpdates{
+				GradleService:             gradleService,
+				BadgeLastAccessRepository: &gateways.BadgeLastAccessRepository{},
+				SendUpdate:                sendUpdate,
 			},
 		},
 	}

@@ -12,21 +12,21 @@ import (
 	"google.golang.org/appengine/log"
 )
 
-type RequestUpdate struct {
-	RequestUpdate usecases.RequestUpdate
+type SendUpdate struct {
+	SendUpdate usecases.SendUpdate
 }
 
-func (h *RequestUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 	id := domain.RepositoryID{Owner: owner, Name: repo}
 	badgeURL := fmt.Sprintf("/%s/%s/status.svg", owner, repo)
 
-	if err := h.RequestUpdate.Do(ctx, id, badgeURL); err != nil {
-		if err, ok := errors.Cause(err).(usecases.RequestUpdateError); ok {
+	if err := h.SendUpdate.Do(ctx, id, badgeURL); err != nil {
+		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
 			switch {
-			case err.NoBadgeInReadme():
+			case err.NoReadmeBadge():
 				w.Header().Set("content-type", "text/html")
 				w.WriteHeader(http.StatusNotFound)
 				//TODO: replace with a dedicated error page

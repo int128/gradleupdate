@@ -3,6 +3,7 @@ package gateways
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/int128/gradleupdate/domain"
 )
@@ -10,8 +11,14 @@ import (
 //go:generate mockgen -destination mock_gateways/badge_last_access.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository
 
 type BadgeLastAccessRepository interface {
-	Get(context.Context, domain.RepositoryID) (*domain.BadgeLastAccess, error)
 	Put(context.Context, domain.BadgeLastAccess) error
+	FindBySince(ctx context.Context, since time.Time) ([]domain.BadgeLastAccess, error)
+}
+
+//go:generate mockgen -destination mock_gateways/repo_last_scan.go -package mock_gateways github.com/int128/gradleupdate/gateways/interfaces RepositoryLastScanRepository
+
+type RepositoryLastScanRepository interface {
+	Save(ctx context.Context, a domain.RepositoryLastScan) error
 }
 
 type PushBranchRequest struct {

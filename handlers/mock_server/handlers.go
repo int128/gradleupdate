@@ -13,7 +13,7 @@ var nonNil = gomock.Not(gomock.Nil())
 func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 	getBadge := mock_usecases.NewMockGetBadge(ctrl)
 	getRepository := mock_usecases.NewMockGetRepository(ctrl)
-	requestUpdate := mock_usecases.NewMockRequestUpdate(ctrl)
+	sendUpdate := mock_usecases.NewMockSendUpdate(ctrl)
 
 	var exampleRepository = domain.RepositoryID{Owner: "int128", Name: "gradleupdate"}
 	getBadge.EXPECT().Do(nonNil, exampleRepository).AnyTimes().Return(&usecases.GetBadgeResponse{
@@ -30,7 +30,7 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 		CurrentVersion: "5.0",
 		UpToDate:       false,
 	}, nil)
-	requestUpdate.EXPECT().Do(nonNil, exampleRepository, "/int128/gradleupdate/status.svg").AnyTimes().Return(nil)
+	sendUpdate.EXPECT().Do(nonNil, exampleRepository, "/int128/gradleupdate/status.svg").AnyTimes().Return(nil)
 
 	var latestRepository = domain.RepositoryID{Owner: "int128", Name: "latest-gradle-wrapper"}
 	getBadge.EXPECT().Do(nonNil, latestRepository).AnyTimes().Return(&usecases.GetBadgeResponse{
@@ -45,8 +45,8 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 		GetRepository: handlers.GetRepository{
 			GetRepository: getRepository,
 		},
-		RequestUpdate: handlers.RequestUpdate{
-			RequestUpdate: requestUpdate,
+		SendUpdate: handlers.SendUpdate{
+			SendUpdate: sendUpdate,
 		},
 	}
 }

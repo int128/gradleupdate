@@ -7,11 +7,12 @@ import (
 )
 
 type Handlers struct {
-	Index         Index
-	Landing       Landing
-	GetRepository GetRepository
-	GetBadge      GetBadge
-	RequestUpdate RequestUpdate
+	Index            Index
+	Landing          Landing
+	GetRepository    GetRepository
+	GetBadge         GetBadge
+	SendUpdate       SendUpdate
+	BatchSendUpdates BatchSendUpdates
 }
 
 func NewRouter(h Handlers) http.Handler {
@@ -20,7 +21,8 @@ func NewRouter(h Handlers) http.Handler {
 	m.Methods("POST").Path("/landing").Handler(&h.Landing)
 	m.Methods("GET").Path("/{owner}/{repo}/status").Handler(&h.GetRepository)
 	m.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&h.GetBadge)
-	m.Methods("POST").Path("/{owner}/{repo}/update").Handler(&h.RequestUpdate)
+	m.Methods("POST").Path("/{owner}/{repo}/update").Handler(&h.SendUpdate)
+	m.Methods("POST").Path("/internal/scan-updates").Handler(&h.BatchSendUpdates)
 	return m
 }
 

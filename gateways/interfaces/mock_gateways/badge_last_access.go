@@ -9,6 +9,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/int128/gradleupdate/domain"
 	reflect "reflect"
+	time "time"
 )
 
 // MockBadgeLastAccessRepository is a mock of BadgeLastAccessRepository interface
@@ -34,17 +35,17 @@ func (m *MockBadgeLastAccessRepository) EXPECT() *MockBadgeLastAccessRepositoryM
 	return m.recorder
 }
 
-// Get mocks base method
-func (m *MockBadgeLastAccessRepository) Get(arg0 context.Context, arg1 domain.RepositoryID) (*domain.BadgeLastAccess, error) {
-	ret := m.ctrl.Call(m, "Get", arg0, arg1)
-	ret0, _ := ret[0].(*domain.BadgeLastAccess)
+// FindBySince mocks base method
+func (m *MockBadgeLastAccessRepository) FindBySince(arg0 context.Context, arg1 time.Time) ([]domain.BadgeLastAccess, error) {
+	ret := m.ctrl.Call(m, "FindBySince", arg0, arg1)
+	ret0, _ := ret[0].([]domain.BadgeLastAccess)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Get indicates an expected call of Get
-func (mr *MockBadgeLastAccessRepositoryMockRecorder) Get(arg0, arg1 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockBadgeLastAccessRepository)(nil).Get), arg0, arg1)
+// FindBySince indicates an expected call of FindBySince
+func (mr *MockBadgeLastAccessRepositoryMockRecorder) FindBySince(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindBySince", reflect.TypeOf((*MockBadgeLastAccessRepository)(nil).FindBySince), arg0, arg1)
 }
 
 // Put mocks base method
