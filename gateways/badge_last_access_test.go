@@ -17,13 +17,13 @@ func TestBadgeLastAccessRepository_Save(t *testing.T) {
 	}
 	defer testerator.SpinDown()
 	var r BadgeLastAccessRepository
-	baseTime := time.Now()
+	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
 
 	if err := r.Save(ctx, domain.BadgeLastAccess{
 		Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
 		LatestVersion:  "5.0",
 		CurrentVersion: "4.1",
-		LastAccessTime: baseTime,
+		LastAccessTime: now,
 	}); err != nil {
 		t.Fatalf("could not put the BadgeLastAccess: %s", err)
 	}
@@ -43,7 +43,7 @@ func TestBadgeLastAccessRepository_Save(t *testing.T) {
 		{
 			LatestVersion:  "5.0",
 			CurrentVersion: "4.1",
-			LastAccessTime: baseTime,
+			LastAccessTime: now,
 		},
 	}
 	if diff := deep.Equal(want, entities); diff != nil {
@@ -58,15 +58,16 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 	}
 	defer testerator.SpinDown()
 	var r BadgeLastAccessRepository
-	baseTime := time.Now()
+	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
+
 	t.Run("setup", func(t *testing.T) {
 		keys := []*datastore.Key{
 			newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo1"}),
 			newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo2"}),
 		}
 		entities := []*badgeLastAccessEntity{
-			{LastAccessTime: baseTime.Add(-1 * 24 * time.Hour), CurrentVersion: "4.1", LatestVersion: "5.0"},
-			{LastAccessTime: baseTime.Add(-2 * 24 * time.Hour), CurrentVersion: "4.2", LatestVersion: "5.0"},
+			{LastAccessTime: now.Add(-1 * 24 * time.Hour), CurrentVersion: "4.1", LatestVersion: "5.0"},
+			{LastAccessTime: now.Add(-2 * 24 * time.Hour), CurrentVersion: "4.2", LatestVersion: "5.0"},
 		}
 		if _, err := datastore.PutMulti(ctx, keys, entities); err != nil {
 			t.Fatalf("could not save entities: %s", err)
@@ -74,7 +75,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		//TODO: remove after migration
 		k := newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo3"})
 		e := badgeLastAccessEntityOld{
-			badgeLastAccessEntity{LastAccessTime: baseTime.Add(-3 * 24 * time.Hour), LatestVersion: "5.0"},
+			badgeLastAccessEntity{LastAccessTime: now.Add(-3 * 24 * time.Hour), LatestVersion: "5.0"},
 			"4.3",
 		}
 		if _, err := datastore.Put(ctx, k, &e); err != nil {
@@ -83,7 +84,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 	})
 
 	t.Run("0 day ago", func(t *testing.T) {
-		found, err := r.FindBySince(ctx, baseTime)
+		found, err := r.FindBySince(ctx, now)
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
@@ -92,14 +93,14 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 	})
 	t.Run("1 day ago", func(t *testing.T) {
-		found, err := r.FindBySince(ctx, baseTime.Add(-1*24*time.Hour))
+		found, err := r.FindBySince(ctx, now.Add(-1*24*time.Hour))
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
 		want := []domain.BadgeLastAccess{
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
-				LastAccessTime: baseTime.Add(-1 * 24 * time.Hour),
+				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
 			},
@@ -109,20 +110,20 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 	})
 	t.Run("2 days ago", func(t *testing.T) {
-		found, err := r.FindBySince(ctx, baseTime.Add(-2*24*time.Hour))
+		found, err := r.FindBySince(ctx, now.Add(-2*24*time.Hour))
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
 		want := []domain.BadgeLastAccess{
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
-				LastAccessTime: baseTime.Add(-1 * 24 * time.Hour),
+				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
 			},
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo2"},
-				LastAccessTime: baseTime.Add(-2 * 24 * time.Hour),
+				LastAccessTime: now.Add(-2 * 24 * time.Hour),
 				CurrentVersion: "4.2",
 				LatestVersion:  "5.0",
 			},
@@ -132,26 +133,26 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 	})
 	t.Run("3 days ago", func(t *testing.T) {
-		found, err := r.FindBySince(ctx, baseTime.Add(-3*24*time.Hour))
+		found, err := r.FindBySince(ctx, now.Add(-3*24*time.Hour))
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
 		want := []domain.BadgeLastAccess{
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
-				LastAccessTime: baseTime.Add(-1 * 24 * time.Hour),
+				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
 			},
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo2"},
-				LastAccessTime: baseTime.Add(-2 * 24 * time.Hour),
+				LastAccessTime: now.Add(-2 * 24 * time.Hour),
 				CurrentVersion: "4.2",
 				LatestVersion:  "5.0",
 			},
 			{
 				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo3"},
-				LastAccessTime: baseTime.Add(-3 * 24 * time.Hour),
+				LastAccessTime: now.Add(-3 * 24 * time.Hour),
 				CurrentVersion: "4.3",
 				LatestVersion:  "5.0",
 			},
