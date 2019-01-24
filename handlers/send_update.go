@@ -9,10 +9,12 @@ import (
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/log"
 )
 
 type SendUpdate struct {
+	dig.In
 	SendUpdate usecases.SendUpdate
 }
 

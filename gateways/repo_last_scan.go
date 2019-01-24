@@ -6,6 +6,7 @@ import (
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -22,7 +23,9 @@ type repositoryLastScanEntity struct {
 	AlreadyLatestGradleError bool
 }
 
-type RepositoryLastScanRepository struct{}
+type RepositoryLastScanRepository struct {
+	dig.In
+}
 
 func (r *RepositoryLastScanRepository) Save(ctx context.Context, a domain.RepositoryLastScan) error {
 	k := newRepositoryLastScanKey(ctx, a.Repository)

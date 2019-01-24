@@ -9,6 +9,7 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/quicktemplate v1.0.0
+	go.uber.org/dig v1.7.0
 	golang.org/x/net v0.0.0-20181114220301-adae6a3d119a // indirect
 	golang.org/x/oauth2 v0.0.0-20181106182150-f42d05182288
 	google.golang.org/appengine v1.3.0

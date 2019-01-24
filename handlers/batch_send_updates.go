@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/usecases/interfaces"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/log"
 )
 
 type BatchSendUpdates struct {
+	dig.In
 	BatchSendUpdates usecases.BatchSendUpdates
 }
 

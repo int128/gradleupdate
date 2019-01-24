@@ -11,9 +11,11 @@ import (
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 )
 
 type GetRepository struct {
+	dig.In
 	GetRepository usecases.GetRepository
 }
 

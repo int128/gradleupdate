@@ -5,10 +5,13 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/domain"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/log"
 )
 
-type Landing struct{}
+type Landing struct {
+	dig.In
+}
 
 func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

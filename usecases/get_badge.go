@@ -7,11 +7,13 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/log"
 )
 
 type GetBadge struct {
-	TimeProvider
+	dig.In
+	TimeProvider              `optional:"true"`
 	GradleService             gateways.GradleService
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository

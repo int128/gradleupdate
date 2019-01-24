@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/memcache"
 )
 
@@ -28,7 +29,9 @@ func computeResponseCacheKey(req *http.Request) string {
 	return e
 }
 
-type ResponseCacheRepository struct{}
+type ResponseCacheRepository struct {
+	dig.In
+}
 
 func (r *ResponseCacheRepository) Find(ctx context.Context, req *http.Request) (*http.Response, error) {
 	key := computeResponseCacheKey(req)

@@ -8,10 +8,12 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/log"
 )
 
 type GetBadge struct {
+	dig.In
 	GetBadge usecases.GetBadge
 }
 

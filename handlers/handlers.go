@@ -4,9 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"go.uber.org/dig"
 )
 
 type Handlers struct {
+	dig.In
 	Index            Index
 	Landing          Landing
 	GetRepository    GetRepository

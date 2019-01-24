@@ -4,12 +4,14 @@ import (
 	"context"
 
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/infrastructure"
+	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 )
 
 type GradleService struct {
-	GradleClient *infrastructure.GradleClient
+	dig.In
+	GradleClient infrastructure.GradleClient
 }
 
 func (s *GradleService) GetCurrentVersion(ctx context.Context) (domain.GradleVersion, error) {

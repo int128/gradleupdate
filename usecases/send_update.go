@@ -9,11 +9,13 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 )
 
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
-	TimeProvider
+	dig.In
+	TimeProvider                 `optional:"true"`
 	GradleService                gateways.GradleService
 	RepositoryRepository         gateways.RepositoryRepository
 	RepositoryLastScanRepository gateways.RepositoryLastScanRepository

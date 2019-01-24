@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"github.com/int128/gradleupdate/templates"
+	"go.uber.org/dig"
 )
 
-type Index struct{}
+type Index struct {
+	dig.In
+}
 
 func (h *Index) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")

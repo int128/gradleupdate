@@ -6,6 +6,7 @@ import (
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -27,7 +28,9 @@ type badgeLastAccessEntityOld struct {
 	TargetVersion string
 }
 
-type BadgeLastAccessRepository struct{}
+type BadgeLastAccessRepository struct {
+	dig.In
+}
 
 func (r *BadgeLastAccessRepository) Save(ctx context.Context, a domain.BadgeLastAccess) error {
 	k := newBadgeLastAccessKey(ctx, a.Repository)

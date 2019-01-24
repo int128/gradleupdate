@@ -8,9 +8,11 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 )
 
 type RepositoryRepository struct {
+	dig.In
 	GitHubClientFactory infrastructure.GitHubClientFactory
 }
 

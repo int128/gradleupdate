@@ -7,11 +7,14 @@ import (
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/infrastructure/httpcache"
+	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 	"google.golang.org/appengine/urlfetch"
 )
 
 type GradleClient struct {
+	dig.In
 	ResponseCacheRepository gateways.ResponseCacheRepository
 }
 
@@ -23,23 +26,7 @@ func (c *GradleClient) newClient(ctx context.Context) *http.Client {
 	return &http.Client{Transport: transport}
 }
 
-type CurrentVersionResponse struct {
-	Version            string `json:"version"`
-	BuildTime          string `json:"buildTime"`
-	Current            bool   `json:"current"`
-	Snapshot           bool   `json:"snapshot"`
-	Nightly            bool   `json:"nightly"`
-	ReleaseNightly     bool   `json:"releaseNightly"`
-	ActiveRc           bool   `json:"activeRc"`
-	RcFor              string `json:"rcFor"`
-	MilestoneFor       string `json:"milestoneFor"`
-	Broken             bool   `json:"broken"`
-	DownloadURL        string `json:"downloadUrl"`
-	ChecksumURL        string `json:"checksumUrl"`
-	WrapperChecksumURL string `json:"wrapperChecksumUrl"`
-}
-
-func (c *GradleClient) GetCurrentVersion(ctx context.Context) (*CurrentVersionResponse, error) {
+func (c *GradleClient) GetCurrentVersion(ctx context.Context) (*infrastructure.CurrentVersionResponse, error) {
 	client := c.newClient(ctx)
 	resp, err := client.Get("https://services.gradle.org/versions/current")
 	if err != nil {
@@ -47,7 +34,7 @@ func (c *GradleClient) GetCurrentVersion(ctx context.Context) (*CurrentVersionRe
 	}
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
-	var cvr CurrentVersionResponse
+	var cvr infrastructure.CurrentVersionResponse
 	if err := d.Decode(&cvr); err != nil {
 		return nil, errors.Wrapf(err, "error while decoding JSON response from Gradle Service")
 	}

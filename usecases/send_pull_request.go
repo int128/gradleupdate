@@ -7,9 +7,11 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
+	"go.uber.org/dig"
 )
 
 type SendPullRequest struct {
+	dig.In
 	RepositoryRepository  gateways.RepositoryRepository
 	PullRequestRepository gateways.PullRequestRepository
 	GitService            gateways.GitService
