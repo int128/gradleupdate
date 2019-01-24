@@ -22,14 +22,19 @@ type GradleClient struct {
 func (c *GradleClient) newClient(ctx context.Context) *http.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
-	transport = &loggingTransport{Transport: transport, Context: ctx, Name: "GradleClient", Logger: c.Logger}
-	transport = &httpcache.Transport{Transport: transport, Context: ctx, ResponseCacheRepository: c.ResponseCacheRepository, Logger: c.Logger}
+	transport = &loggingTransport{Transport: transport, Name: "GradleClient", Logger: c.Logger}
+	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: c.ResponseCacheRepository, Logger: c.Logger}
 	return &http.Client{Transport: transport}
 }
 
 func (c *GradleClient) GetCurrentVersion(ctx context.Context) (*infrastructure.CurrentVersionResponse, error) {
 	client := c.newClient(ctx)
-	resp, err := client.Get("https://services.gradle.org/versions/current")
+	req, err := http.NewRequest("GET", "https://services.gradle.org/versions/current", nil)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error while creating a HTTP request")
+	}
+	req = req.WithContext(ctx)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error while getting the current version from Gradle Service")
 	}
