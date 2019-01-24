@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -17,6 +17,7 @@ import (
 type GetRepository struct {
 	dig.In
 	GetRepository usecases.GetRepository
+	Logger        gateways.Logger
 }
 
 func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +42,7 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		log.Printf("could not get the repository %s: %s", id, err)
+		h.Logger.Errorf(ctx, "could not get the repository %s: %s", id, err)
 		w.Header().Set("content-type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)
 		templates.WriteServerError(w)

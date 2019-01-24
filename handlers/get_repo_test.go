@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces/mock_usecases"
@@ -21,7 +22,10 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 		Return(&usecases.GetRepositoryResponse{}, nil)
 
 	h := handlers.NewRouter(handlers.Handlers{
-		GetRepository: handlers.GetRepository{GetRepository: getRepository},
+		GetRepository: handlers.GetRepository{
+			GetRepository: getRepository,
+			Logger:        testing_logger.New(t),
+		},
 	})
 	r := httptest.NewRequest("GET", "/owner/repo/status", nil)
 	w := httptest.NewRecorder()
@@ -66,7 +70,10 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 			Return(nil, c.getRepositoryError)
 
 		h := handlers.NewRouter(handlers.Handlers{
-			GetRepository: handlers.GetRepository{GetRepository: getRepository},
+			GetRepository: handlers.GetRepository{
+				GetRepository: getRepository,
+				Logger:        testing_logger.New(t),
+			},
 		})
 		r := httptest.NewRequest("GET", "/owner/repo/status", nil)
 		w := httptest.NewRecorder()

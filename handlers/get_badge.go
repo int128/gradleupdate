@@ -6,15 +6,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"go.uber.org/dig"
-	"google.golang.org/appengine/log"
 )
 
 type GetBadge struct {
 	dig.In
 	GetBadge usecases.GetBadge
+	Logger   gateways.Logger
 }
 
 func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +31,7 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.GetBadge.Do(ctx, id)
 	switch {
 	case err != nil:
-		log.Warningf(ctx, "could not get a badge for repository %s: %s", id, err)
+		h.Logger.Warnf(ctx, "could not get a badge for repository %s: %s", id, err)
 		templates.DarkBadge("unknown").WriteSVG(w)
 
 	case resp.UpToDate:

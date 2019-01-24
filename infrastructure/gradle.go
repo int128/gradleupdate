@@ -16,13 +16,14 @@ import (
 type GradleClient struct {
 	dig.In
 	ResponseCacheRepository gateways.ResponseCacheRepository
+	Logger                  gateways.Logger
 }
 
 func (c *GradleClient) newClient(ctx context.Context) *http.Client {
 	var transport http.RoundTripper
 	transport = &urlfetch.Transport{Context: ctx}
-	transport = &loggingTransport{Transport: transport, Context: ctx, Name: "GradleClient"}
-	transport = &httpcache.Transport{Transport: transport, Context: ctx, ResponseCacheRepository: c.ResponseCacheRepository}
+	transport = &loggingTransport{Transport: transport, Context: ctx, Name: "GradleClient", Logger: c.Logger}
+	transport = &httpcache.Transport{Transport: transport, Context: ctx, ResponseCacheRepository: c.ResponseCacheRepository, Logger: c.Logger}
 	return &http.Client{Transport: transport}
 }
 

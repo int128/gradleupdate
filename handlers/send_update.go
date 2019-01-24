@@ -6,16 +6,17 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
-	"google.golang.org/appengine/log"
 )
 
 type SendUpdate struct {
 	dig.In
 	SendUpdate usecases.SendUpdate
+	Logger     gateways.Logger
 }
 
 func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +37,7 @@ func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		log.Errorf(ctx, "could not send a pull request for %s: %+v", id, err)
+		h.Logger.Errorf(ctx, "could not send a pull request for %s: %+v", id, err)
 		w.Header().Set("content-type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)
 		templates.WriteServerError(w)

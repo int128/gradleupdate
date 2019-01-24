@@ -15,6 +15,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/pkg/errors"
 )
 
@@ -27,6 +28,7 @@ func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 			ResponseCacheRepository: cache,
 			Context:                 context.Background(),
 			Transport:               http.DefaultTransport,
+			Logger:                  testing_logger.New(t),
 		},
 	}
 	req, err := http.NewRequest("GET", s.URL+"/target", nil)

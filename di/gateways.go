@@ -29,5 +29,8 @@ func provideGateways(c *dig.Container) error {
 	if err := c.Provide(func(i impl.GradleService) gateways.GradleService { return &i }); err != nil {
 		return errors.WithStack(err)
 	}
+	if err := c.Provide(func(i impl.AELogger) gateways.Logger { return &i }); err != nil {
+		return errors.WithStack(err)
+	}
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
-	"google.golang.org/appengine/log"
 )
 
 type GetBadge struct {
@@ -17,6 +16,7 @@ type GetBadge struct {
 	GradleService             gateways.GradleService
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
+	Logger                    gateways.Logger
 }
 
 func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetBadgeResponse, error) {
@@ -39,7 +39,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*useca
 		CurrentVersion: currentVersion,
 		LatestVersion:  latestVersion,
 	}); err != nil {
-		log.Errorf(ctx, "could not save badge access")
+		usecase.Logger.Errorf(ctx, "could not save badge access")
 	}
 	return &usecases.GetBadgeResponse{
 		CurrentVersion: currentVersion,

@@ -68,3 +68,10 @@ type RepositoryError interface {
 	error
 	NoSuchEntity() bool
 }
+
+type Logger interface {
+	Debugf(ctx context.Context, format string, args ...interface{})
+	Infof(ctx context.Context, format string, args ...interface{})
+	Warnf(ctx context.Context, format string, args ...interface{})
+	Errorf(ctx context.Context, format string, args ...interface{})
+}

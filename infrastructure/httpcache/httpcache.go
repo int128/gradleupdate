@@ -7,13 +7,13 @@ import (
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
-	"google.golang.org/appengine/log"
 )
 
 type Transport struct {
 	Transport               http.RoundTripper
 	Context                 context.Context
 	ResponseCacheRepository gateways.ResponseCacheRepository
+	Logger                  gateways.Logger
 }
 
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -33,7 +33,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	ctx := t.Context
 	cachedResp, err := t.ResponseCacheRepository.Find(ctx, req)
 	if err != nil {
-		log.Debugf(ctx, "error while finding response cache: %s", err)
+		t.Logger.Debugf(ctx, "error while finding response cache: %s", err)
 	}
 	if cachedResp == nil {
 		resp, err := t.Transport.RoundTrip(req)
@@ -42,7 +42,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		}
 		if isResponseCacheable(resp) {
 			if err := t.ResponseCacheRepository.Save(ctx, req, resp); err != nil {
-				log.Debugf(ctx, "error while saving response cache: %s", err)
+				t.Logger.Debugf(ctx, "error while saving response cache: %s", err)
 			}
 		}
 		return resp, err
@@ -58,11 +58,11 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 	if isResponseCacheable(resp) {
 		if err := t.ResponseCacheRepository.Save(ctx, req, resp); err != nil {
-			log.Debugf(ctx, "error while saving response cache: %s", err)
+			t.Logger.Debugf(ctx, "error while saving response cache: %s", err)
 		}
 	} else {
 		if err := t.ResponseCacheRepository.Remove(ctx, req); err != nil {
-			log.Debugf(ctx, "error while removing response cache: %s", err)
+			t.Logger.Debugf(ctx, "error while removing response cache: %s", err)
 		}
 	}
 	return resp, nil

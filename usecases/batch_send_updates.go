@@ -9,7 +9,6 @@ import (
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
-	"google.golang.org/appengine/log"
 )
 
 type BatchSendUpdates struct {
@@ -18,6 +17,7 @@ type BatchSendUpdates struct {
 	GradleService             gateways.GradleService
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	SendUpdate                usecases.SendUpdate
+	Logger                    gateways.Logger
 }
 
 func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
@@ -33,13 +33,13 @@ func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
 	}
 	for _, badge := range badges {
 		if badge.CurrentVersion.GreaterOrEqualThan(latestVersion) {
-			log.Infof(ctx, "skip the repository %s because it has the latest Gradle", badge.Repository)
+			usecase.Logger.Infof(ctx, "skip the repository %s because it has the latest Gradle", badge.Repository)
 			continue
 		}
 		//TODO: externalize URL provider
 		badgeURL := fmt.Sprintf("/%s/%s/status.svg", badge.Repository.Owner, badge.Repository.Name)
 		if err := usecase.SendUpdate.Do(ctx, badge.Repository, badgeURL); err != nil {
-			log.Warningf(ctx, "could not send an update for repository %s: %+v", badge.Repository, err)
+			usecase.Logger.Warnf(ctx, "could not send an update for repository %s: %+v", badge.Repository, err)
 		}
 	}
 	return nil

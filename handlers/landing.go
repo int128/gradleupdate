@@ -5,19 +5,20 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"go.uber.org/dig"
-	"google.golang.org/appengine/log"
 )
 
 type Landing struct {
 	dig.In
+	Logger gateways.Logger
 }
 
 func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := r.ParseForm(); err != nil {
-		log.Infof(ctx, "Could not parse form: %s", err)
-		http.Error(w, "Could not parse form", 400)
+		h.Logger.Infof(ctx, "Could not parse form: %s", err)
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
 		return
 	}
 	url := domain.RepositoryURL(r.FormValue("url"))
