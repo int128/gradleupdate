@@ -11,7 +11,7 @@ func provideInfrastructure(c *dig.Container) error {
 	if err := c.Provide(func(i impl.GitHubClientFactory) infrastructure.GitHubClientFactory { return &i }); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := c.Provide(func(i impl.GradleClient) infrastructure.GradleClient { return &i }); err != nil {
+	if err := c.Provide(func(i impl.HTTPClientFactory) infrastructure.HTTPClientFactory { return &i }); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

@@ -6,27 +6,22 @@ import (
 	"os"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/gateways/interfaces"
-	"github.com/int128/gradleupdate/infrastructure/httpcache"
+	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"go.uber.org/dig"
 	"golang.org/x/oauth2"
-	"google.golang.org/appengine/urlfetch"
 )
 
 type GitHubClientFactory struct {
 	dig.In
-	ResponseCacheRepository gateways.ResponseCacheRepository
-	Logger                  gateways.Logger
+	HTTPClientFactory infrastructure.HTTPClientFactory
 }
 
-func (c *GitHubClientFactory) New(ctx context.Context) *github.Client {
+func (factory *GitHubClientFactory) New(ctx context.Context) *github.Client {
 	//TODO: extract token provider interface
 	token := os.Getenv("GITHUB_TOKEN")
 
 	var transport http.RoundTripper
-	transport = &urlfetch.Transport{Context: ctx}
-	transport = &loggingTransport{Transport: transport, Name: "GitHubClient", Logger: c.Logger}
-	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: c.ResponseCacheRepository, Logger: c.Logger}
+	transport = factory.HTTPClientFactory.New(ctx).Transport
 	transport = &oauth2.Transport{Base: transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})}
 	return github.NewClient(&http.Client{Transport: transport})
 }
