@@ -7,7 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/testdata"
-	"github.com/int128/gradleupdate/gateways/interfaces/mock_gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 )
@@ -41,13 +41,13 @@ func TestGetRepository_Do(t *testing.T) {
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
+			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().Get(ctx, repositoryID).
 				Return(&domain.Repository{}, nil)
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
 				Return(c.content, nil)
 
-			gradleService := mock_gateways.NewMockGradleService(ctrl)
+			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentVersion(ctx).
 				Return(c.latestVersion, nil)
 
@@ -78,14 +78,14 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
 
-	repositoryError := mock_gateways.NewMockRepositoryError(ctrl)
+	repositoryError := gateways.NewMockRepositoryError(ctrl)
 	repositoryError.EXPECT().NoSuchEntity().AnyTimes().Return(true)
 
-	repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
+	repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 	repositoryRepository.EXPECT().Get(ctx, repositoryID).
 		Return(nil, repositoryError)
 
-	gradleService := mock_gateways.NewMockGradleService(ctrl)
+	gradleService := gateways.NewMockGradleService(ctrl)
 
 	u := GetRepository{
 		RepositoryRepository: repositoryRepository,

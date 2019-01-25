@@ -5,15 +5,15 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/int128/gradleupdate/usecases/interfaces/mock_usecases"
+	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
 var nonNil = gomock.Not(gomock.Nil())
 
 func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
-	getBadge := mock_usecases.NewMockGetBadge(ctrl)
-	getRepository := mock_usecases.NewMockGetRepository(ctrl)
-	sendUpdate := mock_usecases.NewMockSendUpdate(ctrl)
+	getBadge := usecaseTestDoubles.NewMockGetBadge(ctrl)
+	getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
+	sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
 
 	var exampleRepository = domain.RepositoryID{Owner: "int128", Name: "gradleupdate"}
 	getBadge.EXPECT().Do(nonNil, exampleRepository).AnyTimes().Return(&usecases.GetBadgeResponse{

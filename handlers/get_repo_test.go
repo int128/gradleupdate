@@ -9,7 +9,7 @@ import (
 	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/int128/gradleupdate/usecases/interfaces/mock_usecases"
+	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
 func TestGetRepository_ServeHTTP(t *testing.T) {
@@ -17,7 +17,7 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 	defer ctrl.Finish()
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
 
-	getRepository := mock_usecases.NewMockGetRepository(ctrl)
+	getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
 	getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 		Return(&usecases.GetRepositoryResponse{}, nil)
 
@@ -51,21 +51,21 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 	}{
 		{
 			func() error {
-				err := mock_usecases.NewMockGetRepositoryError(ctrl)
+				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
 				err.EXPECT().NoSuchRepository().AnyTimes().Return(true)
 				err.EXPECT().NoGradleVersion().AnyTimes()
 				return err
 			}(),
 		}, {
 			func() error {
-				err := mock_usecases.NewMockGetRepositoryError(ctrl)
+				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
 				err.EXPECT().NoSuchRepository().AnyTimes()
 				err.EXPECT().NoGradleVersion().AnyTimes().Return(true)
 				return err
 			}(),
 		},
 	} {
-		getRepository := mock_usecases.NewMockGetRepository(ctrl)
+		getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
 		getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 			Return(nil, c.getRepositoryError)
 

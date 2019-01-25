@@ -8,7 +8,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/testdata"
-	"github.com/int128/gradleupdate/gateways/interfaces/mock_gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/usecases"
 )
@@ -43,15 +43,15 @@ func TestGetBadge_Do(t *testing.T) {
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			repositoryRepository := mock_gateways.NewMockRepositoryRepository(ctrl)
+			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
 				Return(c.content, nil)
 
-			gradleService := mock_gateways.NewMockGradleService(ctrl)
+			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentVersion(ctx).
 				Return(c.latestVersion, nil)
 
-			badgeLastAccessRepository := mock_gateways.NewMockBadgeLastAccessRepository(ctrl)
+			badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
 			badgeLastAccessRepository.EXPECT().Save(ctx, domain.BadgeLastAccess{
 				Repository:     repositoryID,
 				CurrentVersion: c.currentVersion,

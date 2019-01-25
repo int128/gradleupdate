@@ -7,10 +7,10 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/gateways/interfaces/mock_gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/usecases"
-	"github.com/int128/gradleupdate/usecases/interfaces/mock_usecases"
+	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
 func TestBatchSendUpdates_Do(t *testing.T) {
@@ -21,11 +21,11 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo1"}
 
-	gradleService := mock_gateways.NewMockGradleService(ctrl)
+	gradleService := gateways.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentVersion(ctx).
 		Return(domain.GradleVersion("5.0"), nil)
 
-	badgeLastAccessRepository := mock_gateways.NewMockBadgeLastAccessRepository(ctrl)
+	badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
 	badgeLastAccessRepository.EXPECT().FindBySince(ctx, oneMonthAgo).Return([]domain.BadgeLastAccess{
 		{
 			Repository:     repositoryID,
@@ -35,7 +35,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		},
 	}, nil)
 
-	sendUpdate := mock_usecases.NewMockSendUpdate(ctrl)
+	sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
 	sendUpdate.EXPECT().Do(ctx, repositoryID, "/owner/repo1/status.svg").Return(nil)
 
 	u := usecases.BatchSendUpdates{
