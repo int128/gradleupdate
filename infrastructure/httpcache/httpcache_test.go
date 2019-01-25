@@ -1,33 +1,23 @@
 package httpcache
 
 import (
-	"bufio"
-	"bytes"
-	"context"
-	"crypto/sha512"
-	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/http/httputil"
-	"strings"
-	"sync"
 	"testing"
 
-	"github.com/int128/gradleupdate/gateways/testing_logger"
-	"github.com/pkg/errors"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 )
 
 func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := newMemoryCacheRepository()
+	cache := gateways.NewInMemoryCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
 			Transport:               http.DefaultTransport,
-			Logger:                  testing_logger.New(t),
+			Logger:                  gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("GET", s.URL+"/target", nil)
@@ -137,12 +127,12 @@ func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 func TestConditionalRequestIfNoneMatch_CreateDelete(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := newMemoryCacheRepository()
+	cache := gateways.NewInMemoryCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
 			Transport:               http.DefaultTransport,
-			Logger:                  testing_logger.New(t),
+			Logger:                  gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("GET", s.URL+"/target", nil)
@@ -257,12 +247,12 @@ func TestConditionalRequestIfNoneMatch_CreateDelete(t *testing.T) {
 func TestNotCacheableRequest(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := newMemoryCacheRepository()
+	cache := gateways.NewInMemoryCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
 			ResponseCacheRepository: cache,
 			Transport:               http.DefaultTransport,
-			Logger:                  testing_logger.New(t),
+			Logger:                  gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("POST", s.URL+"/target", nil)
@@ -329,72 +319,4 @@ func setupTestServer(t *testing.T) (*httptest.Server, *handlerHolder) {
 		t.Logf("[testServer] %s %s", r.Method, r.URL)
 	})
 	return httptest.NewServer(handler), &holder
-}
-
-func computeResponseCacheKey(req *http.Request) string {
-	var b bytes.Buffer
-	for key, values := range req.Header {
-		b.Write([]byte(key))
-		for _, value := range values {
-			b.Write([]byte(value))
-		}
-	}
-	b.Write([]byte(req.Method))
-	b.Write([]byte(req.URL.String()))
-	h := sha512.Sum512(b.Bytes())
-	e := base64.StdEncoding.EncodeToString(h[:])
-	return e
-}
-
-type memoryCacheRepository struct {
-	m map[string][]byte
-	l sync.Mutex
-}
-
-func newMemoryCacheRepository() *memoryCacheRepository {
-	return &memoryCacheRepository{m: make(map[string][]byte)}
-}
-
-func (c *memoryCacheRepository) Find(ctx context.Context, req *http.Request) (*http.Response, error) {
-	k := computeResponseCacheKey(req)
-	c.l.Lock()
-	v, ok := c.m[k]
-	c.l.Unlock()
-	if !ok {
-		return nil, nil
-	}
-	b := bufio.NewReader(bytes.NewBuffer(v))
-	resp, err := http.ReadResponse(b, req)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not decode response bytes")
-	}
-	return resp, nil
-}
-
-func (c *memoryCacheRepository) Save(ctx context.Context, req *http.Request, resp *http.Response) error {
-	b, err := httputil.DumpResponse(resp, true) // DumpResponse preserves Body
-	if err != nil {
-		return errors.Wrapf(err, "could not dump response")
-	}
-	k := computeResponseCacheKey(req)
-	c.l.Lock()
-	c.m[k] = b
-	c.l.Unlock()
-	return nil
-}
-
-func (c *memoryCacheRepository) Remove(ctx context.Context, req *http.Request) error {
-	k := computeResponseCacheKey(req)
-	c.l.Lock()
-	delete(c.m, k)
-	c.l.Unlock()
-	return nil
-}
-
-func (c *memoryCacheRepository) String() string {
-	var b strings.Builder
-	for k, v := range c.m {
-		b.WriteString(fmt.Sprintf("%s=[%d]\n", k, len(v)))
-	}
-	return b.String()
 }

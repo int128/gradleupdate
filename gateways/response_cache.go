@@ -29,11 +29,12 @@ func computeResponseCacheKey(req *http.Request) string {
 	return e
 }
 
-type ResponseCacheRepository struct {
+// AEResponseCacheRepository provides access to the response cache using appengine memcache.
+type AEResponseCacheRepository struct {
 	dig.In
 }
 
-func (r *ResponseCacheRepository) Find(ctx context.Context, req *http.Request) (*http.Response, error) {
+func (r *AEResponseCacheRepository) Find(ctx context.Context, req *http.Request) (*http.Response, error) {
 	key := computeResponseCacheKey(req)
 	item, err := memcache.Get(ctx, key)
 	if err != nil {
@@ -50,7 +51,7 @@ func (r *ResponseCacheRepository) Find(ctx context.Context, req *http.Request) (
 	return resp, nil
 }
 
-func (r *ResponseCacheRepository) Remove(ctx context.Context, req *http.Request) error {
+func (r *AEResponseCacheRepository) Remove(ctx context.Context, req *http.Request) error {
 	key := computeResponseCacheKey(req)
 	err := memcache.Delete(ctx, key)
 	if err != nil {
@@ -62,7 +63,7 @@ func (r *ResponseCacheRepository) Remove(ctx context.Context, req *http.Request)
 	return err
 }
 
-func (r *ResponseCacheRepository) Save(ctx context.Context, req *http.Request, resp *http.Response) error {
+func (r *AEResponseCacheRepository) Save(ctx context.Context, req *http.Request, resp *http.Response) error {
 	b, err := httputil.DumpResponse(resp, true) // DumpResponse preserves Body
 	if err != nil {
 		return errors.Wrapf(err, "could not dump response")

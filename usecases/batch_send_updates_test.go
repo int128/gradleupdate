@@ -8,7 +8,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/usecases"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
@@ -43,7 +42,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
 		TimeProvider:              func() time.Time { return now },
-		Logger:                    testing_logger.New(t),
+		Logger:                    gateways.NewLogger(t),
 	}
 	if err := u.Do(ctx); err != nil {
 		t.Fatalf("could not do the use case: %s", err)

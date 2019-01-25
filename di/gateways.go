@@ -23,7 +23,7 @@ func provideGateways(c *dig.Container) error {
 	if err := c.Provide(func(i impl.RepositoryLastScanRepository) gateways.RepositoryLastScanRepository { return &i }); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := c.Provide(func(i impl.ResponseCacheRepository) gateways.ResponseCacheRepository { return &i }); err != nil {
+	if err := c.Provide(func(i impl.AEResponseCacheRepository) gateways.ResponseCacheRepository { return &i }); err != nil {
 		return errors.WithStack(err)
 	}
 	if err := c.Provide(func(i impl.GradleService) gateways.GradleService { return &i }); err != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/gateways/testing_logger"
 	"github.com/int128/gradleupdate/usecases"
 )
 
@@ -64,7 +63,7 @@ func TestGetBadge_Do(t *testing.T) {
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
 				TimeProvider:              func() time.Time { return now },
-				Logger:                    testing_logger.New(t),
+				Logger:                    gateways.NewLogger(t),
 			}
 			resp, err := u.Do(ctx, repositoryID)
 			if err != nil {

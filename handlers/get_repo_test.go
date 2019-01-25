@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/gateways/testing_logger"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -24,7 +24,7 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 	h := handlers.NewRouter(handlers.Handlers{
 		GetRepository: handlers.GetRepository{
 			GetRepository: getRepository,
-			Logger:        testing_logger.New(t),
+			Logger:        gateways.NewLogger(t),
 		},
 	})
 	r := httptest.NewRequest("GET", "/owner/repo/status", nil)
@@ -72,7 +72,7 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 		h := handlers.NewRouter(handlers.Handlers{
 			GetRepository: handlers.GetRepository{
 				GetRepository: getRepository,
-				Logger:        testing_logger.New(t),
+				Logger:        gateways.NewLogger(t),
 			},
 		})
 		r := httptest.NewRequest("GET", "/owner/repo/status", nil)
