@@ -5,19 +5,17 @@ import (
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 type PullRequestRepository struct {
 	dig.In
-	GitHubClientFactory infrastructure.GitHubClientFactory
+	Client *github.Client
 }
 
 func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	payload, _, err := client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
+	payload, _, err := r.Client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
 		Head:  github.String(pull.HeadBranch.Repository.Owner + ":" + pull.HeadBranch.Name),
 		Title: github.String(pull.Title),
@@ -47,8 +45,7 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 }
 
 func (r *PullRequestRepository) FindByBranch(ctx context.Context, baseBranch, headBranch domain.BranchID) (*domain.PullRequest, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	pulls, _, err := client.PullRequests.List(ctx, baseBranch.Repository.Owner, baseBranch.Repository.Name, &github.PullRequestListOptions{
+	pulls, _, err := r.Client.PullRequests.List(ctx, baseBranch.Repository.Owner, baseBranch.Repository.Name, &github.PullRequestListOptions{
 		Base:        baseBranch.Name,
 		Head:        headBranch.Repository.Owner + ":" + headBranch.Name,
 		State:       "all",

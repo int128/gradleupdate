@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
@@ -16,10 +15,32 @@ type HTTPClientFactory struct {
 	Logger                  gateways.Logger
 }
 
-func (factory *HTTPClientFactory) New(ctx context.Context) *http.Client {
+func (factory *HTTPClientFactory) New() *http.Client {
 	var transport http.RoundTripper
-	transport = &urlfetch.Transport{Context: ctx}
+	transport = &aeTransport{}
 	transport = &loggingTransport{Transport: transport, Logger: factory.Logger}
 	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: factory.ResponseCacheRepository, Logger: factory.Logger}
 	return &http.Client{Transport: transport}
+}
+
+type aeTransport struct{}
+
+func (t *aeTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	ctx := req.Context()
+	transport := &urlfetch.Transport{Context: ctx}
+	return transport.RoundTrip(req)
+}
+
+type loggingTransport struct {
+	Transport http.RoundTripper
+	Logger    gateways.Logger
+}
+
+func (t *loggingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	ctx := req.Context()
+	res, err := t.Transport.RoundTrip(req)
+	if res != nil {
+		t.Logger.Debugf(ctx, "%d %s %s", res.StatusCode, req.Method, req.URL)
+	}
+	return res, err
 }

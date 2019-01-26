@@ -14,11 +14,10 @@ import (
 func TestSendPullRequestRequest_Do(t *testing.T) {
 	ctx := context.Background()
 	client := newGitHubClient(t)
-	gitHubClientFactory := newGitHubClientFactory(t, client)
 	sendPullRequest := usecases.SendPullRequest{
-		RepositoryRepository:  &gateways.RepositoryRepository{GitHubClientFactory: gitHubClientFactory},
-		PullRequestRepository: &gateways.PullRequestRepository{GitHubClientFactory: gitHubClientFactory},
-		GitService:            &gateways.GitService{GitHubClientFactory: gitHubClientFactory},
+		RepositoryRepository:  &gateways.RepositoryRepository{Client: client},
+		PullRequestRepository: &gateways.PullRequestRepository{Client: client},
+		GitService:            &gateways.GitService{Client: client},
 	}
 
 	// Delete the head branch if it exists

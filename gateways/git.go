@@ -7,23 +7,21 @@ import (
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
-	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 type GitService struct {
 	dig.In
-	GitHubClientFactory infrastructure.GitHubClientFactory
+	Client *github.Client
 }
 
 func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRequest) (*domain.Branch, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	headCommit, err := createCommit(ctx, client, req)
+	headCommit, err := r.createCommit(ctx, req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a commit")
 	}
-	headRef, _, err := client.Git.CreateRef(ctx,
+	headRef, _, err := r.Client.Git.CreateRef(ctx,
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		&github.Reference{
@@ -50,12 +48,11 @@ func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRe
 }
 
 func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBranchRequest) (*domain.Branch, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	headCommit, err := createCommit(ctx, client, req)
+	headCommit, err := r.createCommit(ctx, req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a commit")
 	}
-	headRef, _, err := client.Git.UpdateRef(ctx,
+	headRef, _, err := r.Client.Git.UpdateRef(ctx,
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		&github.Reference{
@@ -82,11 +79,11 @@ func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBra
 	}, nil
 }
 
-func createCommit(ctx context.Context, client *github.Client, req gateways.PushBranchRequest) (*github.Commit, error) {
+func (r *GitService) createCommit(ctx context.Context, req gateways.PushBranchRequest) (*github.Commit, error) {
 	headTreeEntries := make([]github.TreeEntry, len(req.CommitFiles))
 	for i, file := range req.CommitFiles {
 		content := base64.StdEncoding.EncodeToString(file.Content)
-		blob, _, err := client.Git.CreateBlob(ctx,
+		blob, _, err := r.Client.Git.CreateBlob(ctx,
 			req.HeadBranch.Repository.Owner,
 			req.HeadBranch.Repository.Name,
 			&github.Blob{
@@ -102,7 +99,7 @@ func createCommit(ctx context.Context, client *github.Client, req gateways.PushB
 			SHA:  blob.SHA,
 		}
 	}
-	headTree, _, err := client.Git.CreateTree(ctx,
+	headTree, _, err := r.Client.Git.CreateTree(ctx,
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		req.BaseBranch.Commit.Tree.SHA.String(),
@@ -110,7 +107,7 @@ func createCommit(ctx context.Context, client *github.Client, req gateways.PushB
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a tree in the head repository %s", req.HeadBranch.Repository)
 	}
-	headCommit, _, err := client.Git.CreateCommit(ctx,
+	headCommit, _, err := r.Client.Git.CreateCommit(ctx,
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		&github.Commit{

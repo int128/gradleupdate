@@ -6,24 +6,22 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 type GradleService struct {
 	dig.In
-	HTTPClientFactory infrastructure.HTTPClientFactory
+	Client *http.Client
 }
 
 func (s *GradleService) GetCurrentVersion(ctx context.Context) (domain.GradleVersion, error) {
-	client := s.HTTPClientFactory.New(ctx)
 	req, err := http.NewRequest("GET", "https://services.gradle.org/versions/current", nil)
 	if err != nil {
 		return "", errors.Wrapf(err, "error while creating a HTTP request")
 	}
 	req = req.WithContext(ctx)
-	resp, err := client.Do(req)
+	resp, err := s.Client.Do(req)
 	if err != nil {
 		return "", errors.Wrapf(err, "error while getting the current version from Gradle Service")
 	}

@@ -1,17 +1,19 @@
 package di
 
 import (
-	impl "github.com/int128/gradleupdate/infrastructure"
-	"github.com/int128/gradleupdate/infrastructure/interfaces"
+	"net/http"
+
+	"github.com/google/go-github/v18/github"
+	"github.com/int128/gradleupdate/infrastructure"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 func provideInfrastructure(c *dig.Container) error {
-	if err := c.Provide(func(i impl.GitHubClientFactory) infrastructure.GitHubClientFactory { return &i }); err != nil {
+	if err := c.Provide(func(f infrastructure.GitHubClientFactory) *github.Client { return f.New() }); err != nil {
 		return errors.WithStack(err)
 	}
-	if err := c.Provide(func(i impl.HTTPClientFactory) infrastructure.HTTPClientFactory { return &i }); err != nil {
+	if err := c.Provide(func(f infrastructure.HTTPClientFactory) *http.Client { return f.New() }); err != nil {
 		return errors.WithStack(err)
 	}
 	return nil

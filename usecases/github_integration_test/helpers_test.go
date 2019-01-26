@@ -1,7 +1,6 @@
 package usecases_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -27,19 +26,6 @@ func newGitHubClient(t *testing.T) *github.Client {
 	transport = &loggingTransport{t, transport}
 	transport = &oauth2.Transport{Base: transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})}
 	return github.NewClient(&http.Client{Transport: transport})
-}
-
-func newGitHubClientFactory(t *testing.T, client *github.Client) *factory {
-	t.Helper()
-	return &factory{client}
-}
-
-type factory struct {
-	client *github.Client
-}
-
-func (c *factory) New(ctx context.Context) *github.Client {
-	return c.client
 }
 
 type loggingTransport struct {

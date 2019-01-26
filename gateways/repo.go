@@ -6,19 +6,17 @@ import (
 
 	"github.com/google/go-github/v18/github"
 	"github.com/int128/gradleupdate/domain"
-	"github.com/int128/gradleupdate/infrastructure/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 type RepositoryRepository struct {
 	dig.In
-	GitHubClientFactory infrastructure.GitHubClientFactory
+	Client *github.Client
 }
 
 func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	repository, _, err := client.Repositories.Get(ctx, id.Owner, id.Name)
+	repository, _, err := r.Client.Repositories.Get(ctx, id.Owner, id.Name)
 	if err != nil {
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 404 {
@@ -45,8 +43,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) 
 }
 
 func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.RepositoryID, path string) (domain.FileContent, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	fc, _, _, err := client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
+	fc, _, _, err := r.Client.Repositories.GetContents(ctx, id.Owner, id.Name, path, nil)
 	if err != nil {
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 404 {
@@ -70,8 +67,7 @@ func (r *RepositoryRepository) GetFileContent(ctx context.Context, id domain.Rep
 }
 
 func (r *RepositoryRepository) GetReadme(ctx context.Context, id domain.RepositoryID) (domain.FileContent, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	fc, _, err := client.Repositories.GetReadme(ctx, id.Owner, id.Name, nil)
+	fc, _, err := r.Client.Repositories.GetReadme(ctx, id.Owner, id.Name, nil)
 	if err != nil {
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 404 {
@@ -92,8 +88,7 @@ func (r *RepositoryRepository) GetReadme(ctx context.Context, id domain.Reposito
 }
 
 func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID) (*domain.Repository, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	fork, _, err := client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
+	fork, _, err := r.Client.Repositories.CreateFork(ctx, id.Owner, id.Name, &github.RepositoryCreateForkOptions{})
 	if err != nil {
 		if _, ok := err.(*github.AcceptedError); ok {
 			// Fork in progress
@@ -119,8 +114,7 @@ func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID)
 }
 
 func (r *RepositoryRepository) GetBranch(ctx context.Context, id domain.BranchID) (*domain.Branch, error) {
-	client := r.GitHubClientFactory.New(ctx)
-	branch, _, err := client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name)
+	branch, _, err := r.Client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name)
 	if err != nil {
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 404 {
