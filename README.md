@@ -41,17 +41,10 @@ go get -u github.com/valyala/quicktemplate/qtc
 go get -u github.com/cortesi/modd/cmd/modd
 ```
 
-You need to create `.env.yaml` as follows:
-
-```yaml
-env_variables:
-  GITHUB_TOKEN: YOUR_GITHUB_TOKEN
-```
-
 Run the local server:
 
 ```sh
-dev_appserver.py .
+GITHUB_TOKEN=$GITHUB_TOKEN dev_appserver.py .
 ```
 
 Run the mock server with `handlers` and `templates`:

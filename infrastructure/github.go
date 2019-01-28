@@ -2,24 +2,38 @@ package infrastructure
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/google/go-github/v18/github"
+	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/pkg/errors"
 	"go.uber.org/dig"
 	"golang.org/x/oauth2"
 )
 
 type GitHubClientFactory struct {
 	dig.In
-	Client *http.Client
+	Client           *http.Client
+	ConfigRepository gateways.ConfigRepository
 }
 
 func (factory *GitHubClientFactory) New() *github.Client {
-	//TODO: extract token provider interface
-	token := os.Getenv("GITHUB_TOKEN")
-
 	var transport http.RoundTripper
 	transport = factory.Client.Transport
-	transport = &oauth2.Transport{Base: transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})}
+	transport = &oauth2Transport{transport, factory.ConfigRepository}
 	return github.NewClient(&http.Client{Transport: transport})
+}
+
+type oauth2Transport struct {
+	Transport        http.RoundTripper
+	ConfigRepository gateways.ConfigRepository
+}
+
+func (t *oauth2Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	ctx := req.Context()
+	config, err := t.ConfigRepository.Get(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error while getting Config")
+	}
+	transport := &oauth2.Transport{Base: t.Transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GitHubToken})}
+	return transport.RoundTrip(req)
 }
