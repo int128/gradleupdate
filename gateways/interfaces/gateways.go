@@ -53,6 +53,10 @@ type GradleService interface {
 	GetCurrentVersion(ctx context.Context) (domain.GradleVersion, error)
 }
 
+type TimeService interface {
+	Now() time.Time
+}
+
 type ConfigRepository interface {
 	Get(ctx context.Context) (*domain.Config, error)
 }

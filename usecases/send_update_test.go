@@ -17,9 +17,11 @@ import (
 
 func TestSendUpdate_Do(t *testing.T) {
 	ctx := context.Background()
-	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
 	badgeURL := "/owner/repo/status.svg"
+	timeService := &gateways.TimeService{
+		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
+	}
 
 	t.Run("OK", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -34,7 +36,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:   repositoryID,
-			LastScanTime: now,
+			LastScanTime: timeService.NowValue,
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
@@ -58,7 +60,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err != nil {
@@ -77,7 +79,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:               repositoryID,
-			LastScanTime:             now,
+			LastScanTime:             timeService.NowValue,
 			AlreadyLatestGradleError: true,
 		})
 
@@ -89,7 +91,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -115,7 +117,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:           repositoryID,
-			LastScanTime:         now,
+			LastScanTime:         timeService.NowValue,
 			NoGradleVersionError: true,
 		})
 
@@ -127,7 +129,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -153,7 +155,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:           repositoryID,
-			LastScanTime:         now,
+			LastScanTime:         timeService.NowValue,
 			NoGradleVersionError: true,
 		})
 
@@ -165,7 +167,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -192,7 +194,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:         repositoryID,
-			LastScanTime:       now,
+			LastScanTime:       timeService.NowValue,
 			NoReadmeBadgeError: true,
 		})
 
@@ -204,7 +206,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {
@@ -232,7 +234,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:         repositoryID,
-			LastScanTime:       now,
+			LastScanTime:       timeService.NowValue,
 			NoReadmeBadgeError: true,
 		})
 
@@ -244,7 +246,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			RepositoryLastScanRepository: repositoryLastScanRepository,
 			GradleService:                gradleService,
 			SendPullRequest:              sendPullRequest,
-			TimeProvider:                 func() time.Time { return now },
+			TimeService:                  timeService,
 		}
 		err := u.Do(ctx, repositoryID, badgeURL)
 		if err == nil {

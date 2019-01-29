@@ -12,6 +12,7 @@ var gatewaysDependencies = []interface{}{
 	func(i impl.BadgeLastAccessRepository) gateways.BadgeLastAccessRepository { return &i },
 	func(i impl.RepositoryLastScanRepository) gateways.RepositoryLastScanRepository { return &i },
 	func(i impl.GradleService) gateways.GradleService { return &i },
+	func(i impl.TimeService) gateways.TimeService { return &i },
 	func(i impl.HTTPCacheRepository) gateways.HTTPCacheRepository { return &i },
 	func(i impl.AELogger) gateways.Logger { return &i },
 	impl.NewConfigRepository,

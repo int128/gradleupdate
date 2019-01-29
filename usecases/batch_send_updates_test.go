@@ -16,14 +16,17 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
-	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
-	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo1"}
+
+	timeService := &gateways.TimeService{
+		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
+	}
 
 	gradleService := gateways.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentVersion(ctx).
 		Return(domain.GradleVersion("5.0"), nil)
 
+	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
 	badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
 	badgeLastAccessRepository.EXPECT().FindBySince(ctx, oneMonthAgo).Return([]domain.BadgeLastAccess{
 		{
@@ -41,7 +44,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		GradleService:             gradleService,
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
-		TimeProvider:              func() time.Time { return now },
+		TimeService:               timeService,
 		Logger:                    gateways.NewLogger(t),
 	}
 	if err := u.Do(ctx); err != nil {

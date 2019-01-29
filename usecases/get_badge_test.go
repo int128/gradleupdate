@@ -17,7 +17,9 @@ func TestGetBadge_Do(t *testing.T) {
 	defer ctrl.Finish()
 	ctx := context.Background()
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
-	now := time.Now()
+	timeService := &gateways.TimeService{
+		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
+	}
 
 	for _, c := range []struct {
 		name           string
@@ -55,14 +57,14 @@ func TestGetBadge_Do(t *testing.T) {
 				Repository:     repositoryID,
 				CurrentVersion: c.currentVersion,
 				LatestVersion:  c.latestVersion,
-				LastAccessTime: now,
+				LastAccessTime: timeService.NowValue,
 			}).Return(nil)
 
 			u := usecases.GetBadge{
 				RepositoryRepository:      repositoryRepository,
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
-				TimeProvider:              func() time.Time { return now },
+				TimeService:               timeService,
 				Logger:                    gateways.NewLogger(t),
 			}
 			resp, err := u.Do(ctx, repositoryID)

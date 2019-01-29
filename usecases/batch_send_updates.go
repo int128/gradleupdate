@@ -13,15 +13,15 @@ import (
 
 type BatchSendUpdates struct {
 	dig.In
-	TimeProvider              `optional:"true"`
 	GradleService             gateways.GradleService
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	SendUpdate                usecases.SendUpdate
+	TimeService               gateways.TimeService
 	Logger                    gateways.Logger
 }
 
 func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
-	oneMonthAgo := usecase.Now().Add(-1 * 30 * 24 * time.Hour)
+	oneMonthAgo := usecase.TimeService.Now().Add(-1 * 30 * 24 * time.Hour)
 	badges, err := usecase.BadgeLastAccessRepository.FindBySince(ctx, oneMonthAgo)
 	if err != nil {
 		return errors.Wrapf(err, "could not find badges since %s", oneMonthAgo)

@@ -15,17 +15,17 @@ import (
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
 	dig.In
-	TimeProvider                 `optional:"true"`
 	GradleService                gateways.GradleService
 	RepositoryRepository         gateways.RepositoryRepository
 	RepositoryLastScanRepository gateways.RepositoryLastScanRepository
 	SendPullRequest              usecases.SendPullRequest
+	TimeService                  gateways.TimeService
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
 	scan := domain.RepositoryLastScan{
 		Repository:   id,
-		LastScanTime: usecase.Now(),
+		LastScanTime: usecase.TimeService.Now(),
 	}
 	err := usecase.sendUpdate(ctx, id, badgeURL)
 	if err != nil {
