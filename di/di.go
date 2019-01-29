@@ -6,21 +6,6 @@ import (
 	"go.uber.org/dig"
 )
 
-// New returns a container.
-func New() (*dig.Container, error) {
-	c := dig.New()
-	if err := provideInfrastructure(c); err != nil {
-		return nil, errors.Wrapf(err, "error while providing infrastructure")
-	}
-	if err := provideGateways(c); err != nil {
-		return nil, errors.Wrapf(err, "error while providing gateways")
-	}
-	if err := provideUsecases(c); err != nil {
-		return nil, errors.Wrapf(err, "error while providing usecases")
-	}
-	return c, nil
-}
-
 type App struct {
 	dig.In
 	Handlers handlers.Handlers
@@ -34,6 +19,30 @@ func Invoke(runner func(App)) error {
 	}
 	if err := c.Invoke(runner); err != nil {
 		return errors.Wrapf(err, "error while invoking the runner")
+	}
+	return nil
+}
+
+// New returns a container.
+func New() (*dig.Container, error) {
+	c := dig.New()
+	if err := provideAll(c, infrastructureDependencies); err != nil {
+		return nil, errors.Wrapf(err, "error while providing infrastructure")
+	}
+	if err := provideAll(c, gatewaysDependencies); err != nil {
+		return nil, errors.Wrapf(err, "error while providing gateways")
+	}
+	if err := provideAll(c, usecasesDependencies); err != nil {
+		return nil, errors.Wrapf(err, "error while providing usecases")
+	}
+	return c, nil
+}
+
+func provideAll(c *dig.Container, providers []interface{}) error {
+	for _, provider := range providers {
+		if err := c.Provide(provider); err != nil {
+			return errors.WithStack(err)
+		}
 	}
 	return nil
 }
