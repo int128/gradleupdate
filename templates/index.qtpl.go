@@ -55,7 +55,7 @@ func StreamIndex(qw422016 *qt422016.Writer) {
     <div class="form-group">
       <label for="github-url">Paste GitHub URL</label>
       <input type="text" id="github-url" name="url"
-             class="form-control text-center input-lg input-text-monospace"
+             class="form-control text-center input-lg text-monospace"
              placeholder="https://github.com/int128/gradleupdate"/>
     </div>
     <button type="submit" class="btn btn-primary">Get your Badge</button>
