@@ -11,7 +11,7 @@ import (
 
 type HTTPClientFactory struct {
 	dig.In
-	ResponseCacheRepository gateways.ResponseCacheRepository
+	ResponseCacheRepository gateways.HTTPCacheRepository
 	Logger                  gateways.Logger
 }
 
@@ -19,7 +19,7 @@ func (factory *HTTPClientFactory) New() *http.Client {
 	var transport http.RoundTripper
 	transport = &aeTransport{}
 	transport = &loggingTransport{Transport: transport, Logger: factory.Logger}
-	transport = &httpcache.Transport{Transport: transport, ResponseCacheRepository: factory.ResponseCacheRepository, Logger: factory.Logger}
+	transport = &httpcache.Transport{Transport: transport, HTTPCacheRepository: factory.ResponseCacheRepository, Logger: factory.Logger}
 	return &http.Client{Transport: transport}
 }
 

@@ -12,12 +12,12 @@ import (
 func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := gateways.NewInMemoryCacheRepository()
+	cache := gateways.NewInMemoryHTTPCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
-			ResponseCacheRepository: cache,
-			Transport:               http.DefaultTransport,
-			Logger:                  gateways.NewLogger(t),
+			HTTPCacheRepository: cache,
+			Transport:           http.DefaultTransport,
+			Logger:              gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("GET", s.URL+"/target", nil)
@@ -127,12 +127,12 @@ func TestConditionalRequestIfNoneMatch_CreateUpdate(t *testing.T) {
 func TestConditionalRequestIfNoneMatch_CreateDelete(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := gateways.NewInMemoryCacheRepository()
+	cache := gateways.NewInMemoryHTTPCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
-			ResponseCacheRepository: cache,
-			Transport:               http.DefaultTransport,
-			Logger:                  gateways.NewLogger(t),
+			HTTPCacheRepository: cache,
+			Transport:           http.DefaultTransport,
+			Logger:              gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("GET", s.URL+"/target", nil)
@@ -247,12 +247,12 @@ func TestConditionalRequestIfNoneMatch_CreateDelete(t *testing.T) {
 func TestNotCacheableRequest(t *testing.T) {
 	s, h := setupTestServer(t)
 	defer s.Close()
-	cache := gateways.NewInMemoryCacheRepository()
+	cache := gateways.NewInMemoryHTTPCacheRepository()
 	client := http.Client{
 		Transport: &Transport{
-			ResponseCacheRepository: cache,
-			Transport:               http.DefaultTransport,
-			Logger:                  gateways.NewLogger(t),
+			HTTPCacheRepository: cache,
+			Transport:           http.DefaultTransport,
+			Logger:              gateways.NewLogger(t),
 		},
 	}
 	req, err := http.NewRequest("POST", s.URL+"/target", nil)

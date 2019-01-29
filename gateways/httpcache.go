@@ -14,7 +14,12 @@ import (
 	"google.golang.org/appengine/memcache"
 )
 
-func computeResponseCacheKey(req *http.Request) string {
+// HTTPCacheRepository provides access to the response cache using appengine memcache.
+type HTTPCacheRepository struct {
+	dig.In
+}
+
+func (r *HTTPCacheRepository) ComputeKey(req *http.Request) string {
 	var b bytes.Buffer
 	for key, values := range req.Header {
 		b.Write([]byte(key))
@@ -29,13 +34,7 @@ func computeResponseCacheKey(req *http.Request) string {
 	return e
 }
 
-// AEResponseCacheRepository provides access to the response cache using appengine memcache.
-type AEResponseCacheRepository struct {
-	dig.In
-}
-
-func (r *AEResponseCacheRepository) Find(ctx context.Context, req *http.Request) (*http.Response, error) {
-	key := computeResponseCacheKey(req)
+func (r *HTTPCacheRepository) Find(ctx context.Context, key string, req *http.Request) (*http.Response, error) {
 	item, err := memcache.Get(ctx, key)
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
@@ -51,8 +50,7 @@ func (r *AEResponseCacheRepository) Find(ctx context.Context, req *http.Request)
 	return resp, nil
 }
 
-func (r *AEResponseCacheRepository) Remove(ctx context.Context, req *http.Request) error {
-	key := computeResponseCacheKey(req)
+func (r *HTTPCacheRepository) Remove(ctx context.Context, key string) error {
 	err := memcache.Delete(ctx, key)
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
@@ -63,12 +61,11 @@ func (r *AEResponseCacheRepository) Remove(ctx context.Context, req *http.Reques
 	return err
 }
 
-func (r *AEResponseCacheRepository) Save(ctx context.Context, req *http.Request, resp *http.Response) error {
+func (r *HTTPCacheRepository) Save(ctx context.Context, key string, resp *http.Response) error {
 	b, err := httputil.DumpResponse(resp, true) // DumpResponse preserves Body
 	if err != nil {
 		return errors.Wrapf(err, "could not dump response")
 	}
-	key := computeResponseCacheKey(req)
 	if err := memcache.Set(ctx, &memcache.Item{Key: key, Value: b}); err != nil {
 		return errors.Wrapf(err, "could not save key %s into memcache", key)
 	}

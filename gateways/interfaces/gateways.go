@@ -57,10 +57,11 @@ type ConfigRepository interface {
 	Get(ctx context.Context) (*domain.Config, error)
 }
 
-type ResponseCacheRepository interface {
-	Find(ctx context.Context, req *http.Request) (*http.Response, error)
-	Save(ctx context.Context, req *http.Request, resp *http.Response) error
-	Remove(ctx context.Context, req *http.Request) error
+type HTTPCacheRepository interface {
+	ComputeKey(req *http.Request) string
+	Find(ctx context.Context, key string, req *http.Request) (*http.Response, error)
+	Save(ctx context.Context, key string, resp *http.Response) error
+	Remove(ctx context.Context, key string) error
 }
 
 type Logger interface {
