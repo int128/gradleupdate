@@ -1,11 +1,40 @@
 package domain
 
 import (
+	"bytes"
 	"regexp"
 )
 
 type GradleRelease struct {
 	Version GradleVersion
+}
+
+type GradleUpdatePreconditionIn struct {
+	Readme                  FileContent
+	BadgeURL                string
+	GradleWrapperProperties FileContent
+	LatestGradleRelease     *GradleRelease
+}
+
+type GradleUpdatePreconditionOut struct {
+	NoReadmeBadge          bool
+	NoGradleVersion        bool
+	AlreadyHasLatestGradle bool
+}
+
+func CheckGradleUpdatePrecondition(in GradleUpdatePreconditionIn) (out GradleUpdatePreconditionOut) {
+	if !bytes.Contains(in.Readme, []byte(in.BadgeURL)) {
+		out.NoReadmeBadge = true
+	}
+	currentVersion := FindGradleWrapperVersion(in.GradleWrapperProperties)
+	if currentVersion == "" {
+		out.NoGradleVersion = true
+	} else {
+		if currentVersion.GreaterOrEqualThan(in.LatestGradleRelease.Version) {
+			out.AlreadyHasLatestGradle = true
+		}
+	}
+	return
 }
 
 // GradleWrapperPropertiesPath is path to the gradle-wrapper.properties

@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 
@@ -42,44 +41,46 @@ func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badge
 }
 
 func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
+	//TODO: fetch entities concurrently
+	readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
+	if err != nil {
+		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+			if err.NoSuchEntity() {
+				return errors.Wrapf(&sendUpdateError{error: err, noReadmeBadge: true}, "README did not found")
+			}
+		}
+		return errors.Wrapf(err, "error while getting README")
+	}
+	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+	if err != nil {
+		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+			if err.NoSuchEntity() {
+				return errors.Wrapf(&sendUpdateError{error: err, noGradleVersion: true}, "gradle-wrapper.properties did not found")
+			}
+		}
+		return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
+	}
 	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "error while getting the latest Gradle version")
 	}
 
-	// check if the properties file has out-of-date version
-	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
-	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return errors.Wrapf(&sendUpdateError{error: err, noGradleVersion: true}, "could not find Gradle version")
-			}
-		}
-		return errors.Wrapf(err, "error while getting the properties file")
-	}
-	currentVersion := domain.FindGradleWrapperVersion(gradleWrapperProperties)
-	if currentVersion == "" {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("properties did not contain version string"), noGradleVersion: true})
-	}
-	if currentVersion.GreaterOrEqualThan(latestRelease.Version) {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("current version %s is already latest", currentVersion), alreadyHasLatestGradle: true})
-	}
-
-	// check if the README has the badge
-	readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
-	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return errors.Wrapf(&sendUpdateError{error: err, noReadmeBadge: true}, "could not find README")
-			}
-		}
-		return errors.Wrapf(err, "error while getting README")
-	}
-	if !bytes.Contains(readme, []byte(badgeURL)) {
+	out := domain.CheckGradleUpdatePrecondition(domain.GradleUpdatePreconditionIn{
+		Readme:                  readme,
+		BadgeURL:                badgeURL,
+		GradleWrapperProperties: gradleWrapperProperties,
+		LatestGradleRelease:     latestRelease,
+	})
+	if out.NoReadmeBadge {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("README did not contain the badge"), noReadmeBadge: true})
 	}
+	if out.NoGradleVersion {
+		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("properties did not contain version string"), noGradleVersion: true})
+	}
+	if out.AlreadyHasLatestGradle {
+		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("current version is already latest"), alreadyHasLatestGradle: true})
+	}
 
-	// send a pull request for the latest version
 	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
