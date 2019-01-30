@@ -27,12 +27,12 @@ func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
 		return errors.Wrapf(err, "could not find badges since %s", oneMonthAgo)
 	}
 
-	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
+	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
 	}
 	for _, badge := range badges {
-		if badge.CurrentVersion.GreaterOrEqualThan(latestVersion) {
+		if badge.CurrentVersion.GreaterOrEqualThan(latestRelease.Version) {
 			usecase.Logger.Infof(ctx, "skip the repository %s because it has the latest Gradle", badge.Repository)
 			continue
 		}

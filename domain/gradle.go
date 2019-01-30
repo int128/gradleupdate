@@ -4,6 +4,10 @@ import (
 	"regexp"
 )
 
+type GradleRelease struct {
+	Version GradleVersion
+}
+
 // GradleWrapperPropertiesPath is path to the gradle-wrapper.properties
 const GradleWrapperPropertiesPath = "gradle/wrapper/gradle-wrapper.properties"
 

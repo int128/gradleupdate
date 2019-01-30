@@ -48,8 +48,8 @@ func TestGetRepository_Do(t *testing.T) {
 				Return(c.content, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
-			gradleService.EXPECT().GetCurrentVersion(ctx).
-				Return(c.latestVersion, nil)
+			gradleService.EXPECT().GetCurrentRelease(ctx).
+				Return(&domain.GradleRelease{Version: c.latestVersion}, nil)
 
 			u := GetRepository{
 				RepositoryRepository: repositoryRepository,

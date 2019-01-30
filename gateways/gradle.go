@@ -15,23 +15,25 @@ type GradleService struct {
 	Client *http.Client
 }
 
-func (s *GradleService) GetCurrentVersion(ctx context.Context) (domain.GradleVersion, error) {
+func (s *GradleService) GetCurrentRelease(ctx context.Context) (*domain.GradleRelease, error) {
 	req, err := http.NewRequest("GET", "https://services.gradle.org/versions/current", nil)
 	if err != nil {
-		return "", errors.Wrapf(err, "error while creating a HTTP request")
+		return nil, errors.Wrapf(err, "error while creating a HTTP request")
 	}
 	req = req.WithContext(ctx)
 	resp, err := s.Client.Do(req)
 	if err != nil {
-		return "", errors.Wrapf(err, "error while getting the current version from Gradle Service")
+		return nil, errors.Wrapf(err, "error while getting the current version from Gradle Service")
 	}
 	defer resp.Body.Close()
 	d := json.NewDecoder(resp.Body)
 	var cvr gradleCurrentVersionResponse
 	if err := d.Decode(&cvr); err != nil {
-		return "", errors.Wrapf(err, "error while decoding JSON response from Gradle Service")
+		return nil, errors.Wrapf(err, "error while decoding JSON response from Gradle Service")
 	}
-	return domain.GradleVersion(cvr.Version), nil
+	return &domain.GradleRelease{
+		Version: domain.GradleVersion(cvr.Version),
+	}, nil
 }
 
 type gradleCurrentVersionResponse struct {

@@ -50,7 +50,7 @@ type PushBranchRequest struct {
 }
 
 type GradleService interface {
-	GetCurrentVersion(ctx context.Context) (domain.GradleVersion, error)
+	GetCurrentRelease(ctx context.Context) (*domain.GradleRelease, error)
 }
 
 type TimeService interface {

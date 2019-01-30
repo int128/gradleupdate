@@ -44,7 +44,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 		return nil, errors.Wrapf(&getRepositoryError{noGradleVersion: true}, "could not find version from properties file in %s", id)
 	}
 
-	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
+	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
@@ -52,8 +52,8 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 	return &usecases.GetRepositoryResponse{
 		Repository:     *repository,
 		CurrentVersion: currentVersion,
-		LatestVersion:  latestVersion,
-		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
+		LatestVersion:  latestRelease.Version,
+		UpToDate:       currentVersion.GreaterOrEqualThan(latestRelease.Version),
 	}, nil
 }
 

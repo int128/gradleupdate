@@ -40,7 +40,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("5.0"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("5.0")}, nil)
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		sendPullRequest.EXPECT().Do(ctx, usecaseInterfaces.SendPullRequestRequest{
@@ -84,7 +85,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("4.10.2"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("4.10.2")}, nil)
+
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
 			RepositoryRepository:         repositoryRepository,
@@ -122,7 +125,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("4.10.2"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("4.10.2")}, nil)
+
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
 			RepositoryRepository:         repositoryRepository,
@@ -160,7 +165,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("4.10.2"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("4.10.2")}, nil)
+
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
 			RepositoryRepository:         repositoryRepository,
@@ -199,7 +206,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("5.0"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("5.0")}, nil)
+
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
 			RepositoryRepository:         repositoryRepository,
@@ -239,7 +248,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentVersion(ctx).Return(domain.GradleVersion("5.0"), nil)
+		gradleService.EXPECT().GetCurrentRelease(ctx).
+			Return(&domain.GradleRelease{Version: domain.GradleVersion("5.0")}, nil)
+
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
 			RepositoryRepository:         repositoryRepository,

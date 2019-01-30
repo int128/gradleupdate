@@ -23,8 +23,8 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	}
 
 	gradleService := gateways.NewMockGradleService(ctrl)
-	gradleService.EXPECT().GetCurrentVersion(ctx).
-		Return(domain.GradleVersion("5.0"), nil)
+	gradleService.EXPECT().GetCurrentRelease(ctx).
+		Return(&domain.GradleRelease{Version: domain.GradleVersion("5.0")}, nil)
 
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
 	badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)

@@ -352,15 +352,15 @@ func (m *MockGradleService) EXPECT() *MockGradleServiceMockRecorder {
 	return m.recorder
 }
 
-// GetCurrentVersion mocks base method
-func (m *MockGradleService) GetCurrentVersion(arg0 context.Context) (domain.GradleVersion, error) {
-	ret := m.ctrl.Call(m, "GetCurrentVersion", arg0)
-	ret0, _ := ret[0].(domain.GradleVersion)
+// GetCurrentRelease mocks base method
+func (m *MockGradleService) GetCurrentRelease(arg0 context.Context) (*domain.GradleRelease, error) {
+	ret := m.ctrl.Call(m, "GetCurrentRelease", arg0)
+	ret0, _ := ret[0].(*domain.GradleRelease)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetCurrentVersion indicates an expected call of GetCurrentVersion
-func (mr *MockGradleServiceMockRecorder) GetCurrentVersion(arg0 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentVersion", reflect.TypeOf((*MockGradleService)(nil).GetCurrentVersion), arg0)
+// GetCurrentRelease indicates an expected call of GetCurrentRelease
+func (mr *MockGradleServiceMockRecorder) GetCurrentRelease(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCurrentRelease", reflect.TypeOf((*MockGradleService)(nil).GetCurrentRelease), arg0)
 }

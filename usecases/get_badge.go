@@ -28,7 +28,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*useca
 	if currentVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}
-	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
+	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
 	}
@@ -37,12 +37,12 @@ func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*useca
 		Repository:     id,
 		LastAccessTime: usecase.TimeService.Now(),
 		CurrentVersion: currentVersion,
-		LatestVersion:  latestVersion,
+		LatestVersion:  latestRelease.Version,
 	}); err != nil {
 		usecase.Logger.Errorf(ctx, "could not save badge access")
 	}
 	return &usecases.GetBadgeResponse{
 		CurrentVersion: currentVersion,
-		UpToDate:       currentVersion.GreaterOrEqualThan(latestVersion),
+		UpToDate:       currentVersion.GreaterOrEqualThan(latestRelease.Version),
 	}, nil
 }

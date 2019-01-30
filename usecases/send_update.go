@@ -42,7 +42,7 @@ func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badge
 }
 
 func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
-	latestVersion, err := usecase.GradleService.GetCurrentVersion(ctx)
+	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "error while getting the latest Gradle version")
 	}
@@ -61,7 +61,7 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 	if currentVersion == "" {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("properties did not contain version string"), noGradleVersion: true})
 	}
-	if currentVersion.GreaterOrEqualThan(latestVersion) {
+	if currentVersion.GreaterOrEqualThan(latestRelease.Version) {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("current version %s is already latest", currentVersion), alreadyHasLatestGradle: true})
 	}
 
@@ -80,19 +80,19 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 	}
 
 	// send a pull request for the latest version
-	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestVersion)
+	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
-		HeadBranchName: fmt.Sprintf("gradle-%s-%s", latestVersion, id.Owner),
-		CommitMessage:  fmt.Sprintf("Gradle %s", latestVersion),
+		HeadBranchName: fmt.Sprintf("gradle-%s-%s", latestRelease.Version, id.Owner),
+		CommitMessage:  fmt.Sprintf("Gradle %s", latestRelease.Version),
 		CommitFiles: []domain.File{
 			{
 				Path:    domain.GradleWrapperPropertiesPath,
 				Content: domain.FileContent(newProps),
 			},
 		},
-		Title: fmt.Sprintf("Gradle %s", latestVersion),
-		Body:  fmt.Sprintf(`Gradle %s is available.`, latestVersion),
+		Title: fmt.Sprintf("Gradle %s", latestRelease.Version),
+		Body:  fmt.Sprintf(`Gradle %s is available.`, latestRelease.Version),
 	}
 	if err := usecase.SendPullRequest.Do(ctx, req); err != nil {
 		return errors.Wrapf(err, "error while sending a pull request %+v", req)
