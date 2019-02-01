@@ -9,6 +9,7 @@ import (
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
+	"golang.org/x/sync/errgroup"
 )
 
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
@@ -21,17 +22,17 @@ type SendUpdate struct {
 	TimeService                  gateways.TimeService
 }
 
-func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
+func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID) error {
 	scan := domain.RepositoryLastScan{
 		Repository:   id,
 		LastScanTime: usecase.TimeService.Now(),
 	}
-	err := usecase.sendUpdate(ctx, id, badgeURL)
+	err := usecase.sendUpdate(ctx, id)
 	if err != nil {
-		if err, ok := errors.Cause(err).(*sendUpdateError); ok {
-			scan.NoGradleVersionError = err.noGradleVersion
-			scan.NoReadmeBadgeError = err.noReadmeBadge
-			scan.AlreadyLatestGradleError = err.alreadyHasLatestGradle
+		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
+			if out := err.PreconditionViolation(); ok {
+				scan.PreconditionOut = out
+			}
 		}
 	}
 	if err := usecase.RepositoryLastScanRepository.Save(ctx, scan); err != nil {
@@ -40,60 +41,67 @@ func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID, badge
 	return errors.Wrapf(err, "error while scanning the repository %s", id)
 }
 
-func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryID, badgeURL string) error {
-	//TODO: fetch entities concurrently
-	readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
-	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return errors.Wrapf(&sendUpdateError{error: err, noReadmeBadge: true}, "README did not found")
-			}
-		}
-		return errors.Wrapf(err, "error while getting README")
-	}
-	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
-	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return errors.Wrapf(&sendUpdateError{error: err, noGradleVersion: true}, "gradle-wrapper.properties did not found")
-			}
-		}
-		return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
-	}
-	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
-	if err != nil {
-		return errors.Wrapf(err, "error while getting the latest Gradle version")
-	}
+func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryID) error {
+	var in domain.GradleUpdatePreconditionIn
+	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
 
-	out := domain.CheckGradleUpdatePrecondition(domain.GradleUpdatePreconditionIn{
-		Readme:                  readme,
-		BadgeURL:                badgeURL,
-		GradleWrapperProperties: gradleWrapperProperties,
-		LatestGradleRelease:     latestRelease,
+	var eg errgroup.Group
+	eg.Go(func() error {
+		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
+		if err != nil {
+			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+				if err.NoSuchEntity() {
+					return nil
+				}
+			}
+			return errors.Wrapf(err, "error while getting README")
+		}
+		in.Readme = readme
+		return nil
 	})
-	if out == domain.NoReadmeBadge {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("README did not contain the badge"), noReadmeBadge: true})
-	}
-	if out == domain.NoGradleVersion {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("properties did not contain version string"), noGradleVersion: true})
-	}
-	if out == domain.AlreadyHasLatestGradle {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("current version is already latest"), alreadyHasLatestGradle: true})
+	eg.Go(func() error {
+		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+		if err != nil {
+			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+				if err.NoSuchEntity() {
+					return nil
+				}
+			}
+			return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
+		}
+		in.GradleWrapperProperties = gradleWrapperProperties
+		return nil
+	})
+	eg.Go(func() error {
+		latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
+		if err != nil {
+			return errors.Wrapf(err, "error while getting the latest Gradle release")
+		}
+		in.LatestGradleRelease = latestRelease
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		return errors.WithStack(err)
 	}
 
-	newProps := domain.ReplaceGradleWrapperVersion(gradleWrapperProperties, latestRelease.Version)
+	out := domain.CheckGradleUpdatePrecondition(in)
+	if out != domain.ReadyToUpdate {
+		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", out), GradleUpdatePreconditionOut: out})
+	}
+
+	newProps := domain.ReplaceGradleWrapperVersion(in.GradleWrapperProperties, in.LatestGradleRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
-		HeadBranchName: fmt.Sprintf("gradle-%s-%s", latestRelease.Version, id.Owner),
-		CommitMessage:  fmt.Sprintf("Gradle %s", latestRelease.Version),
+		HeadBranchName: fmt.Sprintf("gradle-%s-%s", in.LatestGradleRelease.Version, id.Owner),
+		CommitMessage:  fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
 		CommitFiles: []domain.File{
 			{
 				Path:    domain.GradleWrapperPropertiesPath,
 				Content: domain.FileContent(newProps),
 			},
 		},
-		Title: fmt.Sprintf("Gradle %s", latestRelease.Version),
-		Body:  fmt.Sprintf(`Gradle %s is available.`, latestRelease.Version),
+		Title: fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
+		Body:  fmt.Sprintf(`Gradle %s is available.`, in.LatestGradleRelease.Version),
 	}
 	if err := usecase.SendPullRequest.Do(ctx, req); err != nil {
 		return errors.Wrapf(err, "error while sending a pull request %+v", req)
@@ -103,11 +111,9 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 
 type sendUpdateError struct {
 	error
-	noGradleVersion        bool
-	noReadmeBadge          bool
-	alreadyHasLatestGradle bool
+	GradleUpdatePreconditionOut domain.GradleUpdatePreconditionOut
 }
 
-func (err *sendUpdateError) NoGradleVersion() bool        { return err.noGradleVersion }
-func (err *sendUpdateError) NoReadmeBadge() bool          { return err.noReadmeBadge }
-func (err *sendUpdateError) AlreadyHasLatestGradle() bool { return err.alreadyHasLatestGradle }
+func (err *sendUpdateError) PreconditionViolation() domain.GradleUpdatePreconditionOut {
+	return err.GradleUpdatePreconditionOut
+}

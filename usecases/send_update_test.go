@@ -18,12 +18,11 @@ import (
 func TestSendUpdate_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
-	badgeURL := "/owner/repo/status.svg"
 	timeService := &gateways.TimeService{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
-	t.Run("OK", func(t *testing.T) {
+	t.Run("SuccessfullyUpdated", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -63,7 +62,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err != nil {
 			t.Fatalf("error while Do: %+v", err)
 		}
@@ -85,9 +84,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:               repositoryID,
-			LastScanTime:             timeService.NowValue,
-			AlreadyLatestGradleError: true,
+			Repository:      repositoryID,
+			LastScanTime:    timeService.NowValue,
+			PreconditionOut: domain.AlreadyHasLatestGradle,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -98,7 +97,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
@@ -106,12 +105,13 @@ func TestSendUpdate_Do(t *testing.T) {
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
-		if sendUpdateError.AlreadyHasLatestGradle() != true {
-			t.Errorf("AlreadyHasLatestGradle wants true but false")
+		preconditionViolation := sendUpdateError.PreconditionViolation()
+		if preconditionViolation != domain.AlreadyHasLatestGradle {
+			t.Errorf("PreconditionViolation wants %v but %v", domain.AlreadyHasLatestGradle, preconditionViolation)
 		}
 	})
 
-	t.Run("NoGradleVersion/GradleWrapperPropertiesNotFound", func(t *testing.T) {
+	t.Run("NoGradleVersion/NoGradleWrapperProperties", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -127,9 +127,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:           repositoryID,
-			LastScanTime:         timeService.NowValue,
-			NoGradleVersionError: true,
+			Repository:      repositoryID,
+			LastScanTime:    timeService.NowValue,
+			PreconditionOut: domain.NoGradleWrapperProperties,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -140,7 +140,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
@@ -148,12 +148,13 @@ func TestSendUpdate_Do(t *testing.T) {
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
-		if sendUpdateError.NoGradleVersion() != true {
-			t.Errorf("NoGradleVersion wants true but false")
+		preconditionViolation := sendUpdateError.PreconditionViolation()
+		if preconditionViolation != domain.NoGradleWrapperProperties {
+			t.Errorf("PreconditionViolation wants %v but %v", domain.NoGradleWrapperProperties, preconditionViolation)
 		}
 	})
 
-	t.Run("NoGradleVersion/InvalidGradleWrapperProperties", func(t *testing.T) {
+	t.Run("NoGradleVersion/NoGradleVersion", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -169,9 +170,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:           repositoryID,
-			LastScanTime:         timeService.NowValue,
-			NoGradleVersionError: true,
+			Repository:      repositoryID,
+			LastScanTime:    timeService.NowValue,
+			PreconditionOut: domain.NoGradleVersion,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -182,7 +183,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
@@ -190,12 +191,13 @@ func TestSendUpdate_Do(t *testing.T) {
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
-		if sendUpdateError.NoGradleVersion() != true {
-			t.Errorf("NoGradleVersion wants true but false")
+		preconditionViolation := sendUpdateError.PreconditionViolation()
+		if preconditionViolation != domain.NoGradleVersion {
+			t.Errorf("PreconditionViolation wants %v but %v", domain.NoGradleVersion, preconditionViolation)
 		}
 	})
 
-	t.Run("NoReadmeBadge/ReadmeNotFound", func(t *testing.T) {
+	t.Run("NoReadmeBadge/NoReadme", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -211,9 +213,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:         repositoryID,
-			LastScanTime:       timeService.NowValue,
-			NoReadmeBadgeError: true,
+			Repository:      repositoryID,
+			LastScanTime:    timeService.NowValue,
+			PreconditionOut: domain.NoReadme,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -224,7 +226,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
@@ -232,12 +234,13 @@ func TestSendUpdate_Do(t *testing.T) {
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
-		if sendUpdateError.NoReadmeBadge() != true {
-			t.Errorf("NoReadmeBadge wants true but false")
+		preconditionViolation := sendUpdateError.PreconditionViolation()
+		if preconditionViolation != domain.NoReadme {
+			t.Errorf("PreconditionViolation wants %v but %v", domain.NoReadme, preconditionViolation)
 		}
 	})
 
-	t.Run("NoReadmeBadge/InvalidReadme", func(t *testing.T) {
+	t.Run("NoReadmeBadge/NoReadmeBadge", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
@@ -253,9 +256,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:         repositoryID,
-			LastScanTime:       timeService.NowValue,
-			NoReadmeBadgeError: true,
+			Repository:      repositoryID,
+			LastScanTime:    timeService.NowValue,
+			PreconditionOut: domain.NoReadmeBadge,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -266,7 +269,7 @@ func TestSendUpdate_Do(t *testing.T) {
 			SendPullRequest:              sendPullRequest,
 			TimeService:                  timeService,
 		}
-		err := u.Do(ctx, repositoryID, badgeURL)
+		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
@@ -274,8 +277,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
-		if sendUpdateError.NoReadmeBadge() != true {
-			t.Errorf("NoReadmeBadge wants true but false")
+		preconditionViolation := sendUpdateError.PreconditionViolation()
+		if preconditionViolation != domain.NoReadmeBadge {
+			t.Errorf("PreconditionViolation wants %v but %v", domain.NoReadmeBadge, preconditionViolation)
 		}
 	})
 }

@@ -155,15 +155,15 @@ func (m *MockSendUpdate) EXPECT() *MockSendUpdateMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockSendUpdate) Do(arg0 context.Context, arg1 domain.RepositoryID, arg2 string) error {
-	ret := m.ctrl.Call(m, "Do", arg0, arg1, arg2)
+func (m *MockSendUpdate) Do(arg0 context.Context, arg1 domain.RepositoryID) error {
+	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Do indicates an expected call of Do
-func (mr *MockSendUpdateMockRecorder) Do(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSendUpdate)(nil).Do), arg0, arg1, arg2)
+func (mr *MockSendUpdateMockRecorder) Do(arg0, arg1 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockSendUpdate)(nil).Do), arg0, arg1)
 }
 
 // MockSendUpdateError is a mock of SendUpdateError interface
@@ -189,18 +189,6 @@ func (m *MockSendUpdateError) EXPECT() *MockSendUpdateErrorMockRecorder {
 	return m.recorder
 }
 
-// AlreadyHasLatestGradle mocks base method
-func (m *MockSendUpdateError) AlreadyHasLatestGradle() bool {
-	ret := m.ctrl.Call(m, "AlreadyHasLatestGradle")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// AlreadyHasLatestGradle indicates an expected call of AlreadyHasLatestGradle
-func (mr *MockSendUpdateErrorMockRecorder) AlreadyHasLatestGradle() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AlreadyHasLatestGradle", reflect.TypeOf((*MockSendUpdateError)(nil).AlreadyHasLatestGradle))
-}
-
 // Error mocks base method
 func (m *MockSendUpdateError) Error() string {
 	ret := m.ctrl.Call(m, "Error")
@@ -213,28 +201,16 @@ func (mr *MockSendUpdateErrorMockRecorder) Error() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockSendUpdateError)(nil).Error))
 }
 
-// NoGradleVersion mocks base method
-func (m *MockSendUpdateError) NoGradleVersion() bool {
-	ret := m.ctrl.Call(m, "NoGradleVersion")
-	ret0, _ := ret[0].(bool)
+// PreconditionViolation mocks base method
+func (m *MockSendUpdateError) PreconditionViolation() domain.GradleUpdatePreconditionOut {
+	ret := m.ctrl.Call(m, "PreconditionViolation")
+	ret0, _ := ret[0].(domain.GradleUpdatePreconditionOut)
 	return ret0
 }
 
-// NoGradleVersion indicates an expected call of NoGradleVersion
-func (mr *MockSendUpdateErrorMockRecorder) NoGradleVersion() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NoGradleVersion", reflect.TypeOf((*MockSendUpdateError)(nil).NoGradleVersion))
-}
-
-// NoReadmeBadge mocks base method
-func (m *MockSendUpdateError) NoReadmeBadge() bool {
-	ret := m.ctrl.Call(m, "NoReadmeBadge")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// NoReadmeBadge indicates an expected call of NoReadmeBadge
-func (mr *MockSendUpdateErrorMockRecorder) NoReadmeBadge() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NoReadmeBadge", reflect.TypeOf((*MockSendUpdateError)(nil).NoReadmeBadge))
+// PreconditionViolation indicates an expected call of PreconditionViolation
+func (mr *MockSendUpdateErrorMockRecorder) PreconditionViolation() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PreconditionViolation", reflect.TypeOf((*MockSendUpdateError)(nil).PreconditionViolation))
 }
 
 // MockBatchSendUpdates is a mock of BatchSendUpdates interface

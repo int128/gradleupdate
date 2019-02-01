@@ -38,7 +38,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	}, nil)
 
 	sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
-	sendUpdate.EXPECT().Do(ctx, repositoryID, "/owner/repo1/status.svg").Return(nil)
+	sendUpdate.EXPECT().Do(ctx, repositoryID).Return(nil)
 
 	u := usecases.BatchSendUpdates{
 		GradleService:             gradleService,

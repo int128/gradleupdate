@@ -32,14 +32,12 @@ type GetRepositoryError interface {
 }
 
 type SendUpdate interface {
-	Do(ctx context.Context, id domain.RepositoryID, badgeURL string) error
+	Do(ctx context.Context, id domain.RepositoryID) error
 }
 
 type SendUpdateError interface {
 	error
-	NoGradleVersion() bool
-	NoReadmeBadge() bool
-	AlreadyHasLatestGradle() bool
+	PreconditionViolation() domain.GradleUpdatePreconditionOut
 }
 
 type BatchSendUpdates interface {

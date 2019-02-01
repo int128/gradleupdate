@@ -18,7 +18,7 @@ type GradleUpdatePreconditionIn struct {
 
 type GradleUpdatePreconditionOut int
 
-var (
+const (
 	ReadyToUpdate             = GradleUpdatePreconditionOut(0)
 	AlreadyHasLatestGradle    = GradleUpdatePreconditionOut(1)
 	NoGradleWrapperProperties = GradleUpdatePreconditionOut(51)

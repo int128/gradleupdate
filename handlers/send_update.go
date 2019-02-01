@@ -9,7 +9,6 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
@@ -24,20 +23,9 @@ func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	owner, repo := vars["owner"], vars["repo"]
 	id := domain.RepositoryID{Owner: owner, Name: repo}
-	badgeURL := fmt.Sprintf("/%s/%s/status.svg", owner, repo)
 
-	if err := h.SendUpdate.Do(ctx, id, badgeURL); err != nil {
-		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
-			switch {
-			case err.NoReadmeBadge():
-				w.Header().Set("content-type", "text/html")
-				w.WriteHeader(http.StatusNotFound)
-				//TODO: replace with a dedicated error page
-				templates.WriteNotFoundError(w, fmt.Sprintf("no badge URL (%s) found in the repository %s", badgeURL, id))
-				return
-			}
-		}
-		h.Logger.Errorf(ctx, "could not send a pull request for %s: %+v", id, err)
+	if err := h.SendUpdate.Do(ctx, id); err != nil {
+		h.Logger.Errorf(ctx, "error while sending a pull request for %s: %+v", id, err)
 		w.Header().Set("content-type", "text/html")
 		w.WriteHeader(http.StatusInternalServerError)
 		templates.WriteServerError(w)

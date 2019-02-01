@@ -17,10 +17,8 @@ func newRepositoryLastScanKey(ctx context.Context, id domain.RepositoryID) *data
 }
 
 type repositoryLastScanEntity struct {
-	LastScanTime             time.Time
-	NoGradleVersionError     bool
-	NoReadmeBadgeError       bool
-	AlreadyLatestGradleError bool
+	LastScanTime    time.Time
+	PreconditionOut int
 }
 
 type RepositoryLastScanRepository struct {
@@ -30,13 +28,11 @@ type RepositoryLastScanRepository struct {
 func (r *RepositoryLastScanRepository) Save(ctx context.Context, a domain.RepositoryLastScan) error {
 	k := newRepositoryLastScanKey(ctx, a.Repository)
 	_, err := datastore.Put(ctx, k, &repositoryLastScanEntity{
-		LastScanTime:             a.LastScanTime,
-		NoGradleVersionError:     a.NoGradleVersionError,
-		NoReadmeBadgeError:       a.NoReadmeBadgeError,
-		AlreadyLatestGradleError: a.AlreadyLatestGradleError,
+		LastScanTime:    a.LastScanTime,
+		PreconditionOut: int(a.PreconditionOut),
 	})
 	if err != nil {
-		return errors.Wrapf(err, "could not save an entity")
+		return errors.Wrapf(err, "error while saving an entity")
 	}
 	return nil
 }
