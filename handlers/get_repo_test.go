@@ -53,14 +53,6 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 			func() error {
 				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
 				err.EXPECT().NoSuchRepository().AnyTimes().Return(true)
-				err.EXPECT().NoGradleVersion().AnyTimes()
-				return err
-			}(),
-		}, {
-			func() error {
-				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
-				err.EXPECT().NoSuchRepository().AnyTimes()
-				err.EXPECT().NoGradleVersion().AnyTimes().Return(true)
 				return err
 			}(),
 		},

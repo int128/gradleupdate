@@ -22,16 +22,13 @@ type GetRepository interface {
 }
 
 type GetRepositoryResponse struct {
-	Repository     domain.Repository
-	CurrentVersion domain.GradleVersion
-	LatestVersion  domain.GradleVersion
-	UpToDate       bool
+	Repository                  domain.Repository
+	GradleUpdatePreconditionOut domain.GradleUpdatePreconditionOut
 }
 
 type GetRepositoryError interface {
 	error
 	NoSuchRepository() bool
-	NoGradleVersion() bool
 }
 
 type SendUpdate interface {

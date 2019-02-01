@@ -2,12 +2,14 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
+	"golang.org/x/sync/errgroup"
 )
 
 type GetRepository struct {
@@ -20,48 +22,64 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 	repository, err := usecase.RepositoryRepository.Get(ctx, id)
 	if err != nil {
 		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			switch {
-			case err.NoSuchEntity():
+			if err.NoSuchEntity() {
 				return nil, errors.Wrapf(&getRepositoryError{error: err, noSuchRepository: true}, "repository %s not found", id)
 			}
 		}
-		return nil, errors.Wrapf(err, "could not get the repository %s", id)
+		return nil, errors.Wrapf(err, "error while getting the repository %s", id)
 	}
 
-	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
-	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			switch {
-			case err.NoSuchEntity():
-				return nil, errors.Wrapf(&getRepositoryError{error: err, noGradleVersion: true}, "gradleWrapperProperties not found")
+	var in domain.GradleUpdatePreconditionIn
+	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
+	var eg errgroup.Group
+	eg.Go(func() error {
+		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
+		if err != nil {
+			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+				if err.NoSuchEntity() {
+					return nil
+				}
 			}
+			return errors.Wrapf(err, "error while getting README")
 		}
-		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
+		in.Readme = readme
+		return nil
+	})
+	eg.Go(func() error {
+		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+		if err != nil {
+			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+				if err.NoSuchEntity() {
+					return nil
+				}
+			}
+			return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
+		}
+		in.GradleWrapperProperties = gradleWrapperProperties
+		return nil
+	})
+	eg.Go(func() error {
+		latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
+		if err != nil {
+			return errors.Wrapf(err, "error while getting the latest Gradle release")
+		}
+		in.LatestGradleRelease = latestRelease
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		return nil, errors.WithStack(err)
 	}
 
-	currentVersion := domain.FindGradleWrapperVersion(gradleWrapperProperties)
-	if currentVersion == "" {
-		return nil, errors.Wrapf(&getRepositoryError{noGradleVersion: true}, "could not find version from properties file in %s", id)
-	}
-
-	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not get the latest Gradle version")
-	}
-
+	out := domain.CheckGradleUpdatePrecondition(in)
 	return &usecases.GetRepositoryResponse{
-		Repository:     *repository,
-		CurrentVersion: currentVersion,
-		LatestVersion:  latestRelease.Version,
-		UpToDate:       currentVersion.GreaterOrEqualThan(latestRelease.Version),
+		Repository:                  *repository,
+		GradleUpdatePreconditionOut: out,
 	}, nil
 }
 
 type getRepositoryError struct {
 	error
 	noSuchRepository bool
-	noGradleVersion  bool
 }
 
 func (err *getRepositoryError) NoSuchRepository() bool { return err.noSuchRepository }
-func (err *getRepositoryError) NoGradleVersion() bool  { return err.noGradleVersion }

@@ -32,6 +32,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id domain.RepositoryID) 
 		},
 		Description: repository.GetDescription(),
 		AvatarURL:   repository.GetOwner().GetAvatarURL(),
+		HTMLURL:     repository.GetHTMLURL(),
 		DefaultBranch: domain.BranchID{
 			Repository: domain.RepositoryID{
 				Owner: repository.GetOwner().GetLogin(),
@@ -103,6 +104,7 @@ func (r *RepositoryRepository) Fork(ctx context.Context, id domain.RepositoryID)
 		},
 		Description: fork.GetDescription(),
 		AvatarURL:   fork.GetOwner().GetAvatarURL(),
+		HTMLURL:     fork.GetHTMLURL(),
 		DefaultBranch: domain.BranchID{
 			Repository: domain.RepositoryID{
 				Owner: fork.GetOwner().GetLogin(),

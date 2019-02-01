@@ -35,11 +35,6 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
 				templates.WriteNotFoundError(w, fmt.Sprintf("no such a repository %s", id))
 				return
-			case err.NoGradleVersion():
-				w.Header().Set("content-type", "text/html")
-				w.WriteHeader(http.StatusNotFound)
-				templates.WriteNotFoundError(w, fmt.Sprintf("Gradle not found in %s", id))
-				return
 			}
 		}
 		h.Logger.Errorf(ctx, "could not get the repository %s: %s", id, err)
@@ -52,15 +47,18 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "text/html")
 	w.Header().Set("cache-control", "public")
 	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
+
+	baseURL := baseURL(r)
+	badgeURL := fmt.Sprintf("/%s/%s/status.svg", owner, repo)
+	badgeFullURL := baseURL + badgeURL
+	repositoryFullURL := baseURL + fmt.Sprintf("/%s/%s/status", owner, repo)
+
 	t := templates.Repository{
-		Repository:       resp.Repository,
-		CurrentVersion:   resp.CurrentVersion,
-		LatestVersion:    resp.LatestVersion,
-		UpToDate:         resp.UpToDate,
-		ThisURL:          fmt.Sprintf("/%s/%s/status", owner, repo),
-		BadgeURL:         fmt.Sprintf("/%s/%s/status.svg", owner, repo),
-		RequestUpdateURL: fmt.Sprintf("/%s/%s/update", owner, repo),
-		BaseURL:          baseURL(r),
+		Repository:                  resp.Repository,
+		GradleUpdatePreconditionOut: resp.GradleUpdatePreconditionOut,
+		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, badgeFullURL, repositoryFullURL),
+		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, repositoryFullURL, badgeFullURL),
+		BadgeURL:                    badgeURL,
 	}
 	t.WritePage(w)
 }

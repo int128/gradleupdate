@@ -25,6 +25,7 @@ type Repository struct {
 	DefaultBranch BranchID
 	Description   string
 	AvatarURL     string
+	HTMLURL       string
 }
 
 func (r Repository) String() string {

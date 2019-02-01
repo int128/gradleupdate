@@ -71,13 +71,13 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 		GradleWrapperProperties: gradleWrapperProperties,
 		LatestGradleRelease:     latestRelease,
 	})
-	if out.NoReadmeBadge {
+	if out == domain.NoReadmeBadge {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("README did not contain the badge"), noReadmeBadge: true})
 	}
-	if out.NoGradleVersion {
+	if out == domain.NoGradleVersion {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("properties did not contain version string"), noGradleVersion: true})
 	}
-	if out.AlreadyHasLatestGradle {
+	if out == domain.AlreadyHasLatestGradle {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("current version is already latest"), alreadyHasLatestGradle: true})
 	}
 

@@ -17,27 +17,22 @@ func TestGetRepository_Do(t *testing.T) {
 	defer ctrl.Finish()
 	ctx := context.Background()
 	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	readme := domain.FileContent("/owner/repo/status.svg")
 
 	for _, c := range []struct {
-		name           string
-		content        domain.FileContent
-		currentVersion domain.GradleVersion
-		latestVersion  domain.GradleVersion
-		upToDate       bool
+		name    string
+		content domain.FileContent
+		out     domain.GradleUpdatePreconditionOut
 	}{
 		{
-			name:           "up-to-date",
-			content:        testdata.GradleWrapperProperties4102,
-			currentVersion: "4.10.2",
-			latestVersion:  "4.10.2",
-			upToDate:       true,
+			name:    "up-to-date",
+			content: testdata.GradleWrapperProperties50,
+			out:     domain.AlreadyHasLatestGradle,
 		},
 		{
-			name:           "out-of-date",
-			content:        testdata.GradleWrapperProperties4102,
-			currentVersion: "4.10.2",
-			latestVersion:  "5.1",
-			upToDate:       false,
+			name:    "out-of-date",
+			content: testdata.GradleWrapperProperties4102,
+			out:     domain.ReadyToUpdate,
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
@@ -46,10 +41,12 @@ func TestGetRepository_Do(t *testing.T) {
 				Return(&domain.Repository{}, nil)
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
 				Return(c.content, nil)
+			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
+				Return(readme, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentRelease(ctx).
-				Return(&domain.GradleRelease{Version: c.latestVersion}, nil)
+				Return(&domain.GradleRelease{Version: "5.0"}, nil)
 
 			u := GetRepository{
 				RepositoryRepository: repositoryRepository,
@@ -59,14 +56,8 @@ func TestGetRepository_Do(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not do usecase: %s", err)
 			}
-			if resp.CurrentVersion != c.currentVersion {
-				t.Errorf("CurrentVersion wants %s but %s", c.currentVersion, resp.CurrentVersion)
-			}
-			if resp.LatestVersion != c.latestVersion {
-				t.Errorf("LatestVersion wants %s but %s", c.latestVersion, resp.LatestVersion)
-			}
-			if resp.UpToDate != c.upToDate {
-				t.Errorf("UpToDate wants %v but %v", c.upToDate, resp.UpToDate)
+			if resp.GradleUpdatePreconditionOut != c.out {
+				t.Errorf("GradleUpdatePreconditionOut wants %v but %v", c.out, resp.GradleUpdatePreconditionOut)
 			}
 		})
 	}
@@ -101,9 +92,6 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	cause, ok := errors.Cause(err).(usecases.GetRepositoryError)
 	if !ok {
 		t.Fatalf("cause wants GetRepositoryError but %T", cause)
-	}
-	if cause.NoGradleVersion() != false {
-		t.Errorf("NoGradleVersion wants false")
 	}
 	if cause.NoSuchRepository() != true {
 		t.Errorf("NoSuchRepository wants true")

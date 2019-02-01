@@ -36,7 +36,7 @@ func TestCheckGradleUpdatePrecondition(t *testing.T) {
 				GradleWrapperProperties: testdata.GradleWrapperProperties50,
 				LatestGradleRelease:     &domain.GradleRelease{Version: "5.1"},
 			},
-			domain.GradleUpdatePreconditionOut{},
+			domain.ReadyToUpdate,
 		}, {
 			"NoReadmeBadge",
 			domain.GradleUpdatePreconditionIn{
@@ -45,9 +45,7 @@ func TestCheckGradleUpdatePrecondition(t *testing.T) {
 				GradleWrapperProperties: testdata.GradleWrapperProperties50,
 				LatestGradleRelease:     &domain.GradleRelease{Version: "5.1"},
 			},
-			domain.GradleUpdatePreconditionOut{
-				NoReadmeBadge: true,
-			},
+			domain.NoReadmeBadge,
 		}, {
 			"NoGradleVersion",
 			domain.GradleUpdatePreconditionIn{
@@ -56,9 +54,7 @@ func TestCheckGradleUpdatePrecondition(t *testing.T) {
 				GradleWrapperProperties: domain.FileContent("INVALID"),
 				LatestGradleRelease:     &domain.GradleRelease{Version: "5.1"},
 			},
-			domain.GradleUpdatePreconditionOut{
-				NoGradleVersion: true,
-			},
+			domain.NoGradleVersion,
 		}, {
 			"AlreadyHasLatestGradle",
 			domain.GradleUpdatePreconditionIn{
@@ -67,9 +63,7 @@ func TestCheckGradleUpdatePrecondition(t *testing.T) {
 				GradleWrapperProperties: testdata.GradleWrapperProperties50,
 				LatestGradleRelease:     &domain.GradleRelease{Version: "5.0"},
 			},
-			domain.GradleUpdatePreconditionOut{
-				AlreadyHasLatestGradle: true,
-			},
+			domain.AlreadyHasLatestGradle,
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {

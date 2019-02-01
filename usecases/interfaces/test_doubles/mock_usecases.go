@@ -119,18 +119,6 @@ func (mr *MockGetRepositoryErrorMockRecorder) Error() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Error", reflect.TypeOf((*MockGetRepositoryError)(nil).Error))
 }
 
-// NoGradleVersion mocks base method
-func (m *MockGetRepositoryError) NoGradleVersion() bool {
-	ret := m.ctrl.Call(m, "NoGradleVersion")
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// NoGradleVersion indicates an expected call of NoGradleVersion
-func (mr *MockGetRepositoryErrorMockRecorder) NoGradleVersion() *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NoGradleVersion", reflect.TypeOf((*MockGetRepositoryError)(nil).NoGradleVersion))
-}
-
 // NoSuchRepository mocks base method
 func (m *MockGetRepositoryError) NoSuchRepository() bool {
 	ret := m.ctrl.Call(m, "NoSuchRepository")

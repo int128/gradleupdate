@@ -16,25 +16,35 @@ type GradleUpdatePreconditionIn struct {
 	LatestGradleRelease     *GradleRelease
 }
 
-type GradleUpdatePreconditionOut struct {
-	NoReadmeBadge          bool
-	NoGradleVersion        bool
-	AlreadyHasLatestGradle bool
-}
+type GradleUpdatePreconditionOut int
 
-func CheckGradleUpdatePrecondition(in GradleUpdatePreconditionIn) (out GradleUpdatePreconditionOut) {
+var (
+	ReadyToUpdate             = GradleUpdatePreconditionOut(0)
+	AlreadyHasLatestGradle    = GradleUpdatePreconditionOut(1)
+	NoGradleWrapperProperties = GradleUpdatePreconditionOut(51)
+	NoGradleVersion           = GradleUpdatePreconditionOut(52)
+	NoReadme                  = GradleUpdatePreconditionOut(53)
+	NoReadmeBadge             = GradleUpdatePreconditionOut(54)
+)
+
+func CheckGradleUpdatePrecondition(in GradleUpdatePreconditionIn) GradleUpdatePreconditionOut {
+	if in.GradleWrapperProperties == nil {
+		return NoGradleWrapperProperties
+	}
+	currentGradleVersion := FindGradleWrapperVersion(in.GradleWrapperProperties)
+	if currentGradleVersion == "" {
+		return NoGradleVersion
+	}
+	if in.Readme == nil {
+		return NoReadme
+	}
 	if !bytes.Contains(in.Readme, []byte(in.BadgeURL)) {
-		out.NoReadmeBadge = true
+		return NoReadmeBadge
 	}
-	currentVersion := FindGradleWrapperVersion(in.GradleWrapperProperties)
-	if currentVersion == "" {
-		out.NoGradleVersion = true
-	} else {
-		if currentVersion.GreaterOrEqualThan(in.LatestGradleRelease.Version) {
-			out.AlreadyHasLatestGradle = true
-		}
+	if currentGradleVersion.GreaterOrEqualThan(in.LatestGradleRelease.Version) {
+		return AlreadyHasLatestGradle
 	}
-	return
+	return ReadyToUpdate
 }
 
 // GradleWrapperPropertiesPath is path to the gradle-wrapper.properties
