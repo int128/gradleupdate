@@ -20,25 +20,23 @@ type SendUpdate struct {
 	dig.In
 	GradleService                gateways.GradleService
 	RepositoryRepository         gateways.RepositoryRepository
-	RepositoryLastScanRepository gateways.RepositoryLastScanRepository
+	RepositoryLastScanRepository gateways.RepositoryLastUpdateRepository
 	SendPullRequest              usecases.SendPullRequest
 	TimeService                  gateways.TimeService
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
-	scan := domain.RepositoryLastScan{
-		Repository:   id,
-		LastScanTime: usecase.TimeService.Now(),
+	lastUpdate := domain.RepositoryLastUpdate{
+		Repository:     id,
+		LastUpdateTime: usecase.TimeService.Now(),
 	}
 	err := usecase.sendUpdate(ctx, id)
 	if err != nil {
 		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
-			if out := err.PreconditionViolation(); ok {
-				scan.PreconditionViolation = out
-			}
+			lastUpdate.PreconditionViolation = err.PreconditionViolation()
 		}
 	}
-	if err := usecase.RepositoryLastScanRepository.Save(ctx, scan); err != nil {
+	if err := usecase.RepositoryLastScanRepository.Save(ctx, lastUpdate); err != nil {
 		return errors.Wrapf(err, "error while saving the scan for the repository %s", id)
 	}
 	return errors.Wrapf(err, "error while scanning the repository %s", id)

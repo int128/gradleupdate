@@ -10,7 +10,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gateways github.com/int128/gradleupdate/gateways/interfaces RepositoryError,BadgeLastAccessRepository,RepositoryLastScanRepository,RepositoryRepository,PullRequestRepository,GitService,GradleService
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gateways github.com/int128/gradleupdate/gateways/interfaces RepositoryError,BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleService
 
 type RepositoryError interface {
 	error
@@ -22,8 +22,8 @@ type BadgeLastAccessRepository interface {
 	FindBySince(ctx context.Context, since time.Time) ([]domain.BadgeLastAccess, error)
 }
 
-type RepositoryLastScanRepository interface {
-	Save(ctx context.Context, a domain.RepositoryLastScan) error
+type RepositoryLastUpdateRepository interface {
+	Save(ctx context.Context, a domain.RepositoryLastUpdate) error
 }
 
 type RepositoryRepository interface {

@@ -39,10 +39,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:   repositoryID,
-			LastScanTime: timeService.NowValue,
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+			Repository:     repositoryID,
+			LastUpdateTime: timeService.NowValue,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -85,10 +85,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastScanTime:          timeService.NowValue,
+			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
 		})
 
@@ -128,10 +128,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastScanTime:          timeService.NowValue,
+			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
 		})
 
@@ -171,10 +171,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastScanTime:          timeService.NowValue,
+			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleVersion,
 		})
 
@@ -214,10 +214,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastScanTime:          timeService.NowValue,
+			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoReadme,
 		})
 
@@ -257,10 +257,10 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
+		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastScanTime:          timeService.NowValue,
+			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoReadmeBadge,
 		})
 

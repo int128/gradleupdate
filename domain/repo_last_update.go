@@ -7,8 +7,8 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-type RepositoryLastScan struct {
+type RepositoryLastUpdate struct {
 	Repository            git.RepositoryID
-	LastScanTime          time.Time
+	LastUpdateTime        time.Time
 	PreconditionViolation gradleupdate.PreconditionViolation
 }
