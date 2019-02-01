@@ -25,8 +25,17 @@
     {% case domain.ReadyToUpdate %}
     <h3>This repository has the out-of-dated Gradle.</h3>
     <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
-    <p>We sent a pull request for updating version (or will send soon).</p>
-    <p><a href="{%s r.Repository.HTMLURL %}" target="_blank">Move to GitHub</a></p>
+    <p>We will soon send a pull request for updating version (or we have sent).</p>
+    <p>
+      <a href="{%s r.Repository.HTMLURL %}" target="_blank" class="btn btn-primary">Move to GitHub</a>
+    </p>
+    <form method="POST" action="{%s r.RequestUpdateURL %}">
+      <p>
+        <button type="submit" class="btn btn-link">
+          Request a Pull Request now
+        </button>
+      </p>
+    </form>
 
     {% case domain.AlreadyHasLatestGradle %}
     <h3>This repository has the latest Gradle!</h3>

@@ -8,4 +8,5 @@ type Repository struct {
 	BadgeMarkdown               string
 	BadgeHTML                   string
 	BadgeURL                    string
+	RequestUpdateURL            string
 }
