@@ -9,6 +9,7 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
@@ -86,9 +87,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:      repositoryID,
-			LastScanTime:    timeService.NowValue,
-			PreconditionOut: gradle.AlreadyHasLatestGradle,
+			Repository:            repositoryID,
+			LastScanTime:          timeService.NowValue,
+			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -108,8 +109,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != gradle.AlreadyHasLatestGradle {
-			t.Errorf("PreconditionViolation wants %v but %v", gradle.AlreadyHasLatestGradle, preconditionViolation)
+		if preconditionViolation != gradleupdate.AlreadyHasLatestGradle {
+			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.AlreadyHasLatestGradle, preconditionViolation)
 		}
 	})
 
@@ -129,9 +130,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:      repositoryID,
-			LastScanTime:    timeService.NowValue,
-			PreconditionOut: gradle.NoGradleWrapperProperties,
+			Repository:            repositoryID,
+			LastScanTime:          timeService.NowValue,
+			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -151,8 +152,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != gradle.NoGradleWrapperProperties {
-			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoGradleWrapperProperties, preconditionViolation)
+		if preconditionViolation != gradleupdate.NoGradleWrapperProperties {
+			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoGradleWrapperProperties, preconditionViolation)
 		}
 	})
 
@@ -172,9 +173,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:      repositoryID,
-			LastScanTime:    timeService.NowValue,
-			PreconditionOut: gradle.NoGradleVersion,
+			Repository:            repositoryID,
+			LastScanTime:          timeService.NowValue,
+			PreconditionViolation: gradleupdate.NoGradleVersion,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -194,8 +195,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != gradle.NoGradleVersion {
-			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoGradleVersion, preconditionViolation)
+		if preconditionViolation != gradleupdate.NoGradleVersion {
+			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoGradleVersion, preconditionViolation)
 		}
 	})
 
@@ -215,9 +216,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:      repositoryID,
-			LastScanTime:    timeService.NowValue,
-			PreconditionOut: gradle.NoReadme,
+			Repository:            repositoryID,
+			LastScanTime:          timeService.NowValue,
+			PreconditionViolation: gradleupdate.NoReadme,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -237,8 +238,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != gradle.NoReadme {
-			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoReadme, preconditionViolation)
+		if preconditionViolation != gradleupdate.NoReadme {
+			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoReadme, preconditionViolation)
 		}
 	})
 
@@ -258,9 +259,9 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
-			Repository:      repositoryID,
-			LastScanTime:    timeService.NowValue,
-			PreconditionOut: gradle.NoReadmeBadge,
+			Repository:            repositoryID,
+			LastScanTime:          timeService.NowValue,
+			PreconditionViolation: gradleupdate.NoReadmeBadge,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -280,8 +281,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != gradle.NoReadmeBadge {
-			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoReadmeBadge, preconditionViolation)
+		if preconditionViolation != gradleupdate.NoReadmeBadge {
+			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoReadmeBadge, preconditionViolation)
 		}
 	})
 }

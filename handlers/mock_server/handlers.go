@@ -6,6 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -46,7 +47,7 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 		DoAndReturn(func(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
 			return &usecases.GetRepositoryResponse{
 				Repository:                  repository,
-				GradleUpdatePreconditionOut: gradle.ReadyToUpdate,
+				UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
 			}, nil
 		})
 

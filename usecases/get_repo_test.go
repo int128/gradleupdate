@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
@@ -21,19 +22,19 @@ func TestGetRepository_Do(t *testing.T) {
 	readme := git.FileContent("/owner/repo/status.svg")
 
 	for _, c := range []struct {
-		name    string
-		content git.FileContent
-		out     gradle.UpdatePreconditionOut
+		name                  string
+		content               git.FileContent
+		preconditionViolation gradleupdate.PreconditionViolation
 	}{
 		{
-			name:    "up-to-date",
-			content: testdata.GradleWrapperProperties50,
-			out:     gradle.AlreadyHasLatestGradle,
+			name:                  "up-to-date",
+			content:               testdata.GradleWrapperProperties50,
+			preconditionViolation: gradleupdate.AlreadyHasLatestGradle,
 		},
 		{
-			name:    "out-of-date",
-			content: testdata.GradleWrapperProperties4102,
-			out:     gradle.ReadyToUpdate,
+			name:                  "out-of-date",
+			content:               testdata.GradleWrapperProperties4102,
+			preconditionViolation: gradleupdate.ReadyToUpdate,
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
@@ -57,8 +58,8 @@ func TestGetRepository_Do(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not do usecase: %s", err)
 			}
-			if resp.GradleUpdatePreconditionOut != c.out {
-				t.Errorf("UpdatePreconditionOut wants %v but %v", c.out, resp.GradleUpdatePreconditionOut)
+			if resp.UpdatePreconditionViolation != c.preconditionViolation {
+				t.Errorf("UpdatePreconditionViolation wants %v but %v", c.preconditionViolation, resp.UpdatePreconditionViolation)
 			}
 		})
 	}

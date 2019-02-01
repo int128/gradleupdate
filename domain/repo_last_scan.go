@@ -4,11 +4,11 @@ import (
 	"time"
 
 	"github.com/int128/gradleupdate/domain/git"
-	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
 type RepositoryLastScan struct {
-	Repository      git.RepositoryID
-	LastScanTime    time.Time
-	PreconditionOut gradle.UpdatePreconditionOut
+	Repository            git.RepositoryID
+	LastScanTime          time.Time
+	PreconditionViolation gradleupdate.PreconditionViolation
 }

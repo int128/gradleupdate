@@ -7,6 +7,7 @@ import (
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -33,7 +34,7 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 	if err != nil {
 		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
 			if out := err.PreconditionViolation(); ok {
-				scan.PreconditionOut = out
+				scan.PreconditionViolation = out
 			}
 		}
 	}
@@ -44,8 +45,8 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 }
 
 func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) error {
-	var in gradle.UpdatePreconditionIn
-	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
+	var precondition gradleupdate.Precondition
+	precondition.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
 
 	var eg errgroup.Group
 	eg.Go(func() error {
@@ -58,7 +59,7 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 			}
 			return errors.Wrapf(err, "error while getting README")
 		}
-		in.Readme = readme
+		precondition.Readme = readme
 		return nil
 	})
 	eg.Go(func() error {
@@ -71,7 +72,7 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 			}
 			return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
 		}
-		in.GradleWrapperProperties = gradleWrapperProperties
+		precondition.GradleWrapperProperties = gradleWrapperProperties
 		return nil
 	})
 	eg.Go(func() error {
@@ -79,31 +80,31 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 		if err != nil {
 			return errors.Wrapf(err, "error while getting the latest Gradle release")
 		}
-		in.LatestGradleRelease = latestRelease
+		precondition.LatestGradleRelease = latestRelease
 		return nil
 	})
 	if err := eg.Wait(); err != nil {
 		return errors.WithStack(err)
 	}
 
-	out := gradle.CheckUpdatePrecondition(in)
-	if out != gradle.ReadyToUpdate {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", out), GradleUpdatePreconditionOut: out})
+	out := gradleupdate.CheckPrecondition(precondition)
+	if out != gradleupdate.ReadyToUpdate {
+		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", out), preconditionViolation: out})
 	}
 
-	newProps := gradle.ReplaceWrapperVersion(in.GradleWrapperProperties, in.LatestGradleRelease.Version)
+	newProps := gradle.ReplaceWrapperVersion(precondition.GradleWrapperProperties, precondition.LatestGradleRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
-		HeadBranchName: fmt.Sprintf("gradle-%s-%s", in.LatestGradleRelease.Version, id.Owner),
-		CommitMessage:  fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
+		HeadBranchName: fmt.Sprintf("gradle-%s-%s", precondition.LatestGradleRelease.Version, id.Owner),
+		CommitMessage:  fmt.Sprintf("Gradle %s", precondition.LatestGradleRelease.Version),
 		CommitFiles: []git.File{
 			{
 				Path:    gradle.WrapperPropertiesPath,
 				Content: git.FileContent(newProps),
 			},
 		},
-		Title: fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
-		Body:  fmt.Sprintf(`Gradle %s is available.`, in.LatestGradleRelease.Version),
+		Title: fmt.Sprintf("Gradle %s", precondition.LatestGradleRelease.Version),
+		Body:  fmt.Sprintf(`Gradle %s is available.`, precondition.LatestGradleRelease.Version),
 	}
 	if err := usecase.SendPullRequest.Do(ctx, req); err != nil {
 		return errors.Wrapf(err, "error while sending a pull request %+v", req)
@@ -113,9 +114,9 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 
 type sendUpdateError struct {
 	error
-	GradleUpdatePreconditionOut gradle.UpdatePreconditionOut
+	preconditionViolation gradleupdate.PreconditionViolation
 }
 
-func (err *sendUpdateError) PreconditionViolation() gradle.UpdatePreconditionOut {
-	return err.GradleUpdatePreconditionOut
+func (err *sendUpdateError) PreconditionViolation() gradleupdate.PreconditionViolation {
+	return err.preconditionViolation
 }

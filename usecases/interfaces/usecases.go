@@ -5,6 +5,7 @@ import (
 
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
 //go:generate mockgen -destination test_doubles/mock_usecases.go -package usecases github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetRepository,GetRepositoryError,SendUpdate,SendUpdateError,BatchSendUpdates,SendPullRequest
@@ -24,7 +25,7 @@ type GetRepository interface {
 
 type GetRepositoryResponse struct {
 	Repository                  git.Repository
-	GradleUpdatePreconditionOut gradle.UpdatePreconditionOut
+	UpdatePreconditionViolation gradleupdate.PreconditionViolation
 }
 
 type GetRepositoryError interface {
@@ -38,7 +39,7 @@ type SendUpdate interface {
 
 type SendUpdateError interface {
 	error
-	PreconditionViolation() gradle.UpdatePreconditionOut
+	PreconditionViolation() gradleupdate.PreconditionViolation
 }
 
 type BatchSendUpdates interface {

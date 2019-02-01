@@ -55,7 +55,7 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	t := templates.Repository{
 		Repository:                  resp.Repository,
-		GradleUpdatePreconditionOut: resp.GradleUpdatePreconditionOut,
+		UpdatePreconditionViolation: resp.UpdatePreconditionViolation,
 		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, badgeFullURL, repositoryFullURL),
 		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, repositoryFullURL, badgeFullURL),
 		BadgeURL:                    badgeURL,

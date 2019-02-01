@@ -6,6 +6,7 @@ import (
 
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -30,8 +31,8 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		return nil, errors.Wrapf(err, "error while getting the repository %s", id)
 	}
 
-	var in gradle.UpdatePreconditionIn
-	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
+	var precondition gradleupdate.Precondition
+	precondition.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
 	var eg errgroup.Group
 	eg.Go(func() error {
 		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
@@ -43,7 +44,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 			}
 			return errors.Wrapf(err, "error while getting README")
 		}
-		in.Readme = readme
+		precondition.Readme = readme
 		return nil
 	})
 	eg.Go(func() error {
@@ -56,7 +57,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 			}
 			return errors.Wrapf(err, "error while getting gradle-wrapper.properties")
 		}
-		in.GradleWrapperProperties = gradleWrapperProperties
+		precondition.GradleWrapperProperties = gradleWrapperProperties
 		return nil
 	})
 	eg.Go(func() error {
@@ -64,17 +65,17 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		if err != nil {
 			return errors.Wrapf(err, "error while getting the latest Gradle release")
 		}
-		in.LatestGradleRelease = latestRelease
+		precondition.LatestGradleRelease = latestRelease
 		return nil
 	})
 	if err := eg.Wait(); err != nil {
 		return nil, errors.WithStack(err)
 	}
 
-	out := gradle.CheckUpdatePrecondition(in)
+	out := gradleupdate.CheckPrecondition(precondition)
 	return &usecases.GetRepositoryResponse{
 		Repository:                  *repository,
-		GradleUpdatePreconditionOut: out,
+		UpdatePreconditionViolation: out,
 	}, nil
 }
 

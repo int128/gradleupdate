@@ -8,7 +8,7 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	git "github.com/int128/gradleupdate/domain/git"
-	gradle "github.com/int128/gradleupdate/domain/gradle"
+	gradleupdate "github.com/int128/gradleupdate/domain/gradleupdate"
 	interfaces "github.com/int128/gradleupdate/usecases/interfaces"
 	reflect "reflect"
 )
@@ -203,9 +203,9 @@ func (mr *MockSendUpdateErrorMockRecorder) Error() *gomock.Call {
 }
 
 // PreconditionViolation mocks base method
-func (m *MockSendUpdateError) PreconditionViolation() gradle.UpdatePreconditionOut {
+func (m *MockSendUpdateError) PreconditionViolation() gradleupdate.PreconditionViolation {
 	ret := m.ctrl.Call(m, "PreconditionViolation")
-	ret0, _ := ret[0].(gradle.UpdatePreconditionOut)
+	ret0, _ := ret[0].(gradleupdate.PreconditionViolation)
 	return ret0
 }
 

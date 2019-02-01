@@ -18,8 +18,8 @@ func newRepositoryLastScanKey(ctx context.Context, id git.RepositoryID) *datasto
 }
 
 type repositoryLastScanEntity struct {
-	LastScanTime    time.Time
-	PreconditionOut int
+	LastScanTime          time.Time
+	PreconditionViolation int
 }
 
 type RepositoryLastScanRepository struct {
@@ -29,8 +29,8 @@ type RepositoryLastScanRepository struct {
 func (r *RepositoryLastScanRepository) Save(ctx context.Context, a domain.RepositoryLastScan) error {
 	k := newRepositoryLastScanKey(ctx, a.Repository)
 	_, err := datastore.Put(ctx, k, &repositoryLastScanEntity{
-		LastScanTime:    a.LastScanTime,
-		PreconditionOut: int(a.PreconditionOut),
+		LastScanTime:          a.LastScanTime,
+		PreconditionViolation: int(a.PreconditionViolation),
 	})
 	if err != nil {
 		return errors.Wrapf(err, "error while saving an entity")
