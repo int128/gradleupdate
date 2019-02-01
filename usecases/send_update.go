@@ -18,11 +18,11 @@ import (
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
 	dig.In
-	GradleService                gateways.GradleService
-	RepositoryRepository         gateways.RepositoryRepository
-	RepositoryLastScanRepository gateways.RepositoryLastUpdateRepository
-	SendPullRequest              usecases.SendPullRequest
-	TimeService                  gateways.TimeService
+	GradleService                  gateways.GradleService
+	RepositoryRepository           gateways.RepositoryRepository
+	RepositoryLastUpdateRepository gateways.RepositoryLastUpdateRepository
+	SendPullRequest                usecases.SendPullRequest
+	TimeService                    gateways.TimeService
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
@@ -36,7 +36,7 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 			lastUpdate.PreconditionViolation = err.PreconditionViolation()
 		}
 	}
-	if err := usecase.RepositoryLastScanRepository.Save(ctx, lastUpdate); err != nil {
+	if err := usecase.RepositoryLastUpdateRepository.Save(ctx, lastUpdate); err != nil {
 		return errors.Wrapf(err, "error while saving the scan for the repository %s", id)
 	}
 	return errors.Wrapf(err, "error while scanning the repository %s", id)

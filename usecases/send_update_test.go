@@ -39,8 +39,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:     repositoryID,
 			LastUpdateTime: timeService.NowValue,
 		})
@@ -59,11 +59,11 @@ func TestSendUpdate_Do(t *testing.T) {
 		}).Return(nil)
 
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -85,8 +85,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
@@ -94,11 +94,11 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -128,8 +128,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
@@ -137,11 +137,11 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -171,8 +171,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleVersion,
@@ -180,11 +180,11 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -214,8 +214,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoReadme,
@@ -223,11 +223,11 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -257,8 +257,8 @@ func TestSendUpdate_Do(t *testing.T) {
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastScanRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
+		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        timeService.NowValue,
 			PreconditionViolation: gradleupdate.NoReadmeBadge,
@@ -266,11 +266,11 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
 		u := usecases.SendUpdate{
-			RepositoryRepository:         repositoryRepository,
-			RepositoryLastScanRepository: repositoryLastScanRepository,
-			GradleService:                gradleService,
-			SendPullRequest:              sendPullRequest,
-			TimeService:                  timeService,
+			RepositoryRepository:           repositoryRepository,
+			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
+			GradleService:                  gradleService,
+			SendPullRequest:                sendPullRequest,
+			TimeService:                    timeService,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
