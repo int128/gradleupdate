@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ type GetRepository struct {
 	RepositoryRepository gateways.RepositoryRepository
 }
 
-func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetRepositoryResponse, error) {
+func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
 	repository, err := usecase.RepositoryRepository.Get(ctx, id)
 	if err != nil {
 		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
@@ -29,7 +30,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 		return nil, errors.Wrapf(err, "error while getting the repository %s", id)
 	}
 
-	var in domain.GradleUpdatePreconditionIn
+	var in gradle.UpdatePreconditionIn
 	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
 	var eg errgroup.Group
 	eg.Go(func() error {
@@ -46,7 +47,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 		return nil
 	})
 	eg.Go(func() error {
-		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, gradle.WrapperPropertiesPath)
 		if err != nil {
 			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
 				if err.NoSuchEntity() {
@@ -70,7 +71,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id domain.RepositoryID) (*
 		return nil, errors.WithStack(err)
 	}
 
-	out := domain.CheckGradleUpdatePrecondition(in)
+	out := gradle.CheckUpdatePrecondition(in)
 	return &usecases.GetRepositoryResponse{
 		Repository:                  *repository,
 		GradleUpdatePreconditionOut: out,

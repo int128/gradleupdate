@@ -1,10 +1,13 @@
 package templates
 
-import "github.com/int128/gradleupdate/domain"
+import (
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
+)
 
 type Repository struct {
-	Repository                  domain.Repository
-	GradleUpdatePreconditionOut domain.GradleUpdatePreconditionOut
+	Repository                  git.Repository
+	GradleUpdatePreconditionOut gradle.UpdatePreconditionOut
 	BadgeMarkdown               string
 	BadgeHTML                   string
 	BadgeURL                    string

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
@@ -14,7 +14,7 @@ type PullRequestRepository struct {
 	Client *github.Client
 }
 
-func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequest) (*domain.PullRequest, error) {
+func (r *PullRequestRepository) Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error) {
 	payload, _, err := r.Client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
 		Base:  github.String(pull.BaseBranch.Name),
 		Head:  github.String(pull.HeadBranch.Repository.Owner + ":" + pull.HeadBranch.Name),
@@ -26,17 +26,17 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 	}
 	head := payload.GetHead()
 	base := payload.GetBase()
-	return &domain.PullRequest{
-		ID: domain.PullRequestID{
-			Repository: domain.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+	return &git.PullRequest{
+		ID: git.PullRequestID{
+			Repository: git.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			Number:     payload.GetNumber(),
 		},
-		HeadBranch: domain.BranchID{
-			Repository: domain.RepositoryID{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
+		HeadBranch: git.BranchID{
+			Repository: git.RepositoryID{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
 			Name:       head.GetRef(),
 		},
-		BaseBranch: domain.BranchID{
-			Repository: domain.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+		BaseBranch: git.BranchID{
+			Repository: git.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			Name:       base.GetRef(),
 		},
 		Title: payload.GetTitle(),
@@ -44,7 +44,7 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull domain.PullRequ
 	}, nil
 }
 
-func (r *PullRequestRepository) FindByBranch(ctx context.Context, baseBranch, headBranch domain.BranchID) (*domain.PullRequest, error) {
+func (r *PullRequestRepository) FindByBranch(ctx context.Context, baseBranch, headBranch git.BranchID) (*git.PullRequest, error) {
 	pulls, _, err := r.Client.PullRequests.List(ctx, baseBranch.Repository.Owner, baseBranch.Repository.Name, &github.PullRequestListOptions{
 		Base:        baseBranch.Name,
 		Head:        headBranch.Repository.Owner + ":" + headBranch.Name,
@@ -63,17 +63,17 @@ func (r *PullRequestRepository) FindByBranch(ctx context.Context, baseBranch, he
 	payload := pulls[0]
 	head := payload.GetHead()
 	base := payload.GetBase()
-	return &domain.PullRequest{
-		ID: domain.PullRequestID{
-			Repository: domain.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+	return &git.PullRequest{
+		ID: git.PullRequestID{
+			Repository: git.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			Number:     payload.GetNumber(),
 		},
-		HeadBranch: domain.BranchID{
-			Repository: domain.RepositoryID{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
+		HeadBranch: git.BranchID{
+			Repository: git.RepositoryID{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
 			Name:       head.GetRef(),
 		},
-		BaseBranch: domain.BranchID{
-			Repository: domain.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
+		BaseBranch: git.BranchID{
+			Repository: git.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
 			Name:       base.GetRef(),
 		},
 		Title: payload.GetTitle(),

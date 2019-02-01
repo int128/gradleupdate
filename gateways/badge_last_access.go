@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 	"google.golang.org/appengine/datastore"
@@ -12,7 +14,7 @@ import (
 
 const badgeLastAccessKind = "BadgeLastAccess"
 
-func newBadgeLastAccessKey(ctx context.Context, id domain.RepositoryID) *datastore.Key {
+func newBadgeLastAccessKey(ctx context.Context, id git.RepositoryID) *datastore.Key {
 	return datastore.NewKey(ctx, badgeLastAccessKind, id.FullName().String(), 0, nil)
 }
 
@@ -66,19 +68,19 @@ func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.
 }
 
 func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntityOld) *domain.BadgeLastAccess {
-	repositoryID := domain.RepositoryFullName(k.StringID()).Parse()
+	repositoryID := git.RepositoryFullName(k.StringID()).Parse()
 	if repositoryID == nil {
 		return nil
 	}
-	currentVersion := domain.GradleVersion(e.CurrentVersion)
+	currentVersion := gradle.Version(e.CurrentVersion)
 	//TODO: remove when schema migration is done
 	if e.TargetVersion != "" {
-		currentVersion = domain.GradleVersion(e.TargetVersion)
+		currentVersion = gradle.Version(e.TargetVersion)
 	}
 	return &domain.BadgeLastAccess{
 		Repository:     *repositoryID,
 		LastAccessTime: e.LastAccessTime,
 		CurrentVersion: currentVersion,
-		LatestVersion:  domain.GradleVersion(e.LatestVersion),
+		LatestVersion:  gradle.Version(e.LatestVersion),
 	}
 }

@@ -7,6 +7,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
@@ -17,7 +19,7 @@ import (
 
 func TestSendUpdate_Do(t *testing.T) {
 	ctx := context.Background()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 	timeService := &gateways.TimeService{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
@@ -28,13 +30,13 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "5.0"}, nil)
+			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
@@ -47,8 +49,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			Base:           repositoryID,
 			HeadBranchName: "gradle-5.0-owner",
 			CommitMessage:  "Gradle 5.0",
-			CommitFiles: []domain.File{{
-				Path:    domain.GradleWrapperPropertiesPath,
+			CommitFiles: []git.File{{
+				Path:    gradle.WrapperPropertiesPath,
 				Content: testdata.GradleWrapperProperties50,
 			}},
 			Title: "Gradle 5.0",
@@ -73,20 +75,20 @@ func TestSendUpdate_Do(t *testing.T) {
 		defer ctrl.Finish()
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "4.10.2"}, nil)
+			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:      repositoryID,
 			LastScanTime:    timeService.NowValue,
-			PreconditionOut: domain.AlreadyHasLatestGradle,
+			PreconditionOut: gradle.AlreadyHasLatestGradle,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -106,8 +108,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != domain.AlreadyHasLatestGradle {
-			t.Errorf("PreconditionViolation wants %v but %v", domain.AlreadyHasLatestGradle, preconditionViolation)
+		if preconditionViolation != gradle.AlreadyHasLatestGradle {
+			t.Errorf("PreconditionViolation wants %v but %v", gradle.AlreadyHasLatestGradle, preconditionViolation)
 		}
 	})
 
@@ -117,19 +119,19 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil).MaxTimes(1)
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil).MaxTimes(1)
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, &noSuchEntityError{})
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "5.0"}, nil).MaxTimes(1)
+			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:      repositoryID,
 			LastScanTime:    timeService.NowValue,
-			PreconditionOut: domain.NoGradleWrapperProperties,
+			PreconditionOut: gradle.NoGradleWrapperProperties,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -149,8 +151,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != domain.NoGradleWrapperProperties {
-			t.Errorf("PreconditionViolation wants %v but %v", domain.NoGradleWrapperProperties, preconditionViolation)
+		if preconditionViolation != gradle.NoGradleWrapperProperties {
+			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoGradleWrapperProperties, preconditionViolation)
 		}
 	})
 
@@ -160,19 +162,19 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(domain.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
-			Return(domain.FileContent("INVALID"), nil)
+			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
+			Return(git.FileContent("INVALID"), nil)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "5.0"}, nil)
+			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:      repositoryID,
 			LastScanTime:    timeService.NowValue,
-			PreconditionOut: domain.NoGradleVersion,
+			PreconditionOut: gradle.NoGradleVersion,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -192,8 +194,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != domain.NoGradleVersion {
-			t.Errorf("PreconditionViolation wants %v but %v", domain.NoGradleVersion, preconditionViolation)
+		if preconditionViolation != gradle.NoGradleVersion {
+			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoGradleVersion, preconditionViolation)
 		}
 	})
 
@@ -204,18 +206,18 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(nil, &noSuchEntityError{})
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil).MaxTimes(1)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "5.0"}, nil).MaxTimes(1)
+			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:      repositoryID,
 			LastScanTime:    timeService.NowValue,
-			PreconditionOut: domain.NoReadme,
+			PreconditionOut: gradle.NoReadme,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -235,8 +237,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != domain.NoReadme {
-			t.Errorf("PreconditionViolation wants %v but %v", domain.NoReadme, preconditionViolation)
+		if preconditionViolation != gradle.NoReadme {
+			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoReadme, preconditionViolation)
 		}
 	})
 
@@ -246,19 +248,19 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(domain.FileContent("INVALID"), nil)
-		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+			Return(git.FileContent("INVALID"), nil)
+		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
-			Return(&domain.GradleRelease{Version: "5.0"}, nil)
+			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastScanRepository := gateways.NewMockRepositoryLastScanRepository(ctrl)
 		repositoryLastScanRepository.EXPECT().Save(ctx, domain.RepositoryLastScan{
 			Repository:      repositoryID,
 			LastScanTime:    timeService.NowValue,
-			PreconditionOut: domain.NoReadmeBadge,
+			PreconditionOut: gradle.NoReadmeBadge,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -278,8 +280,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
 		preconditionViolation := sendUpdateError.PreconditionViolation()
-		if preconditionViolation != domain.NoReadmeBadge {
-			t.Errorf("PreconditionViolation wants %v but %v", domain.NoReadmeBadge, preconditionViolation)
+		if preconditionViolation != gradle.NoReadmeBadge {
+			t.Errorf("PreconditionViolation wants %v but %v", gradle.NoReadmeBadge, preconditionViolation)
 		}
 	})
 }

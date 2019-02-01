@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -22,7 +24,7 @@ type SendUpdate struct {
 	TimeService                  gateways.TimeService
 }
 
-func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID) error {
+func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 	scan := domain.RepositoryLastScan{
 		Repository:   id,
 		LastScanTime: usecase.TimeService.Now(),
@@ -41,8 +43,8 @@ func (usecase *SendUpdate) Do(ctx context.Context, id domain.RepositoryID) error
 	return errors.Wrapf(err, "error while scanning the repository %s", id)
 }
 
-func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryID) error {
-	var in domain.GradleUpdatePreconditionIn
+func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) error {
+	var in gradle.UpdatePreconditionIn
 	in.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
 
 	var eg errgroup.Group
@@ -60,7 +62,7 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 		return nil
 	})
 	eg.Go(func() error {
-		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, gradle.WrapperPropertiesPath)
 		if err != nil {
 			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
 				if err.NoSuchEntity() {
@@ -84,20 +86,20 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 		return errors.WithStack(err)
 	}
 
-	out := domain.CheckGradleUpdatePrecondition(in)
-	if out != domain.ReadyToUpdate {
+	out := gradle.CheckUpdatePrecondition(in)
+	if out != gradle.ReadyToUpdate {
 		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", out), GradleUpdatePreconditionOut: out})
 	}
 
-	newProps := domain.ReplaceGradleWrapperVersion(in.GradleWrapperProperties, in.LatestGradleRelease.Version)
+	newProps := gradle.ReplaceWrapperVersion(in.GradleWrapperProperties, in.LatestGradleRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
 		HeadBranchName: fmt.Sprintf("gradle-%s-%s", in.LatestGradleRelease.Version, id.Owner),
 		CommitMessage:  fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
-		CommitFiles: []domain.File{
+		CommitFiles: []git.File{
 			{
-				Path:    domain.GradleWrapperPropertiesPath,
-				Content: domain.FileContent(newProps),
+				Path:    gradle.WrapperPropertiesPath,
+				Content: git.FileContent(newProps),
 			},
 		},
 		Title: fmt.Sprintf("Gradle %s", in.LatestGradleRelease.Version),
@@ -111,9 +113,9 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id domain.RepositoryI
 
 type sendUpdateError struct {
 	error
-	GradleUpdatePreconditionOut domain.GradleUpdatePreconditionOut
+	GradleUpdatePreconditionOut gradle.UpdatePreconditionOut
 }
 
-func (err *sendUpdateError) PreconditionViolation() domain.GradleUpdatePreconditionOut {
+func (err *sendUpdateError) PreconditionViolation() gradle.UpdatePreconditionOut {
 	return err.GradleUpdatePreconditionOut
 }

@@ -8,6 +8,8 @@ import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
 	domain "github.com/int128/gradleupdate/domain"
+	git "github.com/int128/gradleupdate/domain/git"
+	gradle "github.com/int128/gradleupdate/domain/gradle"
 	interfaces "github.com/int128/gradleupdate/gateways/interfaces"
 	reflect "reflect"
 	time "time"
@@ -167,9 +169,9 @@ func (m *MockRepositoryRepository) EXPECT() *MockRepositoryRepositoryMockRecorde
 }
 
 // Fork mocks base method
-func (m *MockRepositoryRepository) Fork(arg0 context.Context, arg1 domain.RepositoryID) (*domain.Repository, error) {
+func (m *MockRepositoryRepository) Fork(arg0 context.Context, arg1 git.RepositoryID) (*git.Repository, error) {
 	ret := m.ctrl.Call(m, "Fork", arg0, arg1)
-	ret0, _ := ret[0].(*domain.Repository)
+	ret0, _ := ret[0].(*git.Repository)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -180,9 +182,9 @@ func (mr *MockRepositoryRepositoryMockRecorder) Fork(arg0, arg1 interface{}) *go
 }
 
 // Get mocks base method
-func (m *MockRepositoryRepository) Get(arg0 context.Context, arg1 domain.RepositoryID) (*domain.Repository, error) {
+func (m *MockRepositoryRepository) Get(arg0 context.Context, arg1 git.RepositoryID) (*git.Repository, error) {
 	ret := m.ctrl.Call(m, "Get", arg0, arg1)
-	ret0, _ := ret[0].(*domain.Repository)
+	ret0, _ := ret[0].(*git.Repository)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -193,9 +195,9 @@ func (mr *MockRepositoryRepositoryMockRecorder) Get(arg0, arg1 interface{}) *gom
 }
 
 // GetBranch mocks base method
-func (m *MockRepositoryRepository) GetBranch(arg0 context.Context, arg1 domain.BranchID) (*domain.Branch, error) {
+func (m *MockRepositoryRepository) GetBranch(arg0 context.Context, arg1 git.BranchID) (*git.Branch, error) {
 	ret := m.ctrl.Call(m, "GetBranch", arg0, arg1)
-	ret0, _ := ret[0].(*domain.Branch)
+	ret0, _ := ret[0].(*git.Branch)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -206,9 +208,9 @@ func (mr *MockRepositoryRepositoryMockRecorder) GetBranch(arg0, arg1 interface{}
 }
 
 // GetFileContent mocks base method
-func (m *MockRepositoryRepository) GetFileContent(arg0 context.Context, arg1 domain.RepositoryID, arg2 string) (domain.FileContent, error) {
+func (m *MockRepositoryRepository) GetFileContent(arg0 context.Context, arg1 git.RepositoryID, arg2 string) (git.FileContent, error) {
 	ret := m.ctrl.Call(m, "GetFileContent", arg0, arg1, arg2)
-	ret0, _ := ret[0].(domain.FileContent)
+	ret0, _ := ret[0].(git.FileContent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -219,9 +221,9 @@ func (mr *MockRepositoryRepositoryMockRecorder) GetFileContent(arg0, arg1, arg2 
 }
 
 // GetReadme mocks base method
-func (m *MockRepositoryRepository) GetReadme(arg0 context.Context, arg1 domain.RepositoryID) (domain.FileContent, error) {
+func (m *MockRepositoryRepository) GetReadme(arg0 context.Context, arg1 git.RepositoryID) (git.FileContent, error) {
 	ret := m.ctrl.Call(m, "GetReadme", arg0, arg1)
-	ret0, _ := ret[0].(domain.FileContent)
+	ret0, _ := ret[0].(git.FileContent)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -255,9 +257,9 @@ func (m *MockPullRequestRepository) EXPECT() *MockPullRequestRepositoryMockRecor
 }
 
 // Create mocks base method
-func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 domain.PullRequest) (*domain.PullRequest, error) {
+func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 git.PullRequest) (*git.PullRequest, error) {
 	ret := m.ctrl.Call(m, "Create", arg0, arg1)
-	ret0, _ := ret[0].(*domain.PullRequest)
+	ret0, _ := ret[0].(*git.PullRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -268,9 +270,9 @@ func (mr *MockPullRequestRepositoryMockRecorder) Create(arg0, arg1 interface{}) 
 }
 
 // FindByBranch mocks base method
-func (m *MockPullRequestRepository) FindByBranch(arg0 context.Context, arg1, arg2 domain.BranchID) (*domain.PullRequest, error) {
+func (m *MockPullRequestRepository) FindByBranch(arg0 context.Context, arg1, arg2 git.BranchID) (*git.PullRequest, error) {
 	ret := m.ctrl.Call(m, "FindByBranch", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*domain.PullRequest)
+	ret0, _ := ret[0].(*git.PullRequest)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -304,9 +306,9 @@ func (m *MockGitService) EXPECT() *MockGitServiceMockRecorder {
 }
 
 // CreateBranch mocks base method
-func (m *MockGitService) CreateBranch(arg0 context.Context, arg1 interfaces.PushBranchRequest) (*domain.Branch, error) {
+func (m *MockGitService) CreateBranch(arg0 context.Context, arg1 interfaces.PushBranchRequest) (*git.Branch, error) {
 	ret := m.ctrl.Call(m, "CreateBranch", arg0, arg1)
-	ret0, _ := ret[0].(*domain.Branch)
+	ret0, _ := ret[0].(*git.Branch)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -317,9 +319,9 @@ func (mr *MockGitServiceMockRecorder) CreateBranch(arg0, arg1 interface{}) *gomo
 }
 
 // UpdateForceBranch mocks base method
-func (m *MockGitService) UpdateForceBranch(arg0 context.Context, arg1 interfaces.PushBranchRequest) (*domain.Branch, error) {
+func (m *MockGitService) UpdateForceBranch(arg0 context.Context, arg1 interfaces.PushBranchRequest) (*git.Branch, error) {
 	ret := m.ctrl.Call(m, "UpdateForceBranch", arg0, arg1)
-	ret0, _ := ret[0].(*domain.Branch)
+	ret0, _ := ret[0].(*git.Branch)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -353,9 +355,9 @@ func (m *MockGradleService) EXPECT() *MockGradleServiceMockRecorder {
 }
 
 // GetCurrentRelease mocks base method
-func (m *MockGradleService) GetCurrentRelease(arg0 context.Context) (*domain.GradleRelease, error) {
+func (m *MockGradleService) GetCurrentRelease(arg0 context.Context) (*gradle.Release, error) {
 	ret := m.ctrl.Call(m, "GetCurrentRelease", arg0)
-	ret0, _ := ret[0].(*domain.GradleRelease)
+	ret0, _ := ret[0].(*gradle.Release)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

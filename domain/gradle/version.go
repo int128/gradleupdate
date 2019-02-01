@@ -1,16 +1,16 @@
-package domain
+package gradle
 
 import (
 	"strconv"
 	"strings"
 )
 
-// GradleVersion represents version of a Gradle.
-type GradleVersion string
+// Version represents version of a Gradle.
+type Version string
 
 // Compare returns an integer comparing two versions by semantic versioning.
 // The result will be 0 if a==b, -1 if a < b, and +1 if a > b.
-func (a GradleVersion) Compare(b GradleVersion) int {
+func (a Version) Compare(b Version) int {
 	as := strings.Split(string(a), ".")
 	bs := strings.Split(string(b), ".")
 	for i := 0; i < minInt(len(as), len(bs)); i++ {
@@ -46,10 +46,10 @@ func minInt(a, b int) int {
 	return a
 }
 
-func (a GradleVersion) String() string {
+func (a Version) String() string {
 	return string(a)
 }
 
-func (a GradleVersion) GreaterOrEqualThan(b GradleVersion) bool {
+func (a Version) GreaterOrEqualThan(b Version) bool {
 	return a.Compare(b) >= 0
 }

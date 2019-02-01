@@ -7,6 +7,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
@@ -16,16 +18,16 @@ func TestGetBadge_Do(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 	timeService := &gateways.TimeService{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
 	for _, c := range []struct {
 		name           string
-		content        domain.FileContent
-		currentVersion domain.GradleVersion
-		latestVersion  domain.GradleVersion
+		content        git.FileContent
+		currentVersion gradle.Version
+		latestVersion  gradle.Version
 		upToDate       bool
 	}{
 		{
@@ -45,12 +47,12 @@ func TestGetBadge_Do(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
-			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentRelease(ctx).
-				Return(&domain.GradleRelease{Version: c.latestVersion}, nil)
+				Return(&gradle.Release{Version: c.latestVersion}, nil)
 
 			badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
 			badgeLastAccessRepository.EXPECT().Save(ctx, domain.BadgeLastAccess{

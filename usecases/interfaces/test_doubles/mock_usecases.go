@@ -7,7 +7,8 @@ package usecases
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	domain "github.com/int128/gradleupdate/domain"
+	git "github.com/int128/gradleupdate/domain/git"
+	gradle "github.com/int128/gradleupdate/domain/gradle"
 	interfaces "github.com/int128/gradleupdate/usecases/interfaces"
 	reflect "reflect"
 )
@@ -36,7 +37,7 @@ func (m *MockGetBadge) EXPECT() *MockGetBadgeMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockGetBadge) Do(arg0 context.Context, arg1 domain.RepositoryID) (*interfaces.GetBadgeResponse, error) {
+func (m *MockGetBadge) Do(arg0 context.Context, arg1 git.RepositoryID) (*interfaces.GetBadgeResponse, error) {
 	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].(*interfaces.GetBadgeResponse)
 	ret1, _ := ret[1].(error)
@@ -72,7 +73,7 @@ func (m *MockGetRepository) EXPECT() *MockGetRepositoryMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockGetRepository) Do(arg0 context.Context, arg1 domain.RepositoryID) (*interfaces.GetRepositoryResponse, error) {
+func (m *MockGetRepository) Do(arg0 context.Context, arg1 git.RepositoryID) (*interfaces.GetRepositoryResponse, error) {
 	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].(*interfaces.GetRepositoryResponse)
 	ret1, _ := ret[1].(error)
@@ -155,7 +156,7 @@ func (m *MockSendUpdate) EXPECT() *MockSendUpdateMockRecorder {
 }
 
 // Do mocks base method
-func (m *MockSendUpdate) Do(arg0 context.Context, arg1 domain.RepositoryID) error {
+func (m *MockSendUpdate) Do(arg0 context.Context, arg1 git.RepositoryID) error {
 	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
@@ -202,9 +203,9 @@ func (mr *MockSendUpdateErrorMockRecorder) Error() *gomock.Call {
 }
 
 // PreconditionViolation mocks base method
-func (m *MockSendUpdateError) PreconditionViolation() domain.GradleUpdatePreconditionOut {
+func (m *MockSendUpdateError) PreconditionViolation() gradle.UpdatePreconditionOut {
 	ret := m.ctrl.Call(m, "PreconditionViolation")
-	ret0, _ := ret[0].(domain.GradleUpdatePreconditionOut)
+	ret0, _ := ret[0].(gradle.UpdatePreconditionOut)
 	return ret0
 }
 

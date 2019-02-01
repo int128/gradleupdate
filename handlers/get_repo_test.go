@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
@@ -15,7 +15,7 @@ import (
 func TestGetRepository_ServeHTTP(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 
 	getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
 	getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
@@ -44,7 +44,7 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 
 	for _, c := range []struct {
 		getRepositoryError error

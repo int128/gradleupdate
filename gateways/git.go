@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
@@ -16,7 +16,7 @@ type GitService struct {
 	Client *github.Client
 }
 
-func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRequest) (*domain.Branch, error) {
+func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRequest) (*git.Branch, error) {
 	headCommit, err := r.createCommit(ctx, req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a commit")
@@ -31,23 +31,23 @@ func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRe
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a ref %s in the head repository %s", req.HeadBranch.Ref(), req.HeadBranch.Repository)
 	}
-	return &domain.Branch{
+	return &git.Branch{
 		ID: req.HeadBranch,
-		Commit: domain.Commit{
-			ID: domain.CommitID{
+		Commit: git.Commit{
+			ID: git.CommitID{
 				Repository: req.HeadBranch.Repository,
-				SHA:        domain.CommitSHA(headRef.GetObject().GetSHA()),
+				SHA:        git.CommitSHA(headRef.GetObject().GetSHA()),
 			},
-			Parents: []domain.CommitID{req.BaseBranch.Commit.ID},
-			Tree: domain.TreeID{
+			Parents: []git.CommitID{req.BaseBranch.Commit.ID},
+			Tree: git.TreeID{
 				Repository: req.HeadBranch.Repository,
-				SHA:        domain.TreeSHA(headCommit.Tree.GetSHA()),
+				SHA:        git.TreeSHA(headCommit.Tree.GetSHA()),
 			},
 		},
 	}, nil
 }
 
-func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBranchRequest) (*domain.Branch, error) {
+func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBranchRequest) (*git.Branch, error) {
 	headCommit, err := r.createCommit(ctx, req)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not create a commit")
@@ -63,17 +63,17 @@ func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBra
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not update the ref %s in the head repository %s", req.HeadBranch.Ref(), req.HeadBranch.Repository)
 	}
-	return &domain.Branch{
+	return &git.Branch{
 		ID: req.HeadBranch,
-		Commit: domain.Commit{
-			ID: domain.CommitID{
+		Commit: git.Commit{
+			ID: git.CommitID{
 				Repository: req.HeadBranch.Repository,
-				SHA:        domain.CommitSHA(headRef.GetObject().GetSHA()),
+				SHA:        git.CommitSHA(headRef.GetObject().GetSHA()),
 			},
-			Parents: []domain.CommitID{req.BaseBranch.Commit.ID},
-			Tree: domain.TreeID{
+			Parents: []git.CommitID{req.BaseBranch.Commit.ID},
+			Tree: git.TreeID{
 				Repository: req.HeadBranch.Repository,
-				SHA:        domain.TreeSHA(headCommit.Tree.GetSHA()),
+				SHA:        git.TreeSHA(headCommit.Tree.GetSHA()),
 			},
 		},
 	}, nil

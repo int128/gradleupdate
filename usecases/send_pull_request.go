@@ -3,7 +3,7 @@ package usecases
 import (
 	"context"
 
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -40,7 +40,7 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 		return errors.Wrapf(err, "could not get the base branch %s", base.DefaultBranch)
 	}
 
-	headBranchID := domain.BranchID{
+	headBranchID := git.BranchID{
 		Repository: head.ID,
 		Name:       req.HeadBranchName,
 	}
@@ -54,8 +54,8 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 		return errors.Wrapf(err, "could not push the branch")
 	}
 
-	pull := domain.PullRequest{
-		ID:         domain.PullRequestID{Repository: req.Base},
+	pull := git.PullRequest{
+		ID:         git.PullRequestID{Repository: req.Base},
 		BaseBranch: base.DefaultBranch,
 		HeadBranch: headBranchID,
 		Title:      req.Title,

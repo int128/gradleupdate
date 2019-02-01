@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
@@ -16,37 +17,37 @@ func TestGetRepository_Do(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
-	readme := domain.FileContent("/owner/repo/status.svg")
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
+	readme := git.FileContent("/owner/repo/status.svg")
 
 	for _, c := range []struct {
 		name    string
-		content domain.FileContent
-		out     domain.GradleUpdatePreconditionOut
+		content git.FileContent
+		out     gradle.UpdatePreconditionOut
 	}{
 		{
 			name:    "up-to-date",
 			content: testdata.GradleWrapperProperties50,
-			out:     domain.AlreadyHasLatestGradle,
+			out:     gradle.AlreadyHasLatestGradle,
 		},
 		{
 			name:    "out-of-date",
 			content: testdata.GradleWrapperProperties4102,
-			out:     domain.ReadyToUpdate,
+			out:     gradle.ReadyToUpdate,
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().Get(ctx, repositoryID).
-				Return(&domain.Repository{}, nil)
-			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, domain.GradleWrapperPropertiesPath).
+				Return(&git.Repository{}, nil)
+			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 				Return(readme, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentRelease(ctx).
-				Return(&domain.GradleRelease{Version: "5.0"}, nil)
+				Return(&gradle.Release{Version: "5.0"}, nil)
 
 			u := GetRepository{
 				RepositoryRepository: repositoryRepository,
@@ -57,7 +58,7 @@ func TestGetRepository_Do(t *testing.T) {
 				t.Fatalf("could not do usecase: %s", err)
 			}
 			if resp.GradleUpdatePreconditionOut != c.out {
-				t.Errorf("GradleUpdatePreconditionOut wants %v but %v", c.out, resp.GradleUpdatePreconditionOut)
+				t.Errorf("UpdatePreconditionOut wants %v but %v", c.out, resp.GradleUpdatePreconditionOut)
 			}
 		})
 	}
@@ -67,7 +68,7 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 
 	repositoryError := gateways.NewMockRepositoryError(ctrl)
 	repositoryError.EXPECT().NoSuchEntity().AnyTimes().Return(true)

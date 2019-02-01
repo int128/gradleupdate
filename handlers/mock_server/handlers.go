@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -19,22 +20,22 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 	getBadge.EXPECT().
 		Do(gomock.Not(nil), gomock.Any()).
 		AnyTimes().
-		DoAndReturn(func(ctx context.Context, id domain.RepositoryID) (*usecases.GetBadgeResponse, error) {
-			if id == (domain.RepositoryID{Owner: "int128", Name: "latest-gradle-wrapper"}) {
+		DoAndReturn(func(ctx context.Context, id git.RepositoryID) (*usecases.GetBadgeResponse, error) {
+			if id == (git.RepositoryID{Owner: "int128", Name: "latest-gradle-wrapper"}) {
 				return &usecases.GetBadgeResponse{
-					CurrentVersion: domain.GradleVersion("5.1"),
+					CurrentVersion: gradle.Version("5.1"),
 					UpToDate:       true,
 				}, nil
 			}
 			return &usecases.GetBadgeResponse{
-				CurrentVersion: domain.GradleVersion("5.0"),
+				CurrentVersion: gradle.Version("5.0"),
 				UpToDate:       false,
 			}, nil
 		})
 
 	// repository page
-	repository := domain.Repository{
-		ID:          domain.RepositoryID{Owner: "int128", Name: "gradleupdate"},
+	repository := git.Repository{
+		ID:          git.RepositoryID{Owner: "int128", Name: "gradleupdate"},
 		Description: "Automatic Gradle Update Service",
 		AvatarURL:   "https://avatars0.githubusercontent.com/u/321266",
 		HTMLURL:     "https://github.com/int128/gradleupdate",
@@ -42,10 +43,10 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 	getRepository.EXPECT().
 		Do(gomock.Not(nil), gomock.Any()).
 		AnyTimes().
-		DoAndReturn(func(ctx context.Context, id domain.RepositoryID) (*usecases.GetRepositoryResponse, error) {
+		DoAndReturn(func(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
 			return &usecases.GetRepositoryResponse{
 				Repository:                  repository,
-				GradleUpdatePreconditionOut: domain.ReadyToUpdate,
+				GradleUpdatePreconditionOut: gradle.ReadyToUpdate,
 			}, nil
 		})
 

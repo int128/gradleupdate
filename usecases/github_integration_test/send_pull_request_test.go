@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways"
 	"github.com/int128/gradleupdate/usecases"
 	interfaces "github.com/int128/gradleupdate/usecases/interfaces"
@@ -37,10 +37,10 @@ func TestSendPullRequestRequest_Do(t *testing.T) {
 		Base:           sandboxRepository,
 		HeadBranchName: "example",
 		CommitMessage:  "Example Commit",
-		CommitFiles: []domain.File{
+		CommitFiles: []git.File{
 			{
 				Path:    "foo/bar",
-				Content: domain.FileContent("baz"),
+				Content: git.FileContent("baz"),
 			},
 		},
 		Title: "Example",

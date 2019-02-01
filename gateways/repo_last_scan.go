@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 	"google.golang.org/appengine/datastore"
@@ -12,7 +13,7 @@ import (
 
 const repositoryLastScanKind = "RepositoryLastScan"
 
-func newRepositoryLastScanKey(ctx context.Context, id domain.RepositoryID) *datastore.Key {
+func newRepositoryLastScanKey(ctx context.Context, id git.RepositoryID) *datastore.Key {
 	return datastore.NewKey(ctx, repositoryLastScanKind, id.FullName().String(), 0, nil)
 }
 

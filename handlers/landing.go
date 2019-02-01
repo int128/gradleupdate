@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"go.uber.org/dig"
 )
@@ -21,7 +21,7 @@ func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not parse form", http.StatusBadRequest)
 		return
 	}
-	url := domain.RepositoryURL(r.FormValue("url"))
+	url := git.RepositoryURL(r.FormValue("url"))
 	id := url.Parse()
 	if id == nil {
 		http.Redirect(w, r, "/", http.StatusFound)

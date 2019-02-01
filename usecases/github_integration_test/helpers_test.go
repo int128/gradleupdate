@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/google/go-github/v18/github"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"golang.org/x/oauth2"
 )
 
-var sandboxRepository = domain.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
+var sandboxRepository = git.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
 
-var forkedRepository = domain.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
+var forkedRepository = git.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
 
 func newGitHubClient(t *testing.T) *github.Client {
 	t.Helper()

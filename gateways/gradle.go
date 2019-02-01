@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
@@ -15,7 +15,7 @@ type GradleService struct {
 	Client *http.Client
 }
 
-func (s *GradleService) GetCurrentRelease(ctx context.Context) (*domain.GradleRelease, error) {
+func (s *GradleService) GetCurrentRelease(ctx context.Context) (*gradle.Release, error) {
 	req, err := http.NewRequest("GET", "https://services.gradle.org/versions/current", nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error while creating a HTTP request")
@@ -31,8 +31,8 @@ func (s *GradleService) GetCurrentRelease(ctx context.Context) (*domain.GradleRe
 	if err := d.Decode(&cvr); err != nil {
 		return nil, errors.Wrapf(err, "error while decoding JSON response from Gradle Service")
 	}
-	return &domain.GradleRelease{
-		Version: domain.GradleVersion(cvr.Version),
+	return &gradle.Release{
+		Version: gradle.Version(cvr.Version),
 	}, nil
 }
 

@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -19,12 +21,12 @@ type GetBadge struct {
 	Logger                    gateways.Logger
 }
 
-func (usecase *GetBadge) Do(ctx context.Context, id domain.RepositoryID) (*usecases.GetBadgeResponse, error) {
-	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, domain.GradleWrapperPropertiesPath)
+func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases.GetBadgeResponse, error) {
+	gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, gradle.WrapperPropertiesPath)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not get the properties file in %s", id)
 	}
-	currentVersion := domain.FindGradleWrapperVersion(gradleWrapperProperties)
+	currentVersion := gradle.FindWrapperVersion(gradleWrapperProperties)
 	if currentVersion == "" {
 		return nil, errors.Errorf("could not find version from properties file in %s", id)
 	}

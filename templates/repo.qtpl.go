@@ -5,16 +5,14 @@
 package templates
 
 //line repo.qtpl:1
-import "github.com/int128/gradleupdate/domain"
-
-//line repo.qtpl:3
 import (
 	qtio422016 "io"
 
-	qt422016 "github.com/valyala/quicktemplate"
+	"github.com/int128/gradleupdate/domain/gradle"
+	qt422016 "github.com/valyala/quicktemplate" //line repo.qtpl:3
+	//line repo.qtpl:3
 )
 
-//line repo.qtpl:3
 var (
 	_ = qtio422016.Copy
 	_ = qt422016.AcquireByteBuffer
@@ -79,7 +77,7 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 	//line repo.qtpl:23
 	switch r.GradleUpdatePreconditionOut {
 	//line repo.qtpl:25
-	case domain.ReadyToUpdate:
+	case gradle.ReadyToUpdate:
 		//line repo.qtpl:25
 		qw422016.N().S(`
     <h3>This repository has the out-of-dated Gradle.</h3>
@@ -110,7 +108,7 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 
     `)
 	//line repo.qtpl:40
-	case domain.AlreadyHasLatestGradle:
+	case gradle.AlreadyHasLatestGradle:
 		//line repo.qtpl:40
 		qw422016.N().S(`
     <h3>This repository has the latest Gradle!</h3>
@@ -123,21 +121,21 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 
     `)
 	//line repo.qtpl:45
-	case domain.NoGradleWrapperProperties:
+	case gradle.NoGradleWrapperProperties:
 		//line repo.qtpl:45
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> This repository does not have <code>gradle-wrapper.properties</code>.</p>
 
     `)
 	//line repo.qtpl:48
-	case domain.NoGradleVersion:
+	case gradle.NoGradleVersion:
 		//line repo.qtpl:48
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> No version found in <code>gradle-wrapper.properties</code>.</p>
 
     `)
 	//line repo.qtpl:51
-	case domain.NoReadme:
+	case gradle.NoReadme:
 		//line repo.qtpl:51
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">
@@ -151,7 +149,7 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 
     `)
 	//line repo.qtpl:57
-	case domain.NoReadmeBadge:
+	case gradle.NoReadmeBadge:
 		//line repo.qtpl:57
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">

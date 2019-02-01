@@ -3,27 +3,28 @@ package usecases
 import (
 	"context"
 
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 )
 
 //go:generate mockgen -destination test_doubles/mock_usecases.go -package usecases github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetRepository,GetRepositoryError,SendUpdate,SendUpdateError,BatchSendUpdates,SendPullRequest
 
 type GetBadge interface {
-	Do(ctx context.Context, id domain.RepositoryID) (*GetBadgeResponse, error)
+	Do(ctx context.Context, id git.RepositoryID) (*GetBadgeResponse, error)
 }
 
 type GetBadgeResponse struct {
-	CurrentVersion domain.GradleVersion
+	CurrentVersion gradle.Version
 	UpToDate       bool
 }
 
 type GetRepository interface {
-	Do(ctx context.Context, id domain.RepositoryID) (*GetRepositoryResponse, error)
+	Do(ctx context.Context, id git.RepositoryID) (*GetRepositoryResponse, error)
 }
 
 type GetRepositoryResponse struct {
-	Repository                  domain.Repository
-	GradleUpdatePreconditionOut domain.GradleUpdatePreconditionOut
+	Repository                  git.Repository
+	GradleUpdatePreconditionOut gradle.UpdatePreconditionOut
 }
 
 type GetRepositoryError interface {
@@ -32,12 +33,12 @@ type GetRepositoryError interface {
 }
 
 type SendUpdate interface {
-	Do(ctx context.Context, id domain.RepositoryID) error
+	Do(ctx context.Context, id git.RepositoryID) error
 }
 
 type SendUpdateError interface {
 	error
-	PreconditionViolation() domain.GradleUpdatePreconditionOut
+	PreconditionViolation() gradle.UpdatePreconditionOut
 }
 
 type BatchSendUpdates interface {
@@ -49,10 +50,10 @@ type SendPullRequest interface {
 }
 
 type SendPullRequestRequest struct {
-	Base           domain.RepositoryID
+	Base           git.RepositoryID
 	HeadBranchName string
 	CommitMessage  string
-	CommitFiles    []domain.File
+	CommitFiles    []git.File
 	Title          string
 	Body           string
 }

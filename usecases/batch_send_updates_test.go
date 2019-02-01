@@ -7,6 +7,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -16,7 +18,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	ctx := context.Background()
-	repositoryID := domain.RepositoryID{Owner: "owner", Name: "repo1"}
+	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo1"}
 
 	timeService := &gateways.TimeService{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
@@ -24,15 +26,15 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 
 	gradleService := gateways.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentRelease(ctx).
-		Return(&domain.GradleRelease{Version: domain.GradleVersion("5.0")}, nil)
+		Return(&gradle.Release{Version: "5.0"}, nil)
 
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
 	badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
 	badgeLastAccessRepository.EXPECT().FindBySince(ctx, oneMonthAgo).Return([]domain.BadgeLastAccess{
 		{
 			Repository:     repositoryID,
-			CurrentVersion: domain.GradleVersion("4.6"),
-			LatestVersion:  domain.GradleVersion("5.0"),
+			CurrentVersion: gradle.Version("4.6"),
+			LatestVersion:  gradle.Version("5.0"),
 			LastAccessTime: time.Date(2019, 1, 1, 12, 34, 0, 0, time.UTC),
 		},
 	}, nil)

@@ -1,9 +1,14 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradle"
+)
 
 type RepositoryLastScan struct {
-	Repository      RepositoryID
+	Repository      git.RepositoryID
 	LastScanTime    time.Time
-	PreconditionOut GradleUpdatePreconditionOut
+	PreconditionOut gradle.UpdatePreconditionOut
 }

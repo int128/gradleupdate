@@ -7,6 +7,7 @@ import (
 	"github.com/favclip/testerator"
 	"github.com/go-test/deep"
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/git"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -20,7 +21,7 @@ func TestBadgeLastAccessRepository_Save(t *testing.T) {
 	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
 
 	if err := r.Save(ctx, domain.BadgeLastAccess{
-		Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
+		Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 		LatestVersion:  "5.0",
 		CurrentVersion: "4.1",
 		LastAccessTime: now,
@@ -62,8 +63,8 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 
 	t.Run("setup", func(t *testing.T) {
 		keys := []*datastore.Key{
-			newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo1"}),
-			newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo2"}),
+			newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo1"}),
+			newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo2"}),
 		}
 		entities := []*badgeLastAccessEntity{
 			{LastAccessTime: now.Add(-1 * 24 * time.Hour), CurrentVersion: "4.1", LatestVersion: "5.0"},
@@ -73,7 +74,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 			t.Fatalf("could not save entities: %s", err)
 		}
 		//TODO: remove after migration
-		k := newBadgeLastAccessKey(ctx, domain.RepositoryID{Owner: "owner", Name: "repo3"})
+		k := newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo3"})
 		e := badgeLastAccessEntityOld{
 			badgeLastAccessEntity{LastAccessTime: now.Add(-3 * 24 * time.Hour), LatestVersion: "5.0"},
 			"4.3",
@@ -99,7 +100,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 		want := []domain.BadgeLastAccess{
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
@@ -116,13 +117,13 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 		want := []domain.BadgeLastAccess{
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
 			},
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo2"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo2"},
 				LastAccessTime: now.Add(-2 * 24 * time.Hour),
 				CurrentVersion: "4.2",
 				LatestVersion:  "5.0",
@@ -139,19 +140,19 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		}
 		want := []domain.BadgeLastAccess{
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo1"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),
 				CurrentVersion: "4.1",
 				LatestVersion:  "5.0",
 			},
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo2"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo2"},
 				LastAccessTime: now.Add(-2 * 24 * time.Hour),
 				CurrentVersion: "4.2",
 				LatestVersion:  "5.0",
 			},
 			{
-				Repository:     domain.RepositoryID{Owner: "owner", Name: "repo3"},
+				Repository:     git.RepositoryID{Owner: "owner", Name: "repo3"},
 				LastAccessTime: now.Add(-3 * 24 * time.Hour),
 				CurrentVersion: "4.3",
 				LatestVersion:  "5.0",
