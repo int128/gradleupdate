@@ -23,8 +23,7 @@ type GetRepository struct {
 func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	vars := mux.Vars(r)
-	owner, repo := vars["owner"], vars["repo"]
-	id := git.RepositoryID{Owner: owner, Name: repo}
+	id := git.RepositoryID{Owner: vars["owner"], Name: vars["repo"]}
 
 	resp, err := h.GetRepository.Do(ctx, id)
 	if err != nil {
@@ -49,9 +48,9 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 
 	baseURL := baseURL(r)
-	badgeURL := fmt.Sprintf("/%s/%s/status.svg", owner, repo)
+	badgeURL := resolveGetBadgeURL(id)
 	badgeFullURL := baseURL + badgeURL
-	repositoryFullURL := baseURL + fmt.Sprintf("/%s/%s/status", owner, repo)
+	repositoryFullURL := baseURL + resolveGetRepositoryURL(id)
 
 	t := templates.Repository{
 		Repository:                  resp.Repository,
@@ -59,7 +58,7 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, badgeFullURL, repositoryFullURL),
 		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, repositoryFullURL, badgeFullURL),
 		BadgeURL:                    badgeURL,
-		RequestUpdateURL:            fmt.Sprintf("/%s/%s/update", owner, repo),
+		RequestUpdateURL:            resolveSendUpdateURL(id),
 	}
 	t.WritePage(w)
 }

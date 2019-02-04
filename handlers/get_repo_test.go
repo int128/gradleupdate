@@ -21,7 +21,7 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 	getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 		Return(&usecases.GetRepositoryResponse{}, nil)
 
-	h := handlers.NewRouter(handlers.Handlers{
+	h := handlers.NewRouter(handlers.RouterIn{
 		GetRepository: handlers.GetRepository{
 			GetRepository: getRepository,
 			Logger:        gateways.NewLogger(t),
@@ -61,7 +61,7 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 		getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 			Return(nil, c.getRepositoryError)
 
-		h := handlers.NewRouter(handlers.Handlers{
+		h := handlers.NewRouter(handlers.RouterIn{
 			GetRepository: handlers.GetRepository{
 				GetRepository: getRepository,
 				Logger:        gateways.NewLogger(t),

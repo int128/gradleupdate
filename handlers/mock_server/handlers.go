@@ -12,7 +12,7 @@ import (
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
-func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
+func newHandlers(ctrl *gomock.Controller) handlers.RouterIn {
 	getBadge := usecaseTestDoubles.NewMockGetBadge(ctrl)
 	getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
 	sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
@@ -51,7 +51,7 @@ func newHandlers(ctrl *gomock.Controller) handlers.Handlers {
 			}, nil
 		})
 
-	return handlers.Handlers{
+	return handlers.RouterIn{
 		GetBadge:      handlers.GetBadge{GetBadge: getBadge},
 		GetRepository: handlers.GetRepository{GetRepository: getRepository},
 		SendUpdate:    handlers.SendUpdate{SendUpdate: sendUpdate},
