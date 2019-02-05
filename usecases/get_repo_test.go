@@ -19,7 +19,7 @@ func TestGetRepository_Do(t *testing.T) {
 	defer ctrl.Finish()
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
-	readme := git.FileContent("/owner/repo/status.svg")
+	readmeContent := git.FileContent("![Gradle Status](https://gradleupdate.appspot.com/owner/repo/status.svg)")
 
 	for _, c := range []struct {
 		name                  string
@@ -44,7 +44,7 @@ func TestGetRepository_Do(t *testing.T) {
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-				Return(readme, nil)
+				Return(readmeContent, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentRelease(ctx).

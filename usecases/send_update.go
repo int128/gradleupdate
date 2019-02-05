@@ -43,9 +43,9 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 }
 
 func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) error {
-	var precondition gradleupdate.Precondition
-	precondition.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
-
+	precondition := gradleupdate.Precondition{
+		BadgeURL: gradleupdate.NewBadgeURL(id),
+	}
 	var eg errgroup.Group
 	eg.Go(func() error {
 		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
@@ -85,9 +85,9 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 		return errors.WithStack(err)
 	}
 
-	out := gradleupdate.CheckPrecondition(precondition)
-	if out != gradleupdate.ReadyToUpdate {
-		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", out), preconditionViolation: out})
+	preconditionViolation := gradleupdate.CheckPrecondition(precondition)
+	if preconditionViolation != gradleupdate.ReadyToUpdate {
+		return errors.WithStack(&sendUpdateError{error: fmt.Errorf("precondition violation (%v)", preconditionViolation), preconditionViolation: preconditionViolation})
 	}
 
 	newProps := gradle.ReplaceWrapperVersion(precondition.GradleWrapperProperties, precondition.LatestGradleRelease.Version)

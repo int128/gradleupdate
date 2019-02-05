@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
@@ -31,8 +30,9 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		return nil, errors.Wrapf(err, "error while getting the repository %s", id)
 	}
 
-	var precondition gradleupdate.Precondition
-	precondition.BadgeURL = fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name) //TODO: externalize
+	precondition := gradleupdate.Precondition{
+		BadgeURL: gradleupdate.NewBadgeURL(id),
+	}
 	var eg errgroup.Group
 	eg.Go(func() error {
 		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
@@ -72,10 +72,10 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		return nil, errors.WithStack(err)
 	}
 
-	out := gradleupdate.CheckPrecondition(precondition)
+	preconditionViolation := gradleupdate.CheckPrecondition(precondition)
 	return &usecases.GetRepositoryResponse{
 		Repository:                  *repository,
-		UpdatePreconditionViolation: out,
+		UpdatePreconditionViolation: preconditionViolation,
 	}, nil
 }
 

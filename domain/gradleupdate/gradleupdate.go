@@ -9,7 +9,7 @@ import (
 
 type Precondition struct {
 	Readme                  git.FileContent
-	BadgeURL                string
+	BadgeURL                BadgeURL
 	GradleWrapperProperties git.FileContent
 	LatestGradleRelease     *gradle.Release
 }

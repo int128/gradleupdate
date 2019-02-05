@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
@@ -47,17 +48,15 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("cache-control", "public")
 	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 
-	baseURL := baseURL(r)
-	badgeURL := resolveGetBadgeURL(id)
-	badgeFullURL := baseURL + badgeURL
-	repositoryFullURL := baseURL + resolveGetRepositoryURL(id)
+	publicBadgeURL := gradleupdate.NewBadgeURL(id)
+	publicRepositoryURL := gradleupdate.NewRepositoryURL(id)
 
 	t := templates.Repository{
 		Repository:                  resp.Repository,
 		UpdatePreconditionViolation: resp.UpdatePreconditionViolation,
-		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, badgeFullURL, repositoryFullURL),
-		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, repositoryFullURL, badgeFullURL),
-		BadgeURL:                    badgeURL,
+		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, publicBadgeURL, publicRepositoryURL),
+		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, publicRepositoryURL, publicBadgeURL),
+		BadgeURL:                    resolveGetBadgeURL(id),
 		RequestUpdateURL:            resolveSendUpdateURL(id),
 	}
 	t.WritePage(w)

@@ -24,6 +24,7 @@ func TestSendUpdate_Do(t *testing.T) {
 	timeService := &gateways.TimeService{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
+	readmeContent := git.FileContent("![Gradle Status](https://gradleupdate.appspot.com/owner/repo/status.svg)")
 
 	t.Run("SuccessfullyUpdated", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
@@ -31,7 +32,7 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+			Return(readmeContent, nil)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
@@ -79,7 +80,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+			Return(readmeContent, nil)
 
 		gradleService := gateways.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
@@ -120,7 +121,7 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil).MaxTimes(1)
+			Return(readmeContent, nil).MaxTimes(1)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, &noSuchEntityError{})
 
@@ -163,7 +164,7 @@ func TestSendUpdate_Do(t *testing.T) {
 
 		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(git.FileContent("![Gradle Status](https://example.com/owner/repo/status.svg)"), nil)
+			Return(readmeContent, nil)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(git.FileContent("INVALID"), nil)
 
