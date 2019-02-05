@@ -10,8 +10,6 @@
 </head>
 <body>
 
-{%= Header() %}
-
 <div class="container jumbotron text-center">
   <h1>gradleupdate</h1>
   <p class="lead">Automatic Gradle Update Service</p>

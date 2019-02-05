@@ -36,12 +36,6 @@ func StreamIndex(qw422016 *qt422016.Writer) {
 </head>
 <body>
 
-`)
-	//line index.qtpl:13
-	StreamHeader(qw422016)
-	//line index.qtpl:13
-	qw422016.N().S(`
-
 <div class="container jumbotron text-center">
   <h1>gradleupdate</h1>
   <p class="lead">Automatic Gradle Update Service</p>
@@ -63,39 +57,39 @@ func StreamIndex(qw422016 *qt422016.Writer) {
 </div>
 
 `)
-	//line index.qtpl:35
+	//line index.qtpl:33
 	StreamFooter(qw422016)
-	//line index.qtpl:35
+	//line index.qtpl:33
 	qw422016.N().S(`
 
 </body>
 </html>
 `)
-//line index.qtpl:39
+//line index.qtpl:37
 }
 
-//line index.qtpl:39
+//line index.qtpl:37
 func WriteIndex(qq422016 qtio422016.Writer) {
-	//line index.qtpl:39
+	//line index.qtpl:37
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line index.qtpl:39
+	//line index.qtpl:37
 	StreamIndex(qw422016)
-	//line index.qtpl:39
+	//line index.qtpl:37
 	qt422016.ReleaseWriter(qw422016)
-//line index.qtpl:39
+//line index.qtpl:37
 }
 
-//line index.qtpl:39
+//line index.qtpl:37
 func Index() string {
-	//line index.qtpl:39
+	//line index.qtpl:37
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line index.qtpl:39
+	//line index.qtpl:37
 	WriteIndex(qb422016)
-	//line index.qtpl:39
+	//line index.qtpl:37
 	qs422016 := string(qb422016.B)
-	//line index.qtpl:39
+	//line index.qtpl:37
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line index.qtpl:39
+	//line index.qtpl:37
 	return qs422016
-//line index.qtpl:39
+//line index.qtpl:37
 }

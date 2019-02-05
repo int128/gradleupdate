@@ -5,14 +5,16 @@
 package templates
 
 //line repo.qtpl:1
+import "github.com/int128/gradleupdate/domain/gradleupdate"
+
+//line repo.qtpl:3
 import (
 	qtio422016 "io"
 
-	"github.com/int128/gradleupdate/domain/gradleupdate"
-	qt422016 "github.com/valyala/quicktemplate" //line repo.qtpl:3
-	//line repo.qtpl:3
+	qt422016 "github.com/valyala/quicktemplate"
 )
 
+//line repo.qtpl:3
 var (
 	_ = qtio422016.Copy
 	_ = qt422016.AcquireByteBuffer

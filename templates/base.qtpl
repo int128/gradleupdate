@@ -1,20 +1,26 @@
 {% func Stylesheets() %}
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 
-  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.2.1/cosmo/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmPRQ4EzBa9ifYo2LjomrSZ28x2GHvKNtv599SfxGvi39OQfRzluOw+sLUfxPOOD" crossorigin="anonymous">
-  <!-- link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" -->
+<link href="https://stackpath.bootstrapcdn.com/bootswatch/4.2.1/cosmo/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-BmPRQ4EzBa9ifYo2LjomrSZ28x2GHvKNtv599SfxGvi39OQfRzluOw+sLUfxPOOD" crossorigin="anonymous">
+<!-- link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" -->
 
-  <link href="/static/app.css" rel="stylesheet"/>
+<link href="/static/app.css" rel="stylesheet"/>
 {% endfunc %}
 
 
 {% func Header() %}
+<nav class="navbar navbar-light bg-light">
+  <div class="mx-auto">
+    <a class="navbar-brand mr-0" href="/">gradleupdate</a>
+  </div>
+</nav>
 {% endfunc %}
 
 
 {% func Footer() %}
-  <section id="footer">
-    <p>gradleupdate &copy; Hidetake Iwata</p>
-  </section>
+<section class="text-muted text-center mt-4 py-4">
+  <a href="https://github.com/int128/gradleupdate" class="text-muted">&copy; gradleupdate</a>
+</section>
 {% endfunc %}
