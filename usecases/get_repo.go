@@ -75,6 +75,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 	preconditionViolation := gradleupdate.CheckPrecondition(precondition)
 	return &usecases.GetRepositoryResponse{
 		Repository:                  *repository,
+		LatestGradleRelease:         *precondition.LatestGradleRelease,
 		UpdatePreconditionViolation: preconditionViolation,
 	}, nil
 }

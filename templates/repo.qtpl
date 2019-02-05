@@ -25,7 +25,7 @@
     {% case gradleupdate.ReadyToUpdate %}
     <h3>This repository has the out-of-dated Gradle.</h3>
     <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
-    <p>We will soon send a pull request for updating version (or we have sent).</p>
+    <p>We will soon send (or have sent) a pull request for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
     <p>
       <a href="{%s r.Repository.HTMLURL %}" target="_blank" class="btn btn-primary">Move to GitHub</a>
     </p>

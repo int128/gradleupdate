@@ -47,6 +47,7 @@ func newHandlers(ctrl *gomock.Controller) handlers.RouterIn {
 		DoAndReturn(func(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
 			return &usecases.GetRepositoryResponse{
 				Repository:                  repository,
+				LatestGradleRelease:         gradle.Release{Version: "5.1"},
 				UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
 			}, nil
 		})

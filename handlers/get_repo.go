@@ -53,6 +53,7 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	t := templates.Repository{
 		Repository:                  resp.Repository,
+		LatestGradleRelease:         resp.LatestGradleRelease,
 		UpdatePreconditionViolation: resp.UpdatePreconditionViolation,
 		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, publicBadgeURL, publicRepositoryURL),
 		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, publicRepositoryURL, publicBadgeURL),

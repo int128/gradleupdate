@@ -86,7 +86,11 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
 		qw422016.E().S(r.BadgeURL)
 		//line repo.qtpl:27
 		qw422016.N().S(`" alt="badge"/></p>
-    <p>We will soon send a pull request for updating version (or we have sent).</p>
+    <p>We will soon send (or have sent) a pull request for bump to Gradle `)
+		//line repo.qtpl:28
+		qw422016.E().V(r.LatestGradleRelease.Version)
+		//line repo.qtpl:28
+		qw422016.N().S(`.</p>
     <p>
       <a href="`)
 		//line repo.qtpl:30
