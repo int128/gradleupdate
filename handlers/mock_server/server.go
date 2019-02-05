@@ -1,45 +1,31 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
-	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/handlers"
+	"github.com/gorilla/mux"
+	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/pkg/errors"
 )
 
-const addr = "127.0.0.1:8080"
-
 func main() {
-	ctx := context.Background()
-	ctrl := gomock.NewController(&testReporter{})
-	defer ctrl.Finish()
-
-	router := handlers.NewRouter(newHandlers(ctrl))
-	http.Handle("/", withContext(ctx, router))
-
-	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
-	http.Handle("/static/", static)
-
-	log.Printf("Open http://%s", addr)
-	if err := http.ListenAndServe(addr, http.DefaultServeMux); err != nil {
-		log.Fatal(err)
+	c, err := newContainer()
+	if err != nil {
+		log.Fatalf("error while setting up a container: %+v", err)
+	}
+	if err := c.Invoke(run); err != nil {
+		log.Fatalf("error while invoking app: %+v", err)
 	}
 }
 
-func withContext(ctx context.Context, h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
+func run(r *mux.Router, logger gateways.Logger) error {
+	static := http.StripPrefix("/static/", http.FileServer(http.Dir("static")))
+	r.PathPrefix("/static/").Handler(static)
 
-type testReporter struct{}
-
-func (t *testReporter) Errorf(format string, args ...interface{}) {
-	log.Printf(format, args...)
-}
-
-func (t *testReporter) Fatalf(format string, args ...interface{}) {
-	log.Printf(format, args...)
+	logger.Debugf(nil, "Open http://localhost:8080")
+	if err := http.ListenAndServe("127.0.0.1:8080", r); err != nil {
+		return errors.Wrapf(err, "error while listening on port")
+	}
+	return nil
 }
