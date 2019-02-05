@@ -102,7 +102,11 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 			},
 		},
 		Title: fmt.Sprintf("Gradle %s", precondition.LatestGradleRelease.Version),
-		Body:  fmt.Sprintf(`Gradle %s is available.`, precondition.LatestGradleRelease.Version),
+		Body: fmt.Sprintf(`Gradle %s is available.
+
+This is sent by @gradleupdate. See %s for more.`,
+			precondition.LatestGradleRelease.Version,
+			gradleupdate.NewRepositoryURL(id)),
 	}
 	if err := usecase.SendPullRequest.Do(ctx, req); err != nil {
 		return errors.Wrapf(err, "error while sending a pull request %+v", req)

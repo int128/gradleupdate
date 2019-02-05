@@ -56,7 +56,9 @@ func TestSendUpdate_Do(t *testing.T) {
 				Content: testdata.GradleWrapperProperties50,
 			}},
 			Title: "Gradle 5.0",
-			Body:  "Gradle 5.0 is available.",
+			Body: `Gradle 5.0 is available.
+
+This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/status for more.`,
 		}).Return(nil)
 
 		u := usecases.SendUpdate{
