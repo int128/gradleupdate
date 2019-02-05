@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -21,8 +20,7 @@ type SendUpdate struct {
 func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	vars := mux.Vars(r)
-	owner, repo := vars["owner"], vars["repo"]
-	id := git.RepositoryID{Owner: owner, Name: repo}
+	id := git.RepositoryID{Owner: vars["owner"], Name: vars["repo"]}
 
 	if err := h.SendUpdate.Do(ctx, id); err != nil {
 		h.Logger.Errorf(ctx, "error while sending a pull request for %s: %+v", id, err)
@@ -32,5 +30,6 @@ func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/%s/%s/status", owner, repo), http.StatusFound)
+	repositoryURL := resolveGetRepositoryURL(id)
+	http.Redirect(w, r, repositoryURL, http.StatusFound)
 }

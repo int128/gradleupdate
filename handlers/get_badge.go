@@ -21,8 +21,7 @@ type GetBadge struct {
 func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	vars := mux.Vars(r)
-	owner, repo := vars["owner"], vars["repo"]
-	id := git.RepositoryID{Owner: owner, Name: repo}
+	id := git.RepositoryID{Owner: vars["owner"], Name: vars["repo"]}
 
 	w.Header().Set("content-type", "image/svg+xml")
 	w.Header().Set("cache-control", "public")
