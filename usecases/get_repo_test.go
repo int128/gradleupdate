@@ -40,7 +40,7 @@ func TestGetRepository_Do(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().Get(ctx, repositoryID).
-				Return(&git.Repository{}, nil)
+				Return(&git.Repository{ID: repositoryID}, nil)
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).

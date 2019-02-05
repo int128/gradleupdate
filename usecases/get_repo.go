@@ -31,11 +31,11 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 	}
 
 	precondition := gradleupdate.Precondition{
-		BadgeURL: gradleupdate.NewBadgeURL(id),
+		BadgeURL: gradleupdate.NewBadgeURL(repository.ID),
 	}
 	var eg errgroup.Group
 	eg.Go(func() error {
-		readme, err := usecase.RepositoryRepository.GetReadme(ctx, id)
+		readme, err := usecase.RepositoryRepository.GetReadme(ctx, repository.ID)
 		if err != nil {
 			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
 				if err.NoSuchEntity() {
@@ -48,7 +48,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		return nil
 	})
 	eg.Go(func() error {
-		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, gradle.WrapperPropertiesPath)
+		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, repository.ID, gradle.WrapperPropertiesPath)
 		if err != nil {
 			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
 				if err.NoSuchEntity() {

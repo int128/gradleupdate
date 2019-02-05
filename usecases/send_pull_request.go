@@ -27,21 +27,21 @@ type SendPullRequest struct {
 // If the pull request exists, do not create any more.
 //
 func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullRequestRequest) error {
-	base, err := usecase.RepositoryRepository.Get(ctx, req.Base)
+	baseRepository, err := usecase.RepositoryRepository.Get(ctx, req.Base)
 	if err != nil {
-		return errors.Wrapf(err, "could not get the repository %s", req.Base)
+		return errors.Wrapf(err, "error while getting the base repository %s", req.Base)
 	}
-	head, err := usecase.RepositoryRepository.Fork(ctx, req.Base)
+	headRepository, err := usecase.RepositoryRepository.Fork(ctx, baseRepository.ID)
 	if err != nil {
-		return errors.Wrapf(err, "could not fork the repository %s", req.Base)
+		return errors.Wrapf(err, "error while forking the repository %s", baseRepository.ID)
 	}
-	baseBranch, err := usecase.RepositoryRepository.GetBranch(ctx, base.DefaultBranch)
+	baseBranch, err := usecase.RepositoryRepository.GetBranch(ctx, baseRepository.DefaultBranch)
 	if err != nil {
-		return errors.Wrapf(err, "could not get the base branch %s", base.DefaultBranch)
+		return errors.Wrapf(err, "error while getting the base branch %s", baseRepository.DefaultBranch)
 	}
 
 	headBranchID := git.BranchID{
-		Repository: head.ID,
+		Repository: headRepository.ID,
 		Name:       req.HeadBranchName,
 	}
 	pushBranchRequest := gateways.PushBranchRequest{
@@ -55,8 +55,8 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 	}
 
 	pull := git.PullRequest{
-		ID:         git.PullRequestID{Repository: req.Base},
-		BaseBranch: base.DefaultBranch,
+		ID:         git.PullRequestID{Repository: baseRepository.ID},
+		BaseBranch: baseRepository.DefaultBranch,
 		HeadBranch: headBranchID,
 		Title:      req.Title,
 		Body:       req.Body,
