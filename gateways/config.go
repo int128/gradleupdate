@@ -35,16 +35,17 @@ func (r *configResolver) Get(ctx context.Context) (*domain.Config, error) {
 	if r.v != nil {
 		return r.v, nil
 	}
+	errs := make([]error, 0)
 	for _, source := range r.Sources {
 		config, err := source.Get(ctx)
 		if err != nil {
-			r.Logger.Warnf(ctx, "error while getting config from %T: %s", source, err)
+			errs = append(errs, errors.Wrapf(err, "error while getting config from %T", source))
 			continue
 		}
 		r.v = config
 		return r.v, nil
 	}
-	return nil, errors.New("could not get config from any source")
+	return nil, errors.Errorf("could not get config from any source: %v", errs)
 }
 
 type envConfigRepository struct{}
@@ -52,9 +53,10 @@ type envConfigRepository struct{}
 func (r *envConfigRepository) Get(ctx context.Context) (*domain.Config, error) {
 	config := domain.Config{
 		GitHubToken: os.Getenv("GITHUB_TOKEN"),
+		CSRFKey:     os.Getenv("CSRF_KEY"),
 	}
-	if config.IsZero() {
-		return nil, errors.New("environment variable was not defined")
+	if !config.IsValid() {
+		return nil, errors.New("environment variables are not defined")
 	}
 	return &config, nil
 }
@@ -67,6 +69,7 @@ func configKey(ctx context.Context, name string) *datastore.Key {
 
 type configEntity struct {
 	GitHubToken string
+	CSRFKey     string
 }
 
 type datastoreConfigRepository struct{}
@@ -80,7 +83,12 @@ func (r *datastoreConfigRepository) Get(ctx context.Context) (*domain.Config, er
 		}
 		return nil, errors.Wrapf(err, "error while getting the entity")
 	}
-	return &domain.Config{
+	config := domain.Config{
 		GitHubToken: e.GitHubToken,
-	}, nil
+		CSRFKey:     e.CSRFKey,
+	}
+	if !config.IsValid() {
+		return nil, errors.New("datastore Config are not defined")
+	}
+	return &config, nil
 }

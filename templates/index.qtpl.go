@@ -18,7 +18,7 @@ var (
 )
 
 //line index.qtpl:1
-func StreamIndex(qw422016 *qt422016.Writer) {
+func StreamIndex(qw422016 *qt422016.Writer, csrf string) {
 	//line index.qtpl:1
 	qw422016.N().S(`
 <!DOCTYPE HTML>
@@ -51,45 +51,50 @@ func StreamIndex(qw422016 *qt422016.Writer) {
       <input type="text" id="github-url" name="url"
              class="form-control text-center input-lg text-monospace"
              placeholder="https://github.com/int128/gradleupdate"/>
+      `)
+	//line index.qtpl:28
+	qw422016.N().S(csrf)
+	//line index.qtpl:28
+	qw422016.N().S(`
     </div>
     <button type="submit" class="btn btn-primary">Get your Badge</button>
   </form>
 </div>
 
 `)
-	//line index.qtpl:33
+	//line index.qtpl:34
 	StreamFooter(qw422016)
-	//line index.qtpl:33
+	//line index.qtpl:34
 	qw422016.N().S(`
 
 </body>
 </html>
 `)
-//line index.qtpl:37
+//line index.qtpl:38
 }
 
-//line index.qtpl:37
-func WriteIndex(qq422016 qtio422016.Writer) {
-	//line index.qtpl:37
+//line index.qtpl:38
+func WriteIndex(qq422016 qtio422016.Writer, csrf string) {
+	//line index.qtpl:38
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line index.qtpl:37
-	StreamIndex(qw422016)
-	//line index.qtpl:37
+	//line index.qtpl:38
+	StreamIndex(qw422016, csrf)
+	//line index.qtpl:38
 	qt422016.ReleaseWriter(qw422016)
-//line index.qtpl:37
+//line index.qtpl:38
 }
 
-//line index.qtpl:37
-func Index() string {
-	//line index.qtpl:37
+//line index.qtpl:38
+func Index(csrf string) string {
+	//line index.qtpl:38
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line index.qtpl:37
-	WriteIndex(qb422016)
-	//line index.qtpl:37
+	//line index.qtpl:38
+	WriteIndex(qb422016, csrf)
+	//line index.qtpl:38
 	qs422016 := string(qb422016.B)
-	//line index.qtpl:37
+	//line index.qtpl:38
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line index.qtpl:37
+	//line index.qtpl:38
 	return qs422016
-//line index.qtpl:37
+//line index.qtpl:38
 }

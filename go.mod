@@ -5,8 +5,9 @@ require (
 	github.com/go-test/deep v1.0.1
 	github.com/golang/mock v1.1.1
 	github.com/google/go-github/v18 v18.2.0
+	github.com/gorilla/csrf v1.5.1
 	github.com/gorilla/mux v1.6.2
-	github.com/pkg/errors v0.8.0
+	github.com/pkg/errors v0.8.1
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/quicktemplate v1.0.0
 	go.uber.org/atomic v1.3.2 // indirect

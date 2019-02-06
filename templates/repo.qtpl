@@ -1,6 +1,6 @@
 {% import "github.com/int128/gradleupdate/domain/gradleupdate" %}
 
-{% func (r Repository) Page() %}
+{% func (r Repository) Page(csrf string) %}
 <!DOCTYPE HTML>
 <html>
 
@@ -35,6 +35,7 @@
           Request a Pull Request now
         </button>
       </p>
+      {%s= csrf %}
     </form>
 
     {% case gradleupdate.AlreadyHasLatestGradle %}

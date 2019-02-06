@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
@@ -60,5 +61,5 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		BadgeURL:                    resolveGetBadgeURL(id),
 		RequestUpdateURL:            resolveSendUpdateURL(id),
 	}
-	t.WritePage(w)
+	t.WritePage(w, string(csrf.TemplateField(r)))
 }

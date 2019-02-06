@@ -1,4 +1,4 @@
-{% func Index() %}
+{% func Index(csrf string) %}
 <!DOCTYPE HTML>
 <html>
 
@@ -25,6 +25,7 @@
       <input type="text" id="github-url" name="url"
              class="form-control text-center input-lg text-monospace"
              placeholder="https://github.com/int128/gradleupdate"/>
+      {%s= csrf %}
     </div>
     <button type="submit" class="btn btn-primary">Get your Badge</button>
   </form>

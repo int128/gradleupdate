@@ -44,7 +44,7 @@ go get -u github.com/cortesi/modd/cmd/modd
 Run the local server:
 
 ```sh
-GITHUB_TOKEN=$GITHUB_TOKEN dev_appserver.py .
+GITHUB_TOKEN=$GITHUB_TOKEN CSRF_KEY=0123456789abcdef0123456789abcdef dev_appserver.py .
 ```
 
 Run the mock server with `handlers` and `templates`:
@@ -53,14 +53,23 @@ Run the mock server with `handlers` and `templates`:
 modd
 ```
 
-Deploy:
-
-```sh
-gcloud app deploy --project=gradleupdate
-```
-
 Regenerate templates and interface mocks:
 
 ```sh
 go generate -v ./...
+```
+
+### Deployment
+
+Open the Cloud Datastore console and create an entity with the following properties:
+
+- Kind = `Config`
+- Key (string) = `DEFAULT`
+- `GitHubToken` (string) = your GitHub token
+- `CSRFKey` (string) = 32 bytes string
+
+Deploy:
+
+```sh
+gcloud app deploy --project=gradleupdate
 ```

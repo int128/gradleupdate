@@ -21,7 +21,7 @@ var (
 )
 
 //line repo.qtpl:3
-func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
+func (r Repository) StreamPage(qw422016 *qt422016.Writer, csrf string) {
 	//line repo.qtpl:3
 	qw422016.N().S(`
 <!DOCTYPE HTML>
@@ -110,112 +110,117 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer) {
           Request a Pull Request now
         </button>
       </p>
+      `)
+		//line repo.qtpl:38
+		qw422016.N().S(csrf)
+		//line repo.qtpl:38
+		qw422016.N().S(`
     </form>
 
     `)
-	//line repo.qtpl:40
+	//line repo.qtpl:41
 	case gradleupdate.AlreadyHasLatestGradle:
-		//line repo.qtpl:40
+		//line repo.qtpl:41
 		qw422016.N().S(`
     <h3>This repository has the latest Gradle!</h3>
     <p>We will send a pull request for updating version when the newer Gradle is released.</p>
     <p><img src="`)
-		//line repo.qtpl:43
+		//line repo.qtpl:44
 		qw422016.E().S(r.BadgeURL)
-		//line repo.qtpl:43
+		//line repo.qtpl:44
 		qw422016.N().S(`" alt="badge"/></p>
 
     `)
-	//line repo.qtpl:45
+	//line repo.qtpl:46
 	case gradleupdate.NoGradleWrapperProperties:
-		//line repo.qtpl:45
+		//line repo.qtpl:46
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> This repository does not have <code>gradle-wrapper.properties</code>.</p>
 
     `)
-	//line repo.qtpl:48
+	//line repo.qtpl:49
 	case gradleupdate.NoGradleVersion:
-		//line repo.qtpl:48
+		//line repo.qtpl:49
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> No version found in <code>gradle-wrapper.properties</code>.</p>
 
     `)
-	//line repo.qtpl:51
+	//line repo.qtpl:52
 	case gradleupdate.NoReadme:
-		//line repo.qtpl:51
+		//line repo.qtpl:52
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">
       <strong>No Auto Update:</strong> You need to create README.
     </div>
     `)
-		//line repo.qtpl:55
+		//line repo.qtpl:56
 		r.StreamHowToAutoUpdate(qw422016)
-		//line repo.qtpl:55
+		//line repo.qtpl:56
 		qw422016.N().S(`
 
     `)
-	//line repo.qtpl:57
+	//line repo.qtpl:58
 	case gradleupdate.NoReadmeBadge:
-		//line repo.qtpl:57
+		//line repo.qtpl:58
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">
       <strong>No Auto Update:</strong> You need to add the badge to README.
     </div>
     `)
-		//line repo.qtpl:61
+		//line repo.qtpl:62
 		r.StreamHowToAutoUpdate(qw422016)
-		//line repo.qtpl:61
+		//line repo.qtpl:62
 		qw422016.N().S(`
 
     `)
-		//line repo.qtpl:63
+		//line repo.qtpl:64
 	}
-	//line repo.qtpl:63
+	//line repo.qtpl:64
 	qw422016.N().S(`
   </div>
 </div>
 
 `)
-	//line repo.qtpl:67
+	//line repo.qtpl:68
 	StreamFooter(qw422016)
-	//line repo.qtpl:67
+	//line repo.qtpl:68
 	qw422016.N().S(`
 
 </body>
 </html>
 `)
-//line repo.qtpl:71
+//line repo.qtpl:72
 }
 
-//line repo.qtpl:71
-func (r Repository) WritePage(qq422016 qtio422016.Writer) {
-	//line repo.qtpl:71
+//line repo.qtpl:72
+func (r Repository) WritePage(qq422016 qtio422016.Writer, csrf string) {
+	//line repo.qtpl:72
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line repo.qtpl:71
-	r.StreamPage(qw422016)
-	//line repo.qtpl:71
+	//line repo.qtpl:72
+	r.StreamPage(qw422016, csrf)
+	//line repo.qtpl:72
 	qt422016.ReleaseWriter(qw422016)
-//line repo.qtpl:71
+//line repo.qtpl:72
 }
 
-//line repo.qtpl:71
-func (r Repository) Page() string {
-	//line repo.qtpl:71
+//line repo.qtpl:72
+func (r Repository) Page(csrf string) string {
+	//line repo.qtpl:72
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line repo.qtpl:71
-	r.WritePage(qb422016)
-	//line repo.qtpl:71
+	//line repo.qtpl:72
+	r.WritePage(qb422016, csrf)
+	//line repo.qtpl:72
 	qs422016 := string(qb422016.B)
-	//line repo.qtpl:71
+	//line repo.qtpl:72
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line repo.qtpl:71
+	//line repo.qtpl:72
 	return qs422016
-//line repo.qtpl:71
+//line repo.qtpl:72
 }
 
-//line repo.qtpl:73
+//line repo.qtpl:74
 func (r Repository) StreamHowToAutoUpdate(qw422016 *qt422016.Writer) {
-	//line repo.qtpl:73
+	//line repo.qtpl:74
 	qw422016.N().S(`
 <div>
   <h3>How to turn on Auto Update?</h3>
@@ -224,62 +229,62 @@ func (r Repository) StreamHowToAutoUpdate(qw422016 *qt422016.Writer) {
     We will send a pull request with the latest version of Gradle.
   </p>
   <p><img src="`)
-	//line repo.qtpl:80
+	//line repo.qtpl:81
 	qw422016.E().S(r.BadgeURL)
-	//line repo.qtpl:80
+	//line repo.qtpl:81
 	qw422016.N().S(`" alt="badge"/></p>
   <form>
     <div class="form-group">
       <label for="badge-markdown" class="font-weight-bold">Markdown:</label>
       <input type="text" id="badge-markdown" class="form-control text-monospace" value="`)
-	//line repo.qtpl:84
+	//line repo.qtpl:85
 	qw422016.E().S(r.BadgeMarkdown)
-	//line repo.qtpl:84
+	//line repo.qtpl:85
 	qw422016.N().S(`"/>
     </div>
     <div class="form-group">
       <label for="badge-html" class="font-weight-bold">HTML:</label>
       <input type="text" id="badge-html" class="form-control text-monospace" value="`)
-	//line repo.qtpl:88
+	//line repo.qtpl:89
 	qw422016.E().S(r.BadgeHTML)
-	//line repo.qtpl:88
+	//line repo.qtpl:89
 	qw422016.N().S(`"/>
     </div>
     <div class="form-group">
       <a href="`)
-	//line repo.qtpl:91
+	//line repo.qtpl:92
 	qw422016.E().S(r.Repository.HTMLURL)
-	//line repo.qtpl:91
+	//line repo.qtpl:92
 	qw422016.N().S(`" target="_blank" class="btn btn-primary">Open GitHub</a>
     </div>
   </form>
 </div>
 `)
-//line repo.qtpl:95
+//line repo.qtpl:96
 }
 
-//line repo.qtpl:95
+//line repo.qtpl:96
 func (r Repository) WriteHowToAutoUpdate(qq422016 qtio422016.Writer) {
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	r.StreamHowToAutoUpdate(qw422016)
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	qt422016.ReleaseWriter(qw422016)
-//line repo.qtpl:95
+//line repo.qtpl:96
 }
 
-//line repo.qtpl:95
+//line repo.qtpl:96
 func (r Repository) HowToAutoUpdate() string {
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	r.WriteHowToAutoUpdate(qb422016)
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	qs422016 := string(qb422016.B)
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line repo.qtpl:95
+	//line repo.qtpl:96
 	return qs422016
-//line repo.qtpl:95
+//line repo.qtpl:96
 }

@@ -5,9 +5,11 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/infrastructure"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
@@ -21,10 +23,23 @@ func TestGetRepository_ServeHTTP(t *testing.T) {
 	getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 		Return(&usecases.GetRepositoryResponse{}, nil)
 
+	configRepository := gateways.NewMockConfigRepository(ctrl)
+	configRepository.EXPECT().
+		Get(gomock.Not(nil)).
+		AnyTimes().
+		Return(&domain.Config{
+			GitHubToken: "",
+			CSRFKey:     "0123456789abcdef0123456789abcdef",
+		}, nil)
+
 	h := handlers.NewRouter(handlers.RouterIn{
 		GetRepository: handlers.GetRepository{
 			GetRepository: getRepository,
 			Logger:        gateways.NewLogger(t),
+		},
+		CSRFMiddlewareFactory: infrastructure.CSRFMiddlewareFactory{
+			Logger:           gateways.NewLogger(t),
+			ConfigRepository: configRepository,
 		},
 	})
 	r := httptest.NewRequest("GET", "/owner/repo/status", nil)
@@ -61,10 +76,23 @@ func TestGetRepository_ServeHTTP_NotFound(t *testing.T) {
 		getRepository.EXPECT().Do(gomock.Not(nil), repositoryID).
 			Return(nil, c.getRepositoryError)
 
+		configRepository := gateways.NewMockConfigRepository(ctrl)
+		configRepository.EXPECT().
+			Get(gomock.Not(nil)).
+			AnyTimes().
+			Return(&domain.Config{
+				GitHubToken: "",
+				CSRFKey:     "0123456789abcdef0123456789abcdef",
+			}, nil)
+
 		h := handlers.NewRouter(handlers.RouterIn{
 			GetRepository: handlers.GetRepository{
 				GetRepository: getRepository,
 				Logger:        gateways.NewLogger(t),
+			},
+			CSRFMiddlewareFactory: infrastructure.CSRFMiddlewareFactory{
+				Logger:           gateways.NewLogger(t),
+				ConfigRepository: configRepository,
 			},
 		})
 		r := httptest.NewRequest("GET", "/owner/repo/status", nil)
