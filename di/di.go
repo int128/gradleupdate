@@ -1,14 +1,14 @@
 package di
 
 import (
-	"github.com/gorilla/mux"
+	"github.com/int128/gradleupdate/handlers"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
 type App struct {
 	dig.In
-	Router *mux.Router
+	Router handlers.Router
 }
 
 // Invoke runs the function with dependencies.

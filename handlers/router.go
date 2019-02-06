@@ -2,11 +2,16 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
 	"go.uber.org/dig"
 )
+
+type Router interface {
+	http.Handler
+}
 
 type RouterIn struct {
 	dig.In
@@ -18,7 +23,7 @@ type RouterIn struct {
 	BatchSendUpdates BatchSendUpdates
 }
 
-func NewRouter(in RouterIn) *mux.Router {
+func NewRouter(in RouterIn) Router {
 	m := mux.NewRouter()
 	m.Methods("GET").Path("/").Handler(&in.Index)
 	m.Methods("POST").Path("/landing").Handler(&in.Landing)

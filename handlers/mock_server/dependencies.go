@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/int128/gradleupdate/domain/git"
@@ -25,6 +26,12 @@ func newContainer() (*dig.Container, error) {
 		}
 	}
 	return c, nil
+}
+
+type app struct {
+	dig.In
+	Router handlers.Router
+	Logger gateways.Logger
 }
 
 var dependencies = []interface{}{
@@ -71,6 +78,13 @@ var dependencies = []interface{}{
 	},
 	func(ctrl *gomock.Controller) usecases.SendUpdate {
 		sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
+		sendUpdate.EXPECT().
+			Do(gomock.Not(nil), gomock.Any()).
+			AnyTimes().
+			DoAndReturn(func(ctx context.Context, id git.RepositoryID) error {
+				time.Sleep(3 * time.Second)
+				return nil
+			})
 		return sendUpdate
 	},
 	func(ctrl *gomock.Controller) usecases.BatchSendUpdates {

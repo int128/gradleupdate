@@ -2,8 +2,6 @@ package main
 
 import (
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func Test_newContainer(t *testing.T) {
@@ -11,7 +9,7 @@ func Test_newContainer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("could not set up a container: %s", err)
 	}
-	if err := c.Invoke(func(r *mux.Router) {}); err != nil {
+	if err := c.Invoke(func(app) {}); err != nil {
 		t.Fatalf("could not resolve dependencies: %s", err)
 	}
 }
