@@ -15,6 +15,7 @@ type SendPullRequest struct {
 	RepositoryRepository  gateways.RepositoryRepository
 	PullRequestRepository gateways.PullRequestRepository
 	GitService            gateways.GitService
+	Logger                gateways.Logger
 }
 
 // Do sends a pull request for updating the Gradle wrapper in the repository.
@@ -51,7 +52,7 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 		CommitFiles:   req.CommitFiles,
 	}
 	if err := usecase.pushBranch(ctx, pushBranchRequest); err != nil {
-		return errors.Wrapf(err, "could not push the branch")
+		return errors.Wrapf(err, "error while pushing the branch")
 	}
 
 	pull := git.PullRequest{
@@ -61,15 +62,14 @@ func (usecase *SendPullRequest) Do(ctx context.Context, req usecases.SendPullReq
 		Title:      req.Title,
 		Body:       req.Body,
 	}
-	exist, err := usecase.PullRequestRepository.FindByBranch(ctx, pull.BaseBranch, pull.HeadBranch)
-	if err != nil {
-		return errors.Wrapf(err, "could not find existent pull request")
-	}
-	if exist != nil {
-		return nil // pull request already exists
-	}
 	if _, err := usecase.PullRequestRepository.Create(ctx, pull); err != nil {
-		return errors.Wrapf(err, "could not create a pull request %s", pull)
+		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+			if err.AlreadyExists() {
+				usecase.Logger.Infof(ctx, "skip: %s", err)
+				return nil
+			}
+		}
+		return errors.Wrapf(err, "error while creating a pull request %s", pull)
 	}
 	return nil
 }
@@ -78,23 +78,21 @@ func (usecase *SendPullRequest) pushBranch(ctx context.Context, req gateways.Pus
 	headBranch, err := usecase.RepositoryRepository.GetBranch(ctx, req.HeadBranch)
 	if err != nil {
 		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			switch {
-			case err.NoSuchEntity():
+			if err.NoSuchEntity() {
 				_, err := usecase.GitService.CreateBranch(ctx, req)
 				if err != nil {
-					return errors.Wrapf(err, "could not create a branch %s", req.HeadBranch)
+					return errors.Wrapf(err, "error while creating a branch %s", req.HeadBranch)
 				}
 				return nil
 			}
 		}
-		return errors.Wrapf(err, "could not get the head branch %s", req.HeadBranch)
-	} else {
-		if !headBranch.Commit.IsBasedOn(req.BaseBranch.Commit.ID) {
-			_, err := usecase.GitService.UpdateForceBranch(ctx, req)
-			if err != nil {
-				return errors.Wrapf(err, "could not update the branch %s", req.HeadBranch)
-			}
-		}
+		return errors.Wrapf(err, "error while getting the head branch %s", req.HeadBranch)
+	}
+	if headBranch.Commit.IsBasedOn(req.BaseBranch.Commit.ID) {
+		return nil // head branch is up-to-date
+	}
+	if _, err := usecase.GitService.UpdateForceBranch(ctx, req); err != nil {
+		return errors.Wrapf(err, "error while updating the branch %s", req.HeadBranch)
 	}
 	return nil
 }

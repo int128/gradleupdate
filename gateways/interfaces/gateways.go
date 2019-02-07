@@ -15,6 +15,7 @@ import (
 type RepositoryError interface {
 	error
 	NoSuchEntity() bool
+	AlreadyExists() bool
 }
 
 type BadgeLastAccessRepository interface {
@@ -36,7 +37,6 @@ type RepositoryRepository interface {
 
 type PullRequestRepository interface {
 	Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error)
-	FindByBranch(ctx context.Context, baseBranch, headBranch git.BranchID) (*git.PullRequest, error)
 }
 
 type GitService interface {

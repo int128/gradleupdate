@@ -38,6 +38,18 @@ func (m *MockRepositoryError) EXPECT() *MockRepositoryErrorMockRecorder {
 	return m.recorder
 }
 
+// AlreadyExists mocks base method
+func (m *MockRepositoryError) AlreadyExists() bool {
+	ret := m.ctrl.Call(m, "AlreadyExists")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// AlreadyExists indicates an expected call of AlreadyExists
+func (mr *MockRepositoryErrorMockRecorder) AlreadyExists() *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AlreadyExists", reflect.TypeOf((*MockRepositoryError)(nil).AlreadyExists))
+}
+
 // Error mocks base method
 func (m *MockRepositoryError) Error() string {
 	ret := m.ctrl.Call(m, "Error")
@@ -267,19 +279,6 @@ func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 git.PullRe
 // Create indicates an expected call of Create
 func (mr *MockPullRequestRepositoryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPullRequestRepository)(nil).Create), arg0, arg1)
-}
-
-// FindByBranch mocks base method
-func (m *MockPullRequestRepository) FindByBranch(arg0 context.Context, arg1, arg2 git.BranchID) (*git.PullRequest, error) {
-	ret := m.ctrl.Call(m, "FindByBranch", arg0, arg1, arg2)
-	ret0, _ := ret[0].(*git.PullRequest)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FindByBranch indicates an expected call of FindByBranch
-func (mr *MockPullRequestRepositoryMockRecorder) FindByBranch(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByBranch", reflect.TypeOf((*MockPullRequestRepository)(nil).FindByBranch), arg0, arg1, arg2)
 }
 
 // MockGitService is a mock of GitService interface

@@ -11,6 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
+	gatewaysInterfaces "github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
 	usecaseInterfaces "github.com/int128/gradleupdate/usecases/interfaces"
@@ -292,5 +293,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 
 type noSuchEntityError struct{}
 
-func (err *noSuchEntityError) Error() string      { return "404" }
-func (err *noSuchEntityError) NoSuchEntity() bool { return true }
+func (err *noSuchEntityError) Error() string       { return "404" }
+func (err *noSuchEntityError) NoSuchEntity() bool  { return true }
+func (err *noSuchEntityError) AlreadyExists() bool { return false }
+
+var _ gatewaysInterfaces.RepositoryError = &noSuchEntityError{}
