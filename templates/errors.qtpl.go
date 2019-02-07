@@ -83,7 +83,7 @@ func NotFoundError(message string) string {
 }
 
 //line errors.qtpl:19
-func StreamServerError(qw422016 *qt422016.Writer) {
+func StreamError(qw422016 *qt422016.Writer) {
 	//line errors.qtpl:19
 	qw422016.N().S(`
 <!DOCTYPE HTML>
@@ -118,22 +118,22 @@ func StreamServerError(qw422016 *qt422016.Writer) {
 }
 
 //line errors.qtpl:35
-func WriteServerError(qq422016 qtio422016.Writer) {
+func WriteError(qq422016 qtio422016.Writer) {
 	//line errors.qtpl:35
 	qw422016 := qt422016.AcquireWriter(qq422016)
 	//line errors.qtpl:35
-	StreamServerError(qw422016)
+	StreamError(qw422016)
 	//line errors.qtpl:35
 	qt422016.ReleaseWriter(qw422016)
 //line errors.qtpl:35
 }
 
 //line errors.qtpl:35
-func ServerError() string {
+func Error() string {
 	//line errors.qtpl:35
 	qb422016 := qt422016.AcquireByteBuffer()
 	//line errors.qtpl:35
-	WriteServerError(qb422016)
+	WriteError(qb422016)
 	//line errors.qtpl:35
 	qs422016 := string(qb422016.B)
 	//line errors.qtpl:35

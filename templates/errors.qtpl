@@ -16,7 +16,7 @@
 </html>
 {% endfunc %}
 
-{% func ServerError() %}
+{% func Error() %}
 <!DOCTYPE HTML>
 <html>
 <head>

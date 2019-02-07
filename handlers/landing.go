@@ -16,8 +16,8 @@ type Landing struct {
 func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := r.ParseForm(); err != nil {
-		h.Logger.Infof(ctx, "Could not parse form: %s", err)
-		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		h.Logger.Debugf(ctx, "error while parsing form: %+v", err)
+		genericErrorHandler(http.StatusBadRequest).ServeHTTP(w, r)
 		return
 	}
 	url := git.RepositoryURL(r.FormValue("url"))

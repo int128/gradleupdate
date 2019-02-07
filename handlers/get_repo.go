@@ -30,18 +30,13 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.GetRepository.Do(ctx, id)
 	if err != nil {
 		if err, ok := errors.Cause(err).(usecases.GetRepositoryError); ok {
-			switch {
-			case err.NoSuchRepository():
-				w.Header().Set("content-type", "text/html")
-				w.WriteHeader(http.StatusNotFound)
-				templates.WriteNotFoundError(w, fmt.Sprintf("no such a repository %s", id))
+			if err.NoSuchRepository() {
+				notFoundHandler(fmt.Sprintf("no such a repository %s", id)).ServeHTTP(w, r)
 				return
 			}
 		}
-		h.Logger.Errorf(ctx, "could not get the repository %s: %s", id, err)
-		w.Header().Set("content-type", "text/html")
-		w.WriteHeader(http.StatusInternalServerError)
-		templates.WriteServerError(w)
+		h.Logger.Errorf(ctx, "error while getting the repository %s: %+v", id, err)
+		genericErrorHandler(http.StatusInternalServerError).ServeHTTP(w, r)
 		return
 	}
 

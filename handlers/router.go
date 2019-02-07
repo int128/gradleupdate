@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/infrastructure"
+	"github.com/int128/gradleupdate/templates"
 	"go.uber.org/dig"
 )
 
@@ -36,6 +37,9 @@ func NewRouter(in RouterIn) Router {
 	p.Methods("GET").Path("/{owner}/{repo}/status").Handler(&in.GetRepository)
 	p.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&in.GetBadge)
 	p.Methods("POST").Path("/{owner}/{repo}/update").Handler(&in.SendUpdate)
+
+	r.NotFoundHandler = notFoundHandler("")
+	r.MethodNotAllowedHandler = genericErrorHandler(http.StatusMethodNotAllowed)
 	return r
 }
 
@@ -47,4 +51,20 @@ func resolveGetBadgeURL(id git.RepositoryID) string {
 }
 func resolveSendUpdateURL(id git.RepositoryID) string {
 	return fmt.Sprintf("/%s/%s/update", id.Owner, id.Name)
+}
+
+func notFoundHandler(message string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "text/html")
+		w.WriteHeader(http.StatusNotFound)
+		templates.WriteNotFoundError(w, message)
+	})
+}
+
+func genericErrorHandler(code int) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("content-type", "text/html")
+		w.WriteHeader(code)
+		templates.WriteError(w)
+	})
 }
