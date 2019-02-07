@@ -1,8 +1,13 @@
-package main
+// Package di provides mock dependencies for frontend development and handlers testing.
+//
+// You need to provide the following dependencies manually:
+//
+// * gateways.Logger
+//
+package di
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/golang/mock/gomock"
@@ -17,10 +22,9 @@ import (
 	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
-	"go.uber.org/zap"
 )
 
-func newContainer() (*dig.Container, error) {
+func New() (*dig.Container, error) {
 	c := dig.New()
 	for _, dependency := range dependencies {
 		if err := c.Provide(dependency); err != nil {
@@ -28,12 +32,6 @@ func newContainer() (*dig.Container, error) {
 		}
 	}
 	return c, nil
-}
-
-type app struct {
-	dig.In
-	Router handlers.Router
-	Logger gateways.Logger
 }
 
 var dependencies = []interface{}{
@@ -51,30 +49,50 @@ var dependencies = []interface{}{
 						UpToDate:       true,
 					}, nil
 				}
-				return &usecases.GetBadgeResponse{
-					CurrentVersion: gradle.Version("5.0"),
-					UpToDate:       false,
-				}, nil
+				if id.Owner == "int128" {
+					return &usecases.GetBadgeResponse{
+						CurrentVersion: gradle.Version("5.0"),
+						UpToDate:       false,
+					}, nil
+				}
+				return nil, errors.New("not found")
 			})
 		return getBadge
 	},
 	func(ctrl *gomock.Controller) usecases.GetRepository {
 		getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
-		repository := git.Repository{
-			ID:          git.RepositoryID{Owner: "int128", Name: "gradleupdate"},
-			Description: "Automatic Gradle Update Service",
-			AvatarURL:   "https://avatars0.githubusercontent.com/u/321266",
-			HTMLURL:     "https://github.com/int128/gradleupdate",
+		repositoryOf := func(id git.RepositoryID) git.Repository {
+			return git.Repository{
+				ID:          id,
+				Description: "Automatic Gradle Update Service",
+				AvatarURL:   "https://avatars0.githubusercontent.com/u/321266",
+				HTMLURL:     "https://github.com/int128/gradleupdate",
+			}
 		}
 		getRepository.EXPECT().
 			Do(gomock.Not(nil), gomock.Any()).
 			AnyTimes().
 			DoAndReturn(func(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
-				return &usecases.GetRepositoryResponse{
-					Repository:                  repository,
-					LatestGradleRelease:         gradle.Release{Version: "5.1"},
-					UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
-				}, nil
+				if id == (git.RepositoryID{Owner: "int128", Name: "latest-gradle-wrapper"}) {
+					return &usecases.GetRepositoryResponse{
+						Repository:                  repositoryOf(id),
+						LatestGradleRelease:         gradle.Release{Version: "5.1"},
+						UpdatePreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
+					}, nil
+				}
+				if id.Owner == "int128" {
+					return &usecases.GetRepositoryResponse{
+						Repository:                  repositoryOf(id),
+						LatestGradleRelease:         gradle.Release{Version: "5.1"},
+						UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
+					}, nil
+				}
+				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
+				err.EXPECT().
+					NoSuchRepository().
+					AnyTimes().
+					Return(true)
+				return nil, err
 			})
 		return getRepository
 	},
@@ -106,45 +124,20 @@ var dependencies = []interface{}{
 		return configRepository
 	},
 
-	func() *gomock.Controller {
-		return gomock.NewController(&testReporter{})
-	},
-	func() (gateways.Logger, error) {
-		// skip 1st caller that is zapLogger
-		logger, err := zap.NewDevelopment(zap.AddCallerSkip(1))
-		if err != nil {
-			return nil, errors.Wrapf(err, "error while creating a logger")
-		}
-		return &zapLogger{logger.Sugar()}, nil
+	func(tr testReporter) *gomock.Controller {
+		return gomock.NewController(&tr)
 	},
 }
 
-type zapLogger struct {
-	sugar *zap.SugaredLogger
+type testReporter struct {
+	dig.In
+	Logger gateways.Logger
 }
-
-func (l *zapLogger) Debugf(ctx context.Context, format string, args ...interface{}) {
-	l.sugar.Debugf(format, args...)
-}
-
-func (l *zapLogger) Infof(ctx context.Context, format string, args ...interface{}) {
-	l.sugar.Infof(format, args...)
-}
-
-func (l *zapLogger) Warnf(ctx context.Context, format string, args ...interface{}) {
-	l.sugar.Warnf(format, args...)
-}
-
-func (l *zapLogger) Errorf(ctx context.Context, format string, args ...interface{}) {
-	l.sugar.Errorf(format, args)
-}
-
-type testReporter struct{}
 
 func (t *testReporter) Errorf(format string, args ...interface{}) {
-	log.Printf(format, args...)
+	t.Logger.Errorf(context.Background(), format, args...)
 }
 
 func (t *testReporter) Fatalf(format string, args ...interface{}) {
-	log.Printf(format, args...)
+	t.Logger.Errorf(context.Background(), format, args...)
 }
