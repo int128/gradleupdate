@@ -55,7 +55,12 @@ var dependencies = []interface{}{
 						UpToDate:       false,
 					}, nil
 				}
-				return nil, errors.New("not found")
+				err := usecaseTestDoubles.NewMockGetBadgeError(ctrl)
+				err.EXPECT().
+					NoGradleVersion().
+					AnyTimes().
+					Return(true)
+				return nil, err
 			})
 		return getBadge
 	},

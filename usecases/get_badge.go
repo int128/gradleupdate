@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
@@ -29,11 +30,16 @@ func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases
 	eg.Go(func() error {
 		gradleWrapperProperties, err := usecase.RepositoryRepository.GetFileContent(ctx, id, gradle.WrapperPropertiesPath)
 		if err != nil {
+			if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
+				if err.NoSuchEntity() {
+					return errors.Wrapf(&getBadgeError{error: err, noGradleVersion: true}, "no gradle-wrapper.properties in %s", id)
+				}
+			}
 			return errors.Wrapf(err, "error while getting gradle-wrapper.properties in %s", id)
 		}
 		currentVersion = gradle.FindWrapperVersion(gradleWrapperProperties)
 		if currentVersion == "" {
-			return errors.Errorf("error while finding Gradle version in the properties of %s", id)
+			return errors.WithStack(&getBadgeError{error: fmt.Errorf("no Gradle version in gradle-wrapper.properties of %s", id), noGradleVersion: true})
 		}
 		return nil
 	})
@@ -62,3 +68,10 @@ func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases
 		UpToDate:       currentVersion.GreaterOrEqualThan(latestRelease.Version),
 	}, nil
 }
+
+type getBadgeError struct {
+	error
+	noGradleVersion bool
+}
+
+func (err *getBadgeError) NoGradleVersion() bool { return err.noGradleVersion }

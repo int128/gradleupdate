@@ -65,5 +65,5 @@ func (l *zapLogger) Warnf(ctx context.Context, format string, args ...interface{
 }
 
 func (l *zapLogger) Errorf(ctx context.Context, format string, args ...interface{}) {
-	l.sugar.Errorf(format, args)
+	l.sugar.Errorf(format, args...)
 }

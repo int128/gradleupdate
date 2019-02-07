@@ -1,4 +1,4 @@
-package usecases_test
+package usecases
 
 import (
 	"context"
@@ -11,12 +11,12 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/usecases"
+	"github.com/int128/gradleupdate/usecases/interfaces"
+	usecasesTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
+	"github.com/pkg/errors"
 )
 
 func TestGetBadge_Do(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 	timeService := &gateways.TimeService{
@@ -46,23 +46,29 @@ func TestGetBadge_Do(t *testing.T) {
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
 			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
-			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
+			repositoryRepository.EXPECT().
+				GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 
 			gradleService := gateways.NewMockGradleService(ctrl)
-			gradleService.EXPECT().GetCurrentRelease(ctx).
+			gradleService.EXPECT().
+				GetCurrentRelease(ctx).
 				Return(&gradle.Release{Version: c.latestVersion}, nil)
 
 			badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
-			badgeLastAccessRepository.EXPECT().Save(ctx, domain.BadgeLastAccess{
-				Repository:     repositoryID,
-				CurrentVersion: c.currentVersion,
-				LatestVersion:  c.latestVersion,
-				LastAccessTime: timeService.NowValue,
-			}).Return(nil)
+			badgeLastAccessRepository.EXPECT().
+				Save(ctx, domain.BadgeLastAccess{
+					Repository:     repositoryID,
+					CurrentVersion: c.currentVersion,
+					LatestVersion:  c.latestVersion,
+					LastAccessTime: timeService.NowValue,
+				}).Return(nil)
 
-			u := usecases.GetBadge{
+			u := GetBadge{
 				RepositoryRepository:      repositoryRepository,
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
@@ -81,4 +87,43 @@ func TestGetBadge_Do(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("NoGradleVersion", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		getBadgeError := usecasesTestDoubles.NewMockGetBadgeError(ctrl)
+		getBadgeError.EXPECT().NoGradleVersion().Return(true)
+		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository.EXPECT().
+			GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
+			Return(nil, getBadgeError)
+
+		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService.EXPECT().GetCurrentRelease(ctx).MaxTimes(1)
+
+		badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
+
+		u := GetBadge{
+			RepositoryRepository:      repositoryRepository,
+			GradleService:             gradleService,
+			BadgeLastAccessRepository: badgeLastAccessRepository,
+			TimeService:               timeService,
+			Logger:                    gateways.NewLogger(t),
+		}
+		resp, err := u.Do(ctx, repositoryID)
+		if resp != nil {
+			t.Errorf("resp wants nil but %+v", resp)
+		}
+		if err == nil {
+			t.Fatalf("err wants non-nil but nil")
+		}
+		cause, ok := errors.Cause(err).(usecases.GetBadgeError)
+		if !ok {
+			t.Fatalf("cause wants GetBadgeError but %T", cause)
+		}
+		if cause.NoGradleVersion() != true {
+			t.Errorf("NoGradleVersion wants true")
+		}
+	})
 }

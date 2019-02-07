@@ -9,6 +9,7 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
+	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
@@ -28,15 +29,22 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("expires", time.Now().Add(15*time.Second).Format(http.TimeFormat))
 
 	resp, err := h.GetBadge.Do(ctx, id)
-	switch {
-	case err != nil:
-		h.Logger.Warnf(ctx, "could not get a badge for repository %s: %s", id, err)
+	if err != nil {
+		if err, ok := errors.Cause(err).(usecases.GetBadgeError); ok {
+			if err.NoGradleVersion() {
+				w.WriteHeader(http.StatusNotFound)
+				templates.DarkBadge("unknown").WriteSVG(w)
+				return
+			}
+		}
+		h.Logger.Errorf(ctx, "error while getting a badge for the repository %s: %+v", id, err)
+		w.WriteHeader(http.StatusInternalServerError)
 		templates.DarkBadge("unknown").WriteSVG(w)
-
-	case resp.UpToDate:
-		templates.GreenBadge(string(resp.CurrentVersion)).WriteSVG(w)
-
-	case !resp.UpToDate:
-		templates.RedBadge(string(resp.CurrentVersion)).WriteSVG(w)
+		return
 	}
+	if resp.UpToDate {
+		templates.GreenBadge(string(resp.CurrentVersion)).WriteSVG(w)
+		return
+	}
+	templates.RedBadge(string(resp.CurrentVersion)).WriteSVG(w)
 }
