@@ -8,7 +8,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_usecases.go -package usecases github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetBadgeError,GetRepository,GetRepositoryError,SendUpdate,SendUpdateError,BatchSendUpdates,SendPullRequest
+//go:generate mockgen -destination test_doubles/mock_usecases.go -package usecasesTestDoubles github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetBadgeError,GetRepository,GetRepositoryError,SendUpdate,SendUpdateError,BatchSendUpdates,SendPullRequest
 
 type GetBadge interface {
 	Do(ctx context.Context, id git.RepositoryID) (*GetBadgeResponse, error)

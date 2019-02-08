@@ -16,10 +16,10 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
-	gatewaysTestDoubles "github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/handlers"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
@@ -38,7 +38,7 @@ var dependencies = []interface{}{
 	handlers.NewRouter,
 
 	func(ctrl *gomock.Controller) usecases.GetBadge {
-		getBadge := usecaseTestDoubles.NewMockGetBadge(ctrl)
+		getBadge := usecasesTestDoubles.NewMockGetBadge(ctrl)
 		getBadge.EXPECT().
 			Do(gomock.Not(nil), gomock.Any()).
 			AnyTimes().
@@ -55,7 +55,7 @@ var dependencies = []interface{}{
 						UpToDate:       false,
 					}, nil
 				}
-				err := usecaseTestDoubles.NewMockGetBadgeError(ctrl)
+				err := usecasesTestDoubles.NewMockGetBadgeError(ctrl)
 				err.EXPECT().
 					NoGradleVersion().
 					AnyTimes().
@@ -65,7 +65,7 @@ var dependencies = []interface{}{
 		return getBadge
 	},
 	func(ctrl *gomock.Controller) usecases.GetRepository {
-		getRepository := usecaseTestDoubles.NewMockGetRepository(ctrl)
+		getRepository := usecasesTestDoubles.NewMockGetRepository(ctrl)
 		repositoryOf := func(id git.RepositoryID) git.Repository {
 			return git.Repository{
 				ID:          id,
@@ -92,7 +92,7 @@ var dependencies = []interface{}{
 						UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
 					}, nil
 				}
-				err := usecaseTestDoubles.NewMockGetRepositoryError(ctrl)
+				err := usecasesTestDoubles.NewMockGetRepositoryError(ctrl)
 				err.EXPECT().
 					NoSuchRepository().
 					AnyTimes().
@@ -102,7 +102,7 @@ var dependencies = []interface{}{
 		return getRepository
 	},
 	func(ctrl *gomock.Controller) usecases.SendUpdate {
-		sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
+		sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
 		sendUpdate.EXPECT().
 			Do(gomock.Not(nil), gomock.Any()).
 			AnyTimes().
@@ -113,7 +113,7 @@ var dependencies = []interface{}{
 		return sendUpdate
 	},
 	func(ctrl *gomock.Controller) usecases.BatchSendUpdates {
-		batchSendUpdates := usecaseTestDoubles.NewMockBatchSendUpdates(ctrl)
+		batchSendUpdates := usecasesTestDoubles.NewMockBatchSendUpdates(ctrl)
 		return batchSendUpdates
 	},
 

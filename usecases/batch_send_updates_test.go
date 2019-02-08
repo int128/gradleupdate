@@ -11,7 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
-	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
 func TestBatchSendUpdates_Do(t *testing.T) {
@@ -39,7 +39,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		},
 	}, nil)
 
-	sendUpdate := usecaseTestDoubles.NewMockSendUpdate(ctrl)
+	sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
 	sendUpdate.EXPECT().Do(ctx, repositoryID).Return(nil)
 
 	u := usecases.BatchSendUpdates{

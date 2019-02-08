@@ -12,7 +12,7 @@ import (
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	usecasesTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 	"github.com/pkg/errors"
 )
 

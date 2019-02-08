@@ -1,4 +1,4 @@
-package usecases_test
+package usecases
 
 import (
 	"context"
@@ -13,9 +13,8 @@ import (
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/usecases"
-	usecaseInterfaces "github.com/int128/gradleupdate/usecases/interfaces"
-	usecaseTestDoubles "github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/usecases/interfaces"
+	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 	"github.com/pkg/errors"
 )
 
@@ -47,8 +46,8 @@ func TestSendUpdate_Do(t *testing.T) {
 			LastUpdateTime: fixedTime.NowValue,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		sendPullRequest.EXPECT().Do(ctx, usecaseInterfaces.SendPullRequestRequest{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		sendPullRequest.EXPECT().Do(ctx, usecases.SendPullRequestRequest{
 			Base:           repositoryID,
 			HeadBranchName: "gradle-5.0-owner",
 			CommitMessage:  "Gradle 5.0",
@@ -62,7 +61,7 @@ func TestSendUpdate_Do(t *testing.T) {
 This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/status for more.`,
 		}).Return(nil)
 
-		u := usecases.SendUpdate{
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -96,8 +95,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		u := usecases.SendUpdate{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -108,7 +107,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecaseInterfaces.SendUpdateError)
+		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
@@ -139,8 +138,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		u := usecases.SendUpdate{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -151,7 +150,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecaseInterfaces.SendUpdateError)
+		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
@@ -182,8 +181,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			PreconditionViolation: gradleupdate.NoGradleVersion,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		u := usecases.SendUpdate{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -194,7 +193,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecaseInterfaces.SendUpdateError)
+		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
@@ -225,8 +224,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			PreconditionViolation: gradleupdate.NoReadme,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		u := usecases.SendUpdate{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -237,7 +236,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecaseInterfaces.SendUpdateError)
+		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
@@ -268,8 +267,8 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			PreconditionViolation: gradleupdate.NoReadmeBadge,
 		})
 
-		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
-		u := usecases.SendUpdate{
+		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
+		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
@@ -280,7 +279,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecaseInterfaces.SendUpdateError)
+		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
 		if !ok {
 			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
 		}
