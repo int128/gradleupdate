@@ -53,9 +53,9 @@ func TestGetBadge_Do(t *testing.T) {
 				GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 
-			gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
+			gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
 			gradleService.EXPECT().
-				GetCurrentRelease(ctx).
+				GetCurrent(ctx).
 				Return(&gradle.Release{Version: c.latestVersion}, nil)
 
 			badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
@@ -69,7 +69,7 @@ func TestGetBadge_Do(t *testing.T) {
 
 			u := GetBadge{
 				RepositoryRepository:      repositoryRepository,
-				GradleService:             gradleService,
+				GradleReleaseRepository:   gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
 				Time:                      fixedTime,
 				Logger:                    gatewaysTestDoubles.NewLogger(t),
@@ -96,14 +96,16 @@ func TestGetBadge_Do(t *testing.T) {
 			GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).MaxTimes(1)
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
+			MaxTimes(1)
 
 		badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 
 		u := GetBadge{
 			RepositoryRepository:      repositoryRepository,
-			GradleService:             gradleService,
+			GradleReleaseRepository:   gradleService,
 			BadgeLastAccessRepository: badgeLastAccessRepository,
 			Time:                      fixedTime,
 			Logger:                    gatewaysTestDoubles.NewLogger(t),

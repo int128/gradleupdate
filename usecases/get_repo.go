@@ -15,8 +15,8 @@ import (
 
 type GetRepository struct {
 	dig.In
-	GradleService        gateways.GradleService
-	RepositoryRepository gateways.RepositoryRepository
+	GradleReleaseRepository gateways.GradleReleaseRepository
+	RepositoryRepository    gateways.RepositoryRepository
 }
 
 func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
@@ -61,7 +61,7 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		return nil
 	})
 	eg.Go(func() error {
-		latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
+		latestRelease, err := usecase.GradleReleaseRepository.GetCurrent(ctx)
 		if err != nil {
 			return errors.Wrapf(err, "error while getting the latest Gradle release")
 		}

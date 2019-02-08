@@ -12,7 +12,7 @@ import (
 
 type BatchSendUpdates struct {
 	dig.In
-	GradleService             gateways.GradleService
+	GradleReleaseRepository   gateways.GradleReleaseRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	SendUpdate                usecases.SendUpdate
 	Time                      gateways.Time
@@ -26,7 +26,7 @@ func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
 		return errors.Wrapf(err, "could not find badges since %s", oneMonthAgo)
 	}
 
-	latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
+	latestRelease, err := usecase.GradleReleaseRepository.GetCurrent(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
 	}

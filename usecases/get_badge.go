@@ -16,7 +16,7 @@ import (
 
 type GetBadge struct {
 	dig.In
-	GradleService             gateways.GradleService
+	GradleReleaseRepository   gateways.GradleReleaseRepository
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	Time                      gateways.Time
@@ -45,7 +45,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases
 	})
 	eg.Go(func() error {
 		var err error
-		latestRelease, err = usecase.GradleService.GetCurrentRelease(ctx)
+		latestRelease, err = usecase.GradleReleaseRepository.GetCurrent(ctx)
 		if err != nil {
 			return errors.Wrapf(err, "error while getting the latest Gradle release")
 		}

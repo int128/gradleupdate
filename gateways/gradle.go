@@ -10,12 +10,12 @@ import (
 	"go.uber.org/dig"
 )
 
-type GradleService struct {
+type GradleReleaseRepository struct {
 	dig.In
 	Client *http.Client
 }
 
-func (s *GradleService) GetCurrentRelease(ctx context.Context) (*gradle.Release, error) {
+func (s *GradleReleaseRepository) GetCurrent(ctx context.Context) (*gradle.Release, error) {
 	req, err := http.NewRequest("GET", "https://services.gradle.org/versions/current", nil)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error while creating a HTTP request")

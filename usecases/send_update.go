@@ -18,7 +18,7 @@ import (
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
 	dig.In
-	GradleService                  gateways.GradleService
+	GradleReleaseRepository        gateways.GradleReleaseRepository
 	RepositoryRepository           gateways.RepositoryRepository
 	RepositoryLastUpdateRepository gateways.RepositoryLastUpdateRepository
 	SendPullRequest                usecases.SendPullRequest
@@ -74,7 +74,7 @@ func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) 
 		return nil
 	})
 	eg.Go(func() error {
-		latestRelease, err := usecase.GradleService.GetCurrentRelease(ctx)
+		latestRelease, err := usecase.GradleReleaseRepository.GetCurrent(ctx)
 		if err != nil {
 			return errors.Wrapf(err, "error while getting the latest Gradle release")
 		}

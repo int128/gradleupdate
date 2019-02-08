@@ -10,7 +10,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleService,ConfigRepository
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,ConfigRepository
 
 type RepositoryError interface {
 	error
@@ -51,8 +51,8 @@ type PushBranchRequest struct {
 	CommitFiles   []git.File
 }
 
-type GradleService interface {
-	GetCurrentRelease(ctx context.Context) (*gradle.Release, error)
+type GradleReleaseRepository interface {
+	GetCurrent(ctx context.Context) (*gradle.Release, error)
 }
 
 type Time interface {

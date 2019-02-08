@@ -35,8 +35,9 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -63,7 +64,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}
@@ -83,8 +84,9 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil)
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -98,7 +100,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}
@@ -126,8 +128,9 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -141,7 +144,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}
@@ -169,8 +172,9 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(git.FileContent("INVALID"), nil)
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -184,7 +188,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}
@@ -212,8 +216,9 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil).MaxTimes(1)
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -227,7 +232,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}
@@ -255,8 +260,9 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
-		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-		gradleService.EXPECT().GetCurrentRelease(ctx).
+		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+		gradleService.EXPECT().
+			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
@@ -270,7 +276,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		u := SendUpdate{
 			RepositoryRepository:           repositoryRepository,
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleService:                  gradleService,
+			GradleReleaseRepository:        gradleService,
 			SendPullRequest:                sendPullRequest,
 			Time:                           fixedTime,
 		}

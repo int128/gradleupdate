@@ -46,13 +46,14 @@ func TestGetRepository_Do(t *testing.T) {
 			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 				Return(readmeContent, nil)
 
-			gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-			gradleService.EXPECT().GetCurrentRelease(ctx).
+			gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+			gradleService.EXPECT().
+				GetCurrent(ctx).
 				Return(&gradle.Release{Version: "5.0"}, nil)
 
 			u := GetRepository{
-				RepositoryRepository: repositoryRepository,
-				GradleService:        gradleService,
+				RepositoryRepository:    repositoryRepository,
+				GradleReleaseRepository: gradleService,
 			}
 			resp, err := u.Do(ctx, repositoryID)
 			if err != nil {
@@ -75,11 +76,11 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	repositoryRepository.EXPECT().Get(ctx, repositoryID).
 		Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
-	gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
+	gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
 
 	u := GetRepository{
-		RepositoryRepository: repositoryRepository,
-		GradleService:        gradleService,
+		RepositoryRepository:    repositoryRepository,
+		GradleReleaseRepository: gradleService,
 	}
 	resp, err := u.Do(ctx, repositoryID)
 	if resp != nil {

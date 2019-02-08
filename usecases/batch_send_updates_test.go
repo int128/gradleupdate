@@ -24,8 +24,9 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
-	gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
-	gradleService.EXPECT().GetCurrentRelease(ctx).
+	gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
+	gradleService.EXPECT().
+		GetCurrent(ctx).
 		Return(&gradle.Release{Version: "5.0"}, nil)
 
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
@@ -43,7 +44,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	sendUpdate.EXPECT().Do(ctx, repositoryID).Return(nil)
 
 	u := usecases.BatchSendUpdates{
-		GradleService:             gradleService,
+		GradleReleaseRepository:   gradleService,
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
 		Time:                      fixedTime,

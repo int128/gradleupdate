@@ -11,7 +11,7 @@ var gatewaysDependencies = []interface{}{
 	func(i impl.GitService) gateways.GitService { return &i },
 	func(i impl.BadgeLastAccessRepository) gateways.BadgeLastAccessRepository { return &i },
 	func(i impl.RepositoryLastUpdateRepository) gateways.RepositoryLastUpdateRepository { return &i },
-	func(i impl.GradleService) gateways.GradleService { return &i },
+	func(i impl.GradleReleaseRepository) gateways.GradleReleaseRepository { return &i },
 	func(i impl.Time) gateways.Time { return &i },
 	func(i impl.HTTPCacheRepository) gateways.HTTPCacheRepository { return &i },
 	func(i impl.AELogger) gateways.Logger { return &i },
