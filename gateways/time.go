@@ -6,10 +6,10 @@ import (
 	"go.uber.org/dig"
 )
 
-type TimeService struct {
+type Time struct {
 	dig.In
 }
 
-func (s *TimeService) Now() time.Time {
+func (s *Time) Now() time.Time {
 	return time.Now()
 }

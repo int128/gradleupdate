@@ -19,7 +19,7 @@ type GetBadge struct {
 	GradleService             gateways.GradleService
 	RepositoryRepository      gateways.RepositoryRepository
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
-	TimeService               gateways.TimeService
+	Time                      gateways.Time
 	Logger                    gateways.Logger
 }
 
@@ -57,7 +57,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases
 
 	if err := usecase.BadgeLastAccessRepository.Save(ctx, domain.BadgeLastAccess{
 		Repository:     id,
-		LastAccessTime: usecase.TimeService.Now(),
+		LastAccessTime: usecase.Time.Now(),
 		CurrentVersion: currentVersion,
 		LatestVersion:  latestRelease.Version,
 	}); err != nil {

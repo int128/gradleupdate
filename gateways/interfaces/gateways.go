@@ -55,7 +55,7 @@ type GradleService interface {
 	GetCurrentRelease(ctx context.Context) (*gradle.Release, error)
 }
 
-type TimeService interface {
+type Time interface {
 	Now() time.Time
 }
 

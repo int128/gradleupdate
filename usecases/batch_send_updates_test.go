@@ -20,7 +20,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo1"}
 
-	timeService := &gateways.TimeService{
+	fixedTime := &gateways.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
@@ -46,7 +46,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		GradleService:             gradleService,
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
-		TimeService:               timeService,
+		Time:                      fixedTime,
 		Logger:                    gateways.NewLogger(t),
 	}
 	if err := u.Do(ctx); err != nil {

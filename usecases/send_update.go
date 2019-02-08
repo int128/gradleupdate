@@ -22,13 +22,13 @@ type SendUpdate struct {
 	RepositoryRepository           gateways.RepositoryRepository
 	RepositoryLastUpdateRepository gateways.RepositoryLastUpdateRepository
 	SendPullRequest                usecases.SendPullRequest
-	TimeService                    gateways.TimeService
+	Time                           gateways.Time
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 	lastUpdate := domain.RepositoryLastUpdate{
 		Repository:     id,
-		LastUpdateTime: usecase.TimeService.Now(),
+		LastUpdateTime: usecase.Time.Now(),
 	}
 	err := usecase.sendUpdate(ctx, id)
 	if err != nil {

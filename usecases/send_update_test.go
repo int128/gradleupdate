@@ -22,7 +22,7 @@ import (
 func TestSendUpdate_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
-	timeService := &gateways.TimeService{
+	fixedTime := &gateways.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 	readmeContent := git.FileContent("![Gradle Status](https://gradleupdate.appspot.com/owner/repo/status.svg)")
@@ -44,7 +44,7 @@ func TestSendUpdate_Do(t *testing.T) {
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:     repositoryID,
-			LastUpdateTime: timeService.NowValue,
+			LastUpdateTime: fixedTime.NowValue,
 		})
 
 		sendPullRequest := usecaseTestDoubles.NewMockSendPullRequest(ctrl)
@@ -67,7 +67,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -92,7 +92,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastUpdateTime:        timeService.NowValue,
+			LastUpdateTime:        fixedTime.NowValue,
 			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
 		})
 
@@ -102,7 +102,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -135,7 +135,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastUpdateTime:        timeService.NowValue,
+			LastUpdateTime:        fixedTime.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
 		})
 
@@ -145,7 +145,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -178,7 +178,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastUpdateTime:        timeService.NowValue,
+			LastUpdateTime:        fixedTime.NowValue,
 			PreconditionViolation: gradleupdate.NoGradleVersion,
 		})
 
@@ -188,7 +188,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -221,7 +221,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastUpdateTime:        timeService.NowValue,
+			LastUpdateTime:        fixedTime.NowValue,
 			PreconditionViolation: gradleupdate.NoReadme,
 		})
 
@@ -231,7 +231,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -264,7 +264,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
-			LastUpdateTime:        timeService.NowValue,
+			LastUpdateTime:        fixedTime.NowValue,
 			PreconditionViolation: gradleupdate.NoReadmeBadge,
 		})
 
@@ -274,7 +274,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
 			GradleService:                  gradleService,
 			SendPullRequest:                sendPullRequest,
-			TimeService:                    timeService,
+			Time:                           fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {

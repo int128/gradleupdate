@@ -19,7 +19,7 @@ import (
 func TestGetBadge_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
-	timeService := &gateways.TimeService{
+	fixedTime := &gateways.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
@@ -65,14 +65,14 @@ func TestGetBadge_Do(t *testing.T) {
 					Repository:     repositoryID,
 					CurrentVersion: c.currentVersion,
 					LatestVersion:  c.latestVersion,
-					LastAccessTime: timeService.NowValue,
+					LastAccessTime: fixedTime.NowValue,
 				}).Return(nil)
 
 			u := GetBadge{
 				RepositoryRepository:      repositoryRepository,
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
-				TimeService:               timeService,
+				Time:                      fixedTime,
 				Logger:                    gateways.NewLogger(t),
 			}
 			resp, err := u.Do(ctx, repositoryID)
@@ -108,7 +108,7 @@ func TestGetBadge_Do(t *testing.T) {
 			RepositoryRepository:      repositoryRepository,
 			GradleService:             gradleService,
 			BadgeLastAccessRepository: badgeLastAccessRepository,
-			TimeService:               timeService,
+			Time:                      fixedTime,
 			Logger:                    gateways.NewLogger(t),
 		}
 		resp, err := u.Do(ctx, repositoryID)
