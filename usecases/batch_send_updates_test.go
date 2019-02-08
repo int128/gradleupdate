@@ -20,16 +20,16 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo1"}
 
-	fixedTime := &gateways.FixedTime{
+	fixedTime := &gatewaysTestDoubles.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
-	gradleService := gateways.NewMockGradleService(ctrl)
+	gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 	gradleService.EXPECT().GetCurrentRelease(ctx).
 		Return(&gradle.Release{Version: "5.0"}, nil)
 
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
-	badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
+	badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 	badgeLastAccessRepository.EXPECT().FindBySince(ctx, oneMonthAgo).Return([]domain.BadgeLastAccess{
 		{
 			Repository:     repositoryID,
@@ -47,7 +47,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		BadgeLastAccessRepository: badgeLastAccessRepository,
 		SendUpdate:                sendUpdate,
 		Time:                      fixedTime,
-		Logger:                    gateways.NewLogger(t),
+		Logger:                    gatewaysTestDoubles.NewLogger(t),
 	}
 	if err := u.Do(ctx); err != nil {
 		t.Fatalf("could not do the use case: %s", err)

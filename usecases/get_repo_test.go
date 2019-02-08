@@ -38,7 +38,7 @@ func TestGetRepository_Do(t *testing.T) {
 		},
 	} {
 		t.Run(c.name, func(t *testing.T) {
-			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+			repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().Get(ctx, repositoryID).
 				Return(&git.Repository{ID: repositoryID}, nil)
 			repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
@@ -46,7 +46,7 @@ func TestGetRepository_Do(t *testing.T) {
 			repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 				Return(readmeContent, nil)
 
-			gradleService := gateways.NewMockGradleService(ctrl)
+			gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 			gradleService.EXPECT().GetCurrentRelease(ctx).
 				Return(&gradle.Release{Version: "5.0"}, nil)
 
@@ -71,14 +71,14 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 
-	repositoryError := gateways.NewMockRepositoryError(ctrl)
+	repositoryError := gatewaysTestDoubles.NewMockRepositoryError(ctrl)
 	repositoryError.EXPECT().NoSuchEntity().AnyTimes().Return(true)
 
-	repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+	repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 	repositoryRepository.EXPECT().Get(ctx, repositoryID).
 		Return(nil, repositoryError)
 
-	gradleService := gateways.NewMockGradleService(ctrl)
+	gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 
 	u := GetRepository{
 		RepositoryRepository: repositoryRepository,

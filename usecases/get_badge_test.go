@@ -19,7 +19,7 @@ import (
 func TestGetBadge_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
-	fixedTime := &gateways.FixedTime{
+	fixedTime := &gatewaysTestDoubles.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 
@@ -49,17 +49,17 @@ func TestGetBadge_Do(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+			repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 			repositoryRepository.EXPECT().
 				GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 				Return(c.content, nil)
 
-			gradleService := gateways.NewMockGradleService(ctrl)
+			gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 			gradleService.EXPECT().
 				GetCurrentRelease(ctx).
 				Return(&gradle.Release{Version: c.latestVersion}, nil)
 
-			badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
+			badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 			badgeLastAccessRepository.EXPECT().
 				Save(ctx, domain.BadgeLastAccess{
 					Repository:     repositoryID,
@@ -73,7 +73,7 @@ func TestGetBadge_Do(t *testing.T) {
 				GradleService:             gradleService,
 				BadgeLastAccessRepository: badgeLastAccessRepository,
 				Time:                      fixedTime,
-				Logger:                    gateways.NewLogger(t),
+				Logger:                    gatewaysTestDoubles.NewLogger(t),
 			}
 			resp, err := u.Do(ctx, repositoryID)
 			if err != nil {
@@ -94,22 +94,22 @@ func TestGetBadge_Do(t *testing.T) {
 
 		getBadgeError := usecasesTestDoubles.NewMockGetBadgeError(ctrl)
 		getBadgeError.EXPECT().NoGradleVersion().Return(true)
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().
 			GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, getBadgeError)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).MaxTimes(1)
 
-		badgeLastAccessRepository := gateways.NewMockBadgeLastAccessRepository(ctrl)
+		badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 
 		u := GetBadge{
 			RepositoryRepository:      repositoryRepository,
 			GradleService:             gradleService,
 			BadgeLastAccessRepository: badgeLastAccessRepository,
 			Time:                      fixedTime,
-			Logger:                    gateways.NewLogger(t),
+			Logger:                    gatewaysTestDoubles.NewLogger(t),
 		}
 		resp, err := u.Do(ctx, repositoryID)
 		if resp != nil {

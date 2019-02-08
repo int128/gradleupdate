@@ -11,7 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
-	gatewaysInterfaces "github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
 	usecaseInterfaces "github.com/int128/gradleupdate/usecases/interfaces"
@@ -22,7 +22,7 @@ import (
 func TestSendUpdate_Do(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
-	fixedTime := &gateways.FixedTime{
+	fixedTime := &gatewaysTestDoubles.FixedTime{
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 	readmeContent := git.FileContent("![Gradle Status](https://gradleupdate.appspot.com/owner/repo/status.svg)")
@@ -31,17 +31,17 @@ func TestSendUpdate_Do(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:     repositoryID,
 			LastUpdateTime: fixedTime.NowValue,
@@ -79,17 +79,17 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        fixedTime.NowValue,
@@ -122,17 +122,17 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil).MaxTimes(1)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(nil, &noSuchEntityError{})
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        fixedTime.NowValue,
@@ -165,17 +165,17 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(git.FileContent("INVALID"), nil)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        fixedTime.NowValue,
@@ -208,17 +208,17 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(nil, &noSuchEntityError{})
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil).MaxTimes(1)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        fixedTime.NowValue,
@@ -251,17 +251,17 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		repositoryRepository := gateways.NewMockRepositoryRepository(ctrl)
+		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(git.FileContent("INVALID"), nil)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil)
 
-		gradleService := gateways.NewMockGradleService(ctrl)
+		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gateways.NewMockRepositoryLastUpdateRepository(ctrl)
+		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
 		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
 			Repository:            repositoryID,
 			LastUpdateTime:        fixedTime.NowValue,
@@ -297,4 +297,4 @@ func (err *noSuchEntityError) Error() string       { return "404" }
 func (err *noSuchEntityError) NoSuchEntity() bool  { return true }
 func (err *noSuchEntityError) AlreadyExists() bool { return false }
 
-var _ gatewaysInterfaces.RepositoryError = &noSuchEntityError{}
+var _ gateways.RepositoryError = &noSuchEntityError{}

@@ -1,4 +1,4 @@
-package gateways
+package gatewaysTestDoubles
 
 import "time"
 
