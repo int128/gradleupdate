@@ -12,7 +12,6 @@ import (
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 	"github.com/pkg/errors"
 )
 
@@ -92,12 +91,10 @@ func TestGetBadge_Do(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		getBadgeError := usecasesTestDoubles.NewMockGetBadgeError(ctrl)
-		getBadgeError.EXPECT().NoGradleVersion().Return(true)
 		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().
 			GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
-			Return(nil, getBadgeError)
+			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
 		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).MaxTimes(1)

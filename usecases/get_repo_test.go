@@ -71,12 +71,9 @@ func TestGetRepository_Do_NoSuchRepository(t *testing.T) {
 	ctx := context.Background()
 	repositoryID := git.RepositoryID{Owner: "owner", Name: "repo"}
 
-	repositoryError := gatewaysTestDoubles.NewMockRepositoryError(ctrl)
-	repositoryError.EXPECT().NoSuchEntity().AnyTimes().Return(true)
-
 	repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 	repositoryRepository.EXPECT().Get(ctx, repositoryID).
-		Return(nil, repositoryError)
+		Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
 	gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 

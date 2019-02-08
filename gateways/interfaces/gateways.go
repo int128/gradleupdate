@@ -10,7 +10,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces RepositoryError,BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleService,ConfigRepository
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleService,ConfigRepository
 
 type RepositoryError interface {
 	error

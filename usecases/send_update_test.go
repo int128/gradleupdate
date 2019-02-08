@@ -11,7 +11,6 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
-	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -125,7 +124,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
 			Return(readmeContent, nil).MaxTimes(1)
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
-			Return(nil, &noSuchEntityError{})
+			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 
 		gradleService := gatewaysTestDoubles.NewMockGradleService(ctrl)
 		gradleService.EXPECT().GetCurrentRelease(ctx).
@@ -209,7 +208,7 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 
 		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().GetReadme(ctx, repositoryID).
-			Return(nil, &noSuchEntityError{})
+			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
 		repositoryRepository.EXPECT().GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
 			Return(testdata.GradleWrapperProperties4102, nil).MaxTimes(1)
 
@@ -289,11 +288,3 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		}
 	})
 }
-
-type noSuchEntityError struct{}
-
-func (err *noSuchEntityError) Error() string       { return "404" }
-func (err *noSuchEntityError) NoSuchEntity() bool  { return true }
-func (err *noSuchEntityError) AlreadyExists() bool { return false }
-
-var _ gateways.RepositoryError = &noSuchEntityError{}
