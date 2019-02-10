@@ -61,18 +61,8 @@ go generate -v ./...
 
 ### Deployment
 
-You need to create the following entity on Cloud Datastore:
-
-- Kind = `Config`
-- Key (string) = `DEFAULT`
-- `GitHubToken` (string) = your GitHub token
-- `CSRFKey` (string) = base64 encoded string of 32 bytes key
-
-You can generate `CSRFKey` by the following command:
-
-```sh
-dd if=/dev/random bs=32 count=1 | base64
-```
+You need to set up your Credentials.
+See [gateways/credentials.go](gateways/credentials.go) for details.
 
 Deploy:
 

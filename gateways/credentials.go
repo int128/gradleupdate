@@ -12,6 +12,32 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
+/*
+NewCredentials returns an implementation of gateways.Credentials.
+
+It resolves credentials from the following resources in order:
+
+	1. In-memory cache
+	2. Environment variables
+	3. Cloud Datastore
+
+You need to create the following entity on Datastore:
+
+	* Kind = Credentials
+	* Key (string) = DEFAULT
+	* Property GitHubToken (string) = your GitHub token
+	* Property CSRFKey (string) = base64 encoded string of 32 bytes key
+
+You can give credentials by the environment variables instead of Datastore.
+
+	GITHUB_TOKEN=token
+	CSRF_KEY=base64key
+
+You can generate `CSRFKey` by the following command:
+
+	dd if=/dev/random bs=32 count=1 | base64
+
+*/
 func NewCredentials(logger gateways.Logger) gateways.Credentials {
 	return &credentialsCache{
 		Base: &credentialsIfEnv{
