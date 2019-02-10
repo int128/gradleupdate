@@ -44,7 +44,7 @@ go get -u github.com/cortesi/modd/cmd/modd
 Run the local server:
 
 ```sh
-GITHUB_TOKEN=$GITHUB_TOKEN CSRF_KEY=0123456789abcdef0123456789abcdef dev_appserver.py .
+GITHUB_TOKEN="$GITHUB_TOKEN" CSRF_KEY="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=" dev_appserver.py .
 ```
 
 Run the mock server with `handlers` and `templates`:
@@ -61,12 +61,18 @@ go generate -v ./...
 
 ### Deployment
 
-Open the Cloud Datastore console and create an entity with the following properties:
+You need to create the following entity on Cloud Datastore:
 
 - Kind = `Config`
 - Key (string) = `DEFAULT`
 - `GitHubToken` (string) = your GitHub token
-- `CSRFKey` (string) = 32 bytes string
+- `CSRFKey` (string) = base64 encoded string of 32 bytes key
+
+You can generate `CSRFKey` by the following command:
+
+```sh
+dd if=/dev/random bs=32 count=1 | base64
+```
 
 Deploy:
 

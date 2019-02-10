@@ -28,7 +28,7 @@ type RouterIn struct {
 
 func NewRouter(in RouterIn) Router {
 	r := mux.NewRouter()
-	r.Methods("POST").Path("/internal/scan-updates").Handler(&in.BatchSendUpdates)
+	r.Methods("POST").Path("/internal/updates").Handler(&in.BatchSendUpdates)
 
 	p := r.PathPrefix("/").Subrouter()
 	p.Use(in.CSRFMiddlewareFactory.New())

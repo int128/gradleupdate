@@ -12,28 +12,28 @@ import (
 
 type GitHubClientFactory struct {
 	dig.In
-	Client           *http.Client
-	ConfigRepository gateways.ConfigRepository
+	Client      *http.Client
+	Credentials gateways.Credentials
 }
 
 func (factory *GitHubClientFactory) New() *github.Client {
 	var transport http.RoundTripper
 	transport = factory.Client.Transport
-	transport = &oauth2Transport{transport, factory.ConfigRepository}
+	transport = &oauth2Transport{transport, factory.Credentials}
 	return github.NewClient(&http.Client{Transport: transport})
 }
 
 type oauth2Transport struct {
-	Transport        http.RoundTripper
-	ConfigRepository gateways.ConfigRepository
+	Transport   http.RoundTripper
+	Credentials gateways.Credentials
 }
 
 func (t *oauth2Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	ctx := req.Context()
-	config, err := t.ConfigRepository.Get(ctx)
+	credentials, err := t.Credentials.Get(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error while getting Config")
+		return nil, errors.Wrapf(err, "could not get credentials for GitHub API")
 	}
-	transport := &oauth2.Transport{Base: t.Transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GitHubToken})}
+	transport := &oauth2.Transport{Base: t.Transport, Source: oauth2.StaticTokenSource(&oauth2.Token{AccessToken: credentials.GitHubToken})}
 	return transport.RoundTrip(req)
 }

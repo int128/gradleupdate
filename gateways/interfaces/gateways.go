@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/config"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,ConfigRepository
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles
 
 type RepositoryError interface {
 	error
@@ -59,8 +60,12 @@ type Time interface {
 	Now() time.Time
 }
 
-type ConfigRepository interface {
-	Get(ctx context.Context) (*domain.Config, error)
+type Credentials interface {
+	Get(ctx context.Context) (*config.Credentials, error)
+}
+
+type Toggles interface {
+	Get(ctx context.Context) (*config.Toggles, error)
 }
 
 type HTTPCacheRepository interface {

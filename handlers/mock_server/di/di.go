@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
+	"github.com/int128/gradleupdate/domain/config"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
@@ -117,16 +117,16 @@ var dependencies = []interface{}{
 		return batchSendUpdates
 	},
 
-	func(ctrl *gomock.Controller) gateways.ConfigRepository {
-		configRepository := gatewaysTestDoubles.NewMockConfigRepository(ctrl)
-		configRepository.EXPECT().
+	func(ctrl *gomock.Controller) gateways.Credentials {
+		credentials := gatewaysTestDoubles.NewMockCredentials(ctrl)
+		credentials.EXPECT().
 			Get(gomock.Not(nil)).
 			AnyTimes().
-			Return(&domain.Config{
+			Return(&config.Credentials{
 				GitHubToken: "",
-				CSRFKey:     "0123456789abcdef0123456789abcdef",
+				CSRFKey:     []byte("0123456789abcdef0123456789abcdef"),
 			}, nil)
-		return configRepository
+		return credentials
 	},
 
 	func(tr testReporter) *gomock.Controller {
