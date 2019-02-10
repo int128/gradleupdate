@@ -16,6 +16,7 @@ type BatchSendUpdates struct {
 	BadgeLastAccessRepository gateways.BadgeLastAccessRepository
 	SendUpdate                usecases.SendUpdate
 	Time                      gateways.Time
+	Toggles                   gateways.Toggles
 	Logger                    gateways.Logger
 }
 
@@ -30,13 +31,21 @@ func (usecase *BatchSendUpdates) Do(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not get the latest Gradle version")
 	}
+	toggles, err := usecase.Toggles.Get(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "error while getting config")
+	}
 	for _, badge := range badges {
 		if badge.CurrentVersion.GreaterOrEqualThan(latestRelease.Version) {
 			usecase.Logger.Infof(ctx, "skip the repository %s because it has the latest Gradle", badge.Repository)
 			continue
 		}
+		if !toggles.IsEligibleForBatchSendUpdates(badge.Repository) {
+			usecase.Logger.Infof(ctx, "skip the repository %s due to the feature toggle", badge.Repository)
+			continue
+		}
 		if err := usecase.SendUpdate.Do(ctx, badge.Repository); err != nil {
-			usecase.Logger.Warnf(ctx, "could not send an update for repository %s: %+v", badge.Repository, err)
+			usecase.Logger.Errorf(ctx, "could not send an update for repository %s: %+v", badge.Repository, err)
 		}
 	}
 	return nil
