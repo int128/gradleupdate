@@ -1,48 +1,56 @@
 package di
 
 import (
-	"github.com/int128/gradleupdate/handlers"
+	"net/http"
+
+	"github.com/google/go-github/v18/github"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
+
+	"github.com/int128/gradleupdate/gateways"
+	gatewaysInterfaces "github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/infrastructure"
+	"github.com/int128/gradleupdate/usecases"
+	usecasesInterfaces "github.com/int128/gradleupdate/usecases/interfaces"
 )
-
-type App struct {
-	dig.In
-	Router handlers.Router
-}
-
-// Invoke runs the function with dependencies.
-func Invoke(runner func(App)) error {
-	c, err := New()
-	if err != nil {
-		return errors.Wrapf(err, "error while setting up a container")
-	}
-	if err := c.Invoke(runner); err != nil {
-		return errors.Wrapf(err, "error while invoking the runner")
-	}
-	return nil
-}
 
 // New returns a container.
 func New() (*dig.Container, error) {
 	c := dig.New()
-	if err := provideAll(c, infrastructureDependencies); err != nil {
-		return nil, errors.Wrapf(err, "error while providing infrastructure")
-	}
-	if err := provideAll(c, gatewaysDependencies); err != nil {
-		return nil, errors.Wrapf(err, "error while providing gateways")
-	}
-	if err := provideAll(c, usecasesDependencies); err != nil {
-		return nil, errors.Wrapf(err, "error while providing usecases")
+	for _, dependency := range dependencies {
+		if err := c.Provide(dependency); err != nil {
+			return nil, errors.Wrapf(err, "error while providing dependency")
+		}
 	}
 	return c, nil
 }
 
-func provideAll(c *dig.Container, providers []interface{}) error {
-	for _, provider := range providers {
-		if err := c.Provide(provider); err != nil {
-			return errors.WithStack(err)
-		}
-	}
-	return nil
+var dependencies = []interface{}{
+	// usecases
+	func(i usecases.GetRepository) usecasesInterfaces.GetRepository { return &i },
+	func(i usecases.GetBadge) usecasesInterfaces.GetBadge { return &i },
+	func(i usecases.SendUpdate) usecasesInterfaces.SendUpdate { return &i },
+	func(i usecases.BatchSendUpdates) usecasesInterfaces.BatchSendUpdates { return &i },
+	func(i usecases.SendPullRequest) usecasesInterfaces.SendPullRequest { return &i },
+
+	// gateways
+	func(i gateways.RepositoryRepository) gatewaysInterfaces.RepositoryRepository { return &i },
+	func(i gateways.PullRequestRepository) gatewaysInterfaces.PullRequestRepository { return &i },
+	func(i gateways.GitService) gatewaysInterfaces.GitService { return &i },
+	func(i gateways.BadgeLastAccessRepository) gatewaysInterfaces.BadgeLastAccessRepository { return &i },
+	func(i gateways.RepositoryLastUpdateRepository) gatewaysInterfaces.RepositoryLastUpdateRepository {
+		return &i
+	},
+	func(i gateways.GradleReleaseRepository) gatewaysInterfaces.GradleReleaseRepository { return &i },
+	gateways.NewToggles,
+	gateways.NewCredentials,
+	func(i gateways.Time) gatewaysInterfaces.Time { return &i },
+	func(i gateways.HTTPCacheRepository) gatewaysInterfaces.HTTPCacheRepository { return &i },
+	func(i gateways.AELogger) gatewaysInterfaces.Logger { return &i },
+
+	// infrastructure
+	handlers.NewRouter,
+	func(factory infrastructure.GitHubClientFactory) *github.Client { return factory.New() },
+	func(factory infrastructure.HTTPClientFactory) *http.Client { return factory.New() },
 }

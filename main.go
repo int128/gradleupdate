@@ -5,14 +5,21 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/di"
+	"github.com/int128/gradleupdate/handlers"
 	"google.golang.org/appengine"
 )
 
+func run(router handlers.Router) {
+	http.Handle("/", router)
+	appengine.Main()
+}
+
 func main() {
-	if err := di.Invoke(func(app di.App) {
-		http.Handle("/", app.Router)
-		appengine.Main()
-	}); err != nil {
+	c, err := di.New()
+	if err != nil {
+		log.Fatalf("could not initialize the dependencies: %+v", err)
+	}
+	if err := c.Invoke(run); err != nil {
 		log.Fatalf("could not run the application: %+v", err)
 	}
 }

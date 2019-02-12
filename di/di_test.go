@@ -4,12 +4,15 @@ import (
 	"testing"
 
 	"github.com/int128/gradleupdate/di"
+	"github.com/int128/gradleupdate/handlers"
 )
 
-func TestInvoke(t *testing.T) {
-	if err := di.Invoke(func(root di.App) {
-		t.Logf("%+v", root)
-	}); err != nil {
-		t.Fatalf("error while di.Invoke: %+v", err)
+func TestNew(t *testing.T) {
+	c, err := di.New()
+	if err != nil {
+		t.Fatalf("could not initialize the dependencies: %+v", err)
+	}
+	if err := c.Invoke(func(handlers.Router) {}); err != nil {
+		t.Fatalf("could not run the application: %+v", err)
 	}
 }
