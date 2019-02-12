@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/config"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
 	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
@@ -22,13 +22,13 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		NowValue: time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC),
 	}
 	oneMonthAgo := time.Date(2018, 12, 22, 16, 43, 0, 0, time.UTC)
-	badge1 := domain.BadgeLastAccess{
+	badge1 := gradleupdate.BadgeLastAccess{
 		Repository:     git.RepositoryID{Owner: "foo", Name: "repo"},
 		CurrentVersion: gradle.Version("4.6"),
 		LatestVersion:  gradle.Version("5.0"),
 		LastAccessTime: time.Date(2019, 1, 1, 12, 34, 0, 0, time.UTC),
 	}
-	badge2 := domain.BadgeLastAccess{
+	badge2 := gradleupdate.BadgeLastAccess{
 		Repository:     git.RepositoryID{Owner: "bar", Name: "repo"},
 		CurrentVersion: gradle.Version("4.7"),
 		LatestVersion:  gradle.Version("5.0"),
@@ -52,7 +52,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 		badgeLastAccessRepository.EXPECT().
 			FindBySince(ctx, oneMonthAgo).
-			Return([]domain.BadgeLastAccess{badge1, badge2}, nil)
+			Return([]gradleupdate.BadgeLastAccess{badge1, badge2}, nil)
 
 		sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
 		sendUpdate.EXPECT().
@@ -92,7 +92,7 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 		badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 		badgeLastAccessRepository.EXPECT().
 			FindBySince(ctx, oneMonthAgo).
-			Return([]domain.BadgeLastAccess{badge1, badge2}, nil)
+			Return([]gradleupdate.BadgeLastAccess{badge1, badge2}, nil)
 
 		sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
 		sendUpdate.EXPECT().

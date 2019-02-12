@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -55,7 +55,7 @@ func (usecase *GetBadge) Do(ctx context.Context, id git.RepositoryID) (*usecases
 		return nil, errors.WithStack(err)
 	}
 
-	if err := usecase.BadgeLastAccessRepository.Save(ctx, domain.BadgeLastAccess{
+	if err := usecase.BadgeLastAccessRepository.Save(ctx, gradleupdate.BadgeLastAccess{
 		Repository:     id,
 		LastAccessTime: usecase.Time.Now(),
 		CurrentVersion: currentVersion,

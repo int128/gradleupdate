@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 	"google.golang.org/appengine/datastore"
@@ -34,7 +34,7 @@ type BadgeLastAccessRepository struct {
 	dig.In
 }
 
-func (r *BadgeLastAccessRepository) Save(ctx context.Context, a domain.BadgeLastAccess) error {
+func (r *BadgeLastAccessRepository) Save(ctx context.Context, a gradleupdate.BadgeLastAccess) error {
 	k := newBadgeLastAccessKey(ctx, a.Repository)
 	_, err := datastore.Put(ctx, k, &badgeLastAccessEntity{
 		LastAccessTime: a.LastAccessTime,
@@ -47,7 +47,7 @@ func (r *BadgeLastAccessRepository) Save(ctx context.Context, a domain.BadgeLast
 	return nil
 }
 
-func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.Time) ([]domain.BadgeLastAccess, error) {
+func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.Time) ([]gradleupdate.BadgeLastAccess, error) {
 	q := datastore.NewQuery(badgeLastAccessKind).
 		Filter("LastAccessTime >=", since).
 		Order("-LastAccessTime")
@@ -56,7 +56,7 @@ func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not find entities")
 	}
-	ret := make([]domain.BadgeLastAccess, 0)
+	ret := make([]gradleupdate.BadgeLastAccess, 0)
 	for i, e := range entities {
 		m := badgeLastAccessEntityToModel(keys[i], *e)
 		if m == nil {
@@ -67,7 +67,7 @@ func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.
 	return ret, nil
 }
 
-func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntityOld) *domain.BadgeLastAccess {
+func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntityOld) *gradleupdate.BadgeLastAccess {
 	repositoryID := git.RepositoryFullName(k.StringID()).Parse()
 	if repositoryID == nil {
 		return nil
@@ -77,7 +77,7 @@ func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntityOld) 
 	if e.TargetVersion != "" {
 		currentVersion = gradle.Version(e.TargetVersion)
 	}
-	return &domain.BadgeLastAccess{
+	return &gradleupdate.BadgeLastAccess{
 		Repository:     *repositoryID,
 		LastAccessTime: e.LastAccessTime,
 		CurrentVersion: currentVersion,

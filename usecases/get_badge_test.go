@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases/interfaces"
@@ -60,7 +60,7 @@ func TestGetBadge_Do(t *testing.T) {
 
 			badgeLastAccessRepository := gatewaysTestDoubles.NewMockBadgeLastAccessRepository(ctrl)
 			badgeLastAccessRepository.EXPECT().
-				Save(ctx, domain.BadgeLastAccess{
+				Save(ctx, gradleupdate.BadgeLastAccess{
 					Repository:     repositoryID,
 					CurrentVersion: c.currentVersion,
 					LatestVersion:  c.latestVersion,

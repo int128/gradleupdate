@@ -6,8 +6,8 @@ import (
 
 	"github.com/favclip/testerator"
 	"github.com/go-test/deep"
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"google.golang.org/appengine/datastore"
 )
 
@@ -20,7 +20,7 @@ func TestBadgeLastAccessRepository_Save(t *testing.T) {
 	var r BadgeLastAccessRepository
 	now := time.Date(2019, 1, 21, 16, 43, 0, 0, time.UTC)
 
-	if err := r.Save(ctx, domain.BadgeLastAccess{
+	if err := r.Save(ctx, gradleupdate.BadgeLastAccess{
 		Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 		LatestVersion:  "5.0",
 		CurrentVersion: "4.1",
@@ -89,7 +89,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
-		if diff := deep.Equal([]domain.BadgeLastAccess{}, found); diff != nil {
+		if diff := deep.Equal([]gradleupdate.BadgeLastAccess{}, found); diff != nil {
 			t.Error(diff)
 		}
 	})
@@ -98,7 +98,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
-		want := []domain.BadgeLastAccess{
+		want := []gradleupdate.BadgeLastAccess{
 			{
 				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),
@@ -115,7 +115,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
-		want := []domain.BadgeLastAccess{
+		want := []gradleupdate.BadgeLastAccess{
 			{
 				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),
@@ -138,7 +138,7 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		if err != nil {
 			t.Fatalf("could not find entities: %s", err)
 		}
-		want := []domain.BadgeLastAccess{
+		want := []gradleupdate.BadgeLastAccess{
 			{
 				Repository:     git.RepositoryID{Owner: "owner", Name: "repo1"},
 				LastAccessTime: now.Add(-1 * 24 * time.Hour),

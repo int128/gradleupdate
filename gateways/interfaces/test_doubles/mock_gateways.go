@@ -11,6 +11,7 @@ import (
 	config "github.com/int128/gradleupdate/domain/config"
 	git "github.com/int128/gradleupdate/domain/git"
 	gradle "github.com/int128/gradleupdate/domain/gradle"
+	gradleupdate "github.com/int128/gradleupdate/domain/gradleupdate"
 	interfaces "github.com/int128/gradleupdate/gateways/interfaces"
 	reflect "reflect"
 	time "time"
@@ -40,9 +41,9 @@ func (m *MockBadgeLastAccessRepository) EXPECT() *MockBadgeLastAccessRepositoryM
 }
 
 // FindBySince mocks base method
-func (m *MockBadgeLastAccessRepository) FindBySince(arg0 context.Context, arg1 time.Time) ([]domain.BadgeLastAccess, error) {
+func (m *MockBadgeLastAccessRepository) FindBySince(arg0 context.Context, arg1 time.Time) ([]gradleupdate.BadgeLastAccess, error) {
 	ret := m.ctrl.Call(m, "FindBySince", arg0, arg1)
-	ret0, _ := ret[0].([]domain.BadgeLastAccess)
+	ret0, _ := ret[0].([]gradleupdate.BadgeLastAccess)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -53,7 +54,7 @@ func (mr *MockBadgeLastAccessRepositoryMockRecorder) FindBySince(arg0, arg1 inte
 }
 
 // Save mocks base method
-func (m *MockBadgeLastAccessRepository) Save(arg0 context.Context, arg1 domain.BadgeLastAccess) error {
+func (m *MockBadgeLastAccessRepository) Save(arg0 context.Context, arg1 gradleupdate.BadgeLastAccess) error {
 	ret := m.ctrl.Call(m, "Save", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
