@@ -86,3 +86,5 @@ type getRepositoryError struct {
 }
 
 func (err *getRepositoryError) NoSuchRepository() bool { return err.noSuchRepository }
+
+var _ usecases.GetRepositoryError = &getRepositoryError{}

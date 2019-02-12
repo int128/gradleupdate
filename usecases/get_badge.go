@@ -75,3 +75,5 @@ type getBadgeError struct {
 }
 
 func (err *getBadgeError) NoGradleVersion() bool { return err.noGradleVersion }
+
+var _ usecases.GetBadgeError = &getBadgeError{}

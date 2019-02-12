@@ -122,3 +122,5 @@ type sendUpdateError struct {
 func (err *sendUpdateError) PreconditionViolation() gradleupdate.PreconditionViolation {
 	return err.preconditionViolation
 }
+
+var _ usecases.SendUpdateError = &sendUpdateError{}
