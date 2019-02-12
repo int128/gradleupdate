@@ -64,6 +64,9 @@ go generate -v ./...
 You need to set up your Credentials.
 See [gateways/credentials.go](gateways/credentials.go) for details.
 
+You can set the feature toggles.
+See [gateways/toggles.go](gateways/toggles.go) for details.
+
 Deploy:
 
 ```sh

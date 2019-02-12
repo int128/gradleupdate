@@ -11,6 +11,19 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
+/*
+NewToggles returns an implementation of gateways.Toggle.
+
+You can create the following entity to enable the feature toggles,
+
+	* Kind = Toggle
+	* Key (string) = DEFAULT
+
+with the following properties:
+
+	* BatchSendUpdatesOwners (string) = comma separated names (everyone if blank)
+
+*/
 func NewToggles() gateways.Toggles {
 	return &togglesCache{
 		Base: &togglesData{},
@@ -58,5 +71,5 @@ func togglesKey(ctx context.Context, name string) *datastore.Key {
 }
 
 type togglesEntity struct {
-	BatchSendUpdatesOwners string // comma-separated strings
+	BatchSendUpdatesOwners string
 }
