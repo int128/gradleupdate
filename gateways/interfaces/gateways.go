@@ -5,14 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/config"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryLastUpdateRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles
 
 type RepositoryError interface {
 	error
@@ -23,10 +22,6 @@ type RepositoryError interface {
 type BadgeLastAccessRepository interface {
 	Save(ctx context.Context, a gradleupdate.BadgeLastAccess) error
 	FindBySince(ctx context.Context, since time.Time) ([]gradleupdate.BadgeLastAccess, error)
-}
-
-type RepositoryLastUpdateRepository interface {
-	Save(ctx context.Context, a domain.RepositoryLastUpdate) error
 }
 
 type RepositoryRepository interface {

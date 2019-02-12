@@ -39,9 +39,6 @@ var dependencies = []interface{}{
 	func(i gateways.PullRequestRepository) gatewaysInterfaces.PullRequestRepository { return &i },
 	func(i gateways.GitService) gatewaysInterfaces.GitService { return &i },
 	func(i gateways.BadgeLastAccessRepository) gatewaysInterfaces.BadgeLastAccessRepository { return &i },
-	func(i gateways.RepositoryLastUpdateRepository) gatewaysInterfaces.RepositoryLastUpdateRepository {
-		return &i
-	},
 	func(i gateways.GradleReleaseRepository) gatewaysInterfaces.GradleReleaseRepository { return &i },
 	gateways.NewToggles,
 	gateways.NewCredentials,

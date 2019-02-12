@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
@@ -18,31 +17,13 @@ import (
 // SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
 type SendUpdate struct {
 	dig.In
-	GradleReleaseRepository        gateways.GradleReleaseRepository
-	RepositoryRepository           gateways.RepositoryRepository
-	RepositoryLastUpdateRepository gateways.RepositoryLastUpdateRepository
-	SendPullRequest                usecases.SendPullRequest
-	Time                           gateways.Time
+	GradleReleaseRepository gateways.GradleReleaseRepository
+	RepositoryRepository    gateways.RepositoryRepository
+	SendPullRequest         usecases.SendPullRequest
+	Time                    gateways.Time
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
-	lastUpdate := domain.RepositoryLastUpdate{
-		Repository:     id,
-		LastUpdateTime: usecase.Time.Now(),
-	}
-	err := usecase.sendUpdate(ctx, id)
-	if err != nil {
-		if err, ok := errors.Cause(err).(usecases.SendUpdateError); ok {
-			lastUpdate.PreconditionViolation = err.PreconditionViolation()
-		}
-	}
-	if err := usecase.RepositoryLastUpdateRepository.Save(ctx, lastUpdate); err != nil {
-		return errors.Wrapf(err, "error while saving the scan for the repository %s", id)
-	}
-	return errors.Wrapf(err, "error while scanning the repository %s", id)
-}
-
-func (usecase *SendUpdate) sendUpdate(ctx context.Context, id git.RepositoryID) error {
 	precondition := gradleupdate.Precondition{
 		BadgeURL: gradleupdate.NewBadgeURL(id),
 	}

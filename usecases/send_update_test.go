@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/int128/gradleupdate/domain"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
@@ -40,12 +39,6 @@ func TestSendUpdate_Do(t *testing.T) {
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:     repositoryID,
-			LastUpdateTime: fixedTime.NowValue,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		sendPullRequest.EXPECT().Do(ctx, usecases.SendPullRequestRequest{
 			Base:           repositoryID,
@@ -62,11 +55,10 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		}).Return(nil)
 
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -89,20 +81,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "4.10.2"}, nil)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:            repositoryID,
-			LastUpdateTime:        fixedTime.NowValue,
-			PreconditionViolation: gradleupdate.AlreadyHasLatestGradle,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -133,20 +117,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:            repositoryID,
-			LastUpdateTime:        fixedTime.NowValue,
-			PreconditionViolation: gradleupdate.NoGradleWrapperProperties,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -177,20 +153,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:            repositoryID,
-			LastUpdateTime:        fixedTime.NowValue,
-			PreconditionViolation: gradleupdate.NoGradleVersion,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -221,20 +189,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil).MaxTimes(1)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:            repositoryID,
-			LastUpdateTime:        fixedTime.NowValue,
-			PreconditionViolation: gradleupdate.NoReadme,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
@@ -265,20 +225,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			GetCurrent(ctx).
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
-		repositoryLastUpdateRepository := gatewaysTestDoubles.NewMockRepositoryLastUpdateRepository(ctrl)
-		repositoryLastUpdateRepository.EXPECT().Save(ctx, domain.RepositoryLastUpdate{
-			Repository:            repositoryID,
-			LastUpdateTime:        fixedTime.NowValue,
-			PreconditionViolation: gradleupdate.NoReadmeBadge,
-		})
-
 		sendPullRequest := usecasesTestDoubles.NewMockSendPullRequest(ctrl)
 		u := SendUpdate{
-			RepositoryRepository:           repositoryRepository,
-			RepositoryLastUpdateRepository: repositoryLastUpdateRepository,
-			GradleReleaseRepository:        gradleService,
-			SendPullRequest:                sendPullRequest,
-			Time:                           fixedTime,
+			RepositoryRepository:    repositoryRepository,
+			GradleReleaseRepository: gradleService,
+			SendPullRequest:         sendPullRequest,
+			Time:                    fixedTime,
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
