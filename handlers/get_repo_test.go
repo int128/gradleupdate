@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 )
 
 func TestGetRepository_ServeHTTP(t *testing.T) {

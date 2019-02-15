@@ -5,12 +5,14 @@ import (
 
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"go.uber.org/dig"
 )
 
 type Landing struct {
 	dig.In
-	Logger gateways.Logger
+	RouteResolver handlers.RouteResolver
+	Logger        gateways.Logger
 }
 
 func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -20,12 +22,13 @@ func (h *Landing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		genericErrorHandler(http.StatusBadRequest).ServeHTTP(w, r)
 		return
 	}
-	url := git.RepositoryURL(r.FormValue("url"))
-	id := url.Parse()
+
+	id := git.RepositoryURL(r.FormValue("url")).Parse()
 	if id == nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-	repositoryURL := resolveGetRepositoryURL(*id)
-	http.Redirect(w, r, repositoryURL, http.StatusFound)
+
+	url := h.RouteResolver.GetRepositoryURL(*id)
+	http.Redirect(w, r, url, http.StatusFound)
 }

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
-	gatewaysTestDoubles "github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/handlers/mock_server/di"
 )
 

@@ -1,19 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/infrastructure"
-	"github.com/int128/gradleupdate/templates"
 	"go.uber.org/dig"
 )
-
-type Router interface {
-	http.Handler
-}
 
 type RouterIn struct {
 	dig.In
@@ -26,49 +21,56 @@ type RouterIn struct {
 	CSRFMiddlewareFactory infrastructure.CSRFMiddlewareFactory
 }
 
-func NewRouter(in RouterIn) Router {
+func NewRouter(in RouterIn) handlers.Router {
 	r := mux.NewRouter()
 	r.Methods("POST").Path("/internal/updates").Handler(&in.BatchSendUpdates)
-	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.SendUpdate)
+	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.SendUpdate).Name("InternalSendUpdate")
 
 	p := r.PathPrefix("/").Subrouter()
 	p.Use(in.CSRFMiddlewareFactory.New())
 	p.Methods("GET").Path("/").Handler(&in.Index)
 	p.Methods("POST").Path("/landing").Handler(&in.Landing)
-	p.Methods("GET").Path("/{owner}/{repo}/status").Handler(&in.GetRepository)
-	p.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&in.GetBadge)
-	p.Methods("POST").Path("/{owner}/{repo}/update").Handler(&in.SendUpdate)
+	p.Methods("GET").Path("/{owner}/{repo}/status").Handler(&in.GetRepository).Name("GetRepository")
+	p.Methods("GET").Path("/{owner}/{repo}/status.svg").Handler(&in.GetBadge).Name("GetBadge")
+	p.Methods("POST").Path("/{owner}/{repo}/update").Handler(&in.SendUpdate).Name("SendUpdate")
 
 	r.NotFoundHandler = notFoundHandler("")
 	r.MethodNotAllowedHandler = genericErrorHandler(http.StatusMethodNotAllowed)
 	return r
 }
 
-func resolveGetRepositoryURL(id git.RepositoryID) string {
-	return fmt.Sprintf("/%s/%s/status", id.Owner, id.Name)
-}
-func resolveGetBadgeURL(id git.RepositoryID) string {
-	return fmt.Sprintf("/%s/%s/status.svg", id.Owner, id.Name)
-}
-func resolveSendUpdateURL(id git.RepositoryID) string {
-	return fmt.Sprintf("/%s/%s/update", id.Owner, id.Name)
-}
-func InternalSendUpdateURL(id git.RepositoryID) string {
-	return fmt.Sprintf("/internal/%s/%s/update", id.Owner, id.Name)
+func NewRouteResolver() handlers.RouteResolver {
+	nullRouter, ok := NewRouter(RouterIn{}).(*mux.Router)
+	if !ok {
+		panic("NewRouter should return *mux.Router")
+	}
+	return &routeResolver{router: nullRouter}
 }
 
-func notFoundHandler(message string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "text/html")
-		w.WriteHeader(http.StatusNotFound)
-		templates.WriteNotFoundError(w, message)
-	})
+type routeResolver struct {
+	router *mux.Router
 }
 
-func genericErrorHandler(code int) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "text/html")
-		w.WriteHeader(code)
-		templates.WriteError(w)
-	})
+func (r *routeResolver) resolve(name string, pairs ...string) string {
+	url, err := r.router.Get(name).URL(pairs...)
+	if err != nil {
+		panic(err) // should be fixed by tests
+	}
+	return url.String()
+}
+
+func (r *routeResolver) InternalSendUpdateURL(id git.RepositoryID) string {
+	return r.resolve("InternalSendUpdate", "owner", id.Owner, "repo", id.Name)
+}
+
+func (r *routeResolver) GetRepositoryURL(id git.RepositoryID) string {
+	return r.resolve("GetRepository", "owner", id.Owner, "repo", id.Name)
+}
+
+func (r *routeResolver) GetBadgeURL(id git.RepositoryID) string {
+	return r.resolve("GetBadge", "owner", id.Owner, "repo", id.Name)
+}
+
+func (r *routeResolver) SendUpdateURL(id git.RepositoryID) string {
+	return r.resolve("SendUpdate", "owner", id.Owner, "repo", id.Name)
 }

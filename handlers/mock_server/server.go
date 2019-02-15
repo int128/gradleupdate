@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/gateways/interfaces"
-	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/handlers/mock_server/di"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"

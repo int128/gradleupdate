@@ -49,6 +49,7 @@ var dependencies = []interface{}{
 
 	// infrastructure
 	handlers.NewRouter,
+	handlers.NewRouteResolver,
 	func(factory infrastructure.GitHubClientFactory) *github.Client { return factory.New() },
 	func(factory infrastructure.HTTPClientFactory) *http.Client { return factory.New() },
 }

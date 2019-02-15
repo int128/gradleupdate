@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/int128/gradleupdate/di"
-	"github.com/int128/gradleupdate/handlers"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"google.golang.org/appengine"
 )
 

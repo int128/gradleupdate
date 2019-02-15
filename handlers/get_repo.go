@@ -10,6 +10,7 @@ import (
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
@@ -19,6 +20,7 @@ import (
 type GetRepository struct {
 	dig.In
 	GetRepository usecases.GetRepository
+	RouteResolver handlers.RouteResolver
 	Logger        gateways.Logger
 }
 
@@ -53,8 +55,8 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		UpdatePreconditionViolation: resp.UpdatePreconditionViolation,
 		BadgeMarkdown:               fmt.Sprintf(`[![Gradle Status](%s)](%s)`, publicBadgeURL, publicRepositoryURL),
 		BadgeHTML:                   fmt.Sprintf(`<a href="%s"><img alt="Gradle Status" src="%s" /></a>`, publicRepositoryURL, publicBadgeURL),
-		BadgeURL:                    resolveGetBadgeURL(id),
-		RequestUpdateURL:            resolveSendUpdateURL(id),
+		BadgeURL:                    h.RouteResolver.GetBadgeURL(id),
+		RequestUpdateURL:            h.RouteResolver.SendUpdateURL(id),
 	}
 	t.WritePage(w, string(csrf.TemplateField(r)))
 }

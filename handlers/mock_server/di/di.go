@@ -36,6 +36,7 @@ func New() (*dig.Container, error) {
 
 var dependencies = []interface{}{
 	handlers.NewRouter,
+	handlers.NewRouteResolver,
 
 	func(ctrl *gomock.Controller) usecases.GetBadge {
 		getBadge := usecasesTestDoubles.NewMockGetBadge(ctrl)

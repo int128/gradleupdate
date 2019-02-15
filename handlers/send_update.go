@@ -6,14 +6,16 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
+	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/usecases/interfaces"
 	"go.uber.org/dig"
 )
 
 type SendUpdate struct {
 	dig.In
-	SendUpdate usecases.SendUpdate
-	Logger     gateways.Logger
+	SendUpdate    usecases.SendUpdate
+	RouteResolver handlers.RouteResolver
+	Logger        gateways.Logger
 }
 
 func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +29,6 @@ func (h *SendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	repositoryURL := resolveGetRepositoryURL(id)
-	http.Redirect(w, r, repositoryURL, http.StatusFound)
+	url := h.RouteResolver.GetRepositoryURL(id)
+	http.Redirect(w, r, url, http.StatusFound)
 }
