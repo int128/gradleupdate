@@ -65,22 +65,15 @@ func TestBadgeLastAccessRepository_FindBySince(t *testing.T) {
 		keys := []*datastore.Key{
 			newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo1"}),
 			newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo2"}),
+			newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo3"}),
 		}
 		entities := []*badgeLastAccessEntity{
 			{LastAccessTime: now.Add(-1 * 24 * time.Hour), CurrentVersion: "4.1", LatestVersion: "5.0"},
 			{LastAccessTime: now.Add(-2 * 24 * time.Hour), CurrentVersion: "4.2", LatestVersion: "5.0"},
+			{LastAccessTime: now.Add(-3 * 24 * time.Hour), CurrentVersion: "4.3", LatestVersion: "5.0"},
 		}
 		if _, err := datastore.PutMulti(ctx, keys, entities); err != nil {
 			t.Fatalf("could not save entities: %s", err)
-		}
-		//TODO: remove after migration
-		k := newBadgeLastAccessKey(ctx, git.RepositoryID{Owner: "owner", Name: "repo3"})
-		e := badgeLastAccessEntityOld{
-			badgeLastAccessEntity{LastAccessTime: now.Add(-3 * 24 * time.Hour), LatestVersion: "5.0"},
-			"4.3",
-		}
-		if _, err := datastore.Put(ctx, k, &e); err != nil {
-			t.Fatalf("could not save the entity: %s", err)
 		}
 	})
 

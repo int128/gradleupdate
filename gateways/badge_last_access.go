@@ -24,12 +24,6 @@ type badgeLastAccessEntity struct {
 	LatestVersion  string
 }
 
-//DEPRECATED: TODO: remove after migration
-type badgeLastAccessEntityOld struct {
-	badgeLastAccessEntity
-	TargetVersion string
-}
-
 type BadgeLastAccessRepository struct {
 	dig.In
 }
@@ -51,7 +45,7 @@ func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.
 	q := datastore.NewQuery(badgeLastAccessKind).
 		Filter("LastAccessTime >=", since).
 		Order("-LastAccessTime")
-	var entities []*badgeLastAccessEntityOld
+	var entities []*badgeLastAccessEntity
 	keys, err := q.GetAll(ctx, &entities)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not find entities")
@@ -67,16 +61,12 @@ func (r *BadgeLastAccessRepository) FindBySince(ctx context.Context, since time.
 	return ret, nil
 }
 
-func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntityOld) *gradleupdate.BadgeLastAccess {
+func badgeLastAccessEntityToModel(k *datastore.Key, e badgeLastAccessEntity) *gradleupdate.BadgeLastAccess {
 	repositoryID := git.RepositoryFullName(k.StringID()).Parse()
 	if repositoryID == nil {
 		return nil
 	}
 	currentVersion := gradle.Version(e.CurrentVersion)
-	//TODO: remove when schema migration is done
-	if e.TargetVersion != "" {
-		currentVersion = gradle.Version(e.TargetVersion)
-	}
 	return &gradleupdate.BadgeLastAccess{
 		Repository:     *repositoryID,
 		LastAccessTime: e.LastAccessTime,
