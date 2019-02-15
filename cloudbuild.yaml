@@ -6,7 +6,6 @@ steps:
     args:
       - -c
       - |
-        gcloud app deploy --version="${TAG_NAME//./-}";
-        gcloud app deploy queue.yaml;
+        gcloud app deploy app.yaml queue.yaml cron.yaml --version="${TAG_NAME//./-}"
 
 timeout: "600s"
