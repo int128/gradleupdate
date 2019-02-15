@@ -12,7 +12,6 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
-	"github.com/int128/gradleupdate/usecases/interfaces/test_doubles"
 )
 
 func TestBatchSendUpdates_Do(t *testing.T) {
@@ -54,20 +53,20 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 			FindBySince(ctx, oneMonthAgo).
 			Return([]gradleupdate.BadgeLastAccess{badge1, badge2}, nil)
 
-		sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
-		sendUpdate.EXPECT().
-			Do(ctx, git.RepositoryID{Owner: "foo", Name: "repo"}).
+		queue := gatewaysTestDoubles.NewMockQueue(ctrl)
+		queue.EXPECT().
+			EnqueueSendUpdate(ctx, git.RepositoryID{Owner: "foo", Name: "repo"}).
 			Return(nil)
-		sendUpdate.EXPECT().
-			Do(ctx, git.RepositoryID{Owner: "bar", Name: "repo"}).
+		queue.EXPECT().
+			EnqueueSendUpdate(ctx, git.RepositoryID{Owner: "bar", Name: "repo"}).
 			Return(nil)
 
 		u := usecases.BatchSendUpdates{
 			GradleReleaseRepository:   gradleService,
 			BadgeLastAccessRepository: badgeLastAccessRepository,
-			SendUpdate:                sendUpdate,
 			Toggles:                   toggles,
 			Time:                      fixedTime,
+			Queue:                     queue,
 			Logger:                    gatewaysTestDoubles.NewLogger(t),
 		}
 		if err := u.Do(ctx); err != nil {
@@ -94,15 +93,15 @@ func TestBatchSendUpdates_Do(t *testing.T) {
 			FindBySince(ctx, oneMonthAgo).
 			Return([]gradleupdate.BadgeLastAccess{badge1, badge2}, nil)
 
-		sendUpdate := usecasesTestDoubles.NewMockSendUpdate(ctrl)
-		sendUpdate.EXPECT().
-			Do(ctx, git.RepositoryID{Owner: "foo", Name: "repo"}).
+		queue := gatewaysTestDoubles.NewMockQueue(ctrl)
+		queue.EXPECT().
+			EnqueueSendUpdate(ctx, git.RepositoryID{Owner: "foo", Name: "repo"}).
 			Return(nil)
 
 		u := usecases.BatchSendUpdates{
 			GradleReleaseRepository:   gradleService,
 			BadgeLastAccessRepository: badgeLastAccessRepository,
-			SendUpdate:                sendUpdate,
+			Queue:                     queue,
 			Toggles:                   toggles,
 			Time:                      fixedTime,
 			Logger:                    gatewaysTestDoubles.NewLogger(t),

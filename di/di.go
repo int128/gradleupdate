@@ -44,6 +44,7 @@ var dependencies = []interface{}{
 	gateways.NewCredentials,
 	func(i gateways.Time) gatewaysInterfaces.Time { return &i },
 	func(i gateways.HTTPCacheRepository) gatewaysInterfaces.HTTPCacheRepository { return &i },
+	func(i gateways.Queue) gatewaysInterfaces.Queue { return &i },
 	func(i gateways.AELogger) gatewaysInterfaces.Logger { return &i },
 
 	// infrastructure

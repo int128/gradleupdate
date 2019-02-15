@@ -11,7 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles,Queue
 
 type RepositoryError interface {
 	error
@@ -69,6 +69,10 @@ type HTTPCacheRepository interface {
 	Find(ctx context.Context, key string, req *http.Request) (*http.Response, error)
 	Save(ctx context.Context, key string, resp *http.Response) error
 	Remove(ctx context.Context, key string) error
+}
+
+type Queue interface {
+	EnqueueSendUpdate(ctx context.Context, id git.RepositoryID) error
 }
 
 type Logger interface {

@@ -29,6 +29,7 @@ type RouterIn struct {
 func NewRouter(in RouterIn) Router {
 	r := mux.NewRouter()
 	r.Methods("POST").Path("/internal/updates").Handler(&in.BatchSendUpdates)
+	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.SendUpdate)
 
 	p := r.PathPrefix("/").Subrouter()
 	p.Use(in.CSRFMiddlewareFactory.New())
@@ -51,6 +52,9 @@ func resolveGetBadgeURL(id git.RepositoryID) string {
 }
 func resolveSendUpdateURL(id git.RepositoryID) string {
 	return fmt.Sprintf("/%s/%s/update", id.Owner, id.Name)
+}
+func InternalSendUpdateURL(id git.RepositoryID) string {
+	return fmt.Sprintf("/internal/%s/%s/update", id.Owner, id.Name)
 }
 
 func notFoundHandler(message string) http.Handler {
