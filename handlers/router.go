@@ -17,6 +17,7 @@ type RouterIn struct {
 	GetRepository         GetRepository
 	GetBadge              GetBadge
 	SendUpdate            SendUpdate
+	TaskSendUpdate        TaskSendUpdate
 	BatchSendUpdates      BatchSendUpdates
 	CSRFMiddlewareFactory infrastructure.CSRFMiddlewareFactory
 }
@@ -24,7 +25,7 @@ type RouterIn struct {
 func NewRouter(in RouterIn) handlers.Router {
 	r := mux.NewRouter()
 	r.Methods("POST").Path("/internal/updates").Handler(&in.BatchSendUpdates)
-	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.SendUpdate).Name("InternalSendUpdate")
+	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.TaskSendUpdate).Name("TaskSendUpdate")
 
 	p := r.PathPrefix("/").Subrouter()
 	p.Use(in.CSRFMiddlewareFactory.New())
@@ -59,8 +60,8 @@ func (r *routeResolver) resolve(name string, pairs ...string) string {
 	return url.String()
 }
 
-func (r *routeResolver) InternalSendUpdateURL(id git.RepositoryID) string {
-	return r.resolve("InternalSendUpdate", "owner", id.Owner, "repo", id.Name)
+func (r *routeResolver) TaskSendUpdate(id git.RepositoryID) string {
+	return r.resolve("TaskSendUpdate", "owner", id.Owner, "repo", id.Name)
 }
 
 func (r *routeResolver) GetRepositoryURL(id git.RepositoryID) string {

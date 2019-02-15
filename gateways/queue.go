@@ -18,7 +18,7 @@ type Queue struct {
 func (q *Queue) EnqueueSendUpdate(ctx context.Context, id git.RepositoryID) error {
 	t := taskqueue.Task{
 		Method: "POST",
-		Path:   q.RouteResolver.InternalSendUpdateURL(id),
+		Path:   q.RouteResolver.TaskSendUpdate(id),
 	}
 	if _, err := taskqueue.Add(ctx, &t, "SendUpdate"); err != nil {
 		return errors.Wrapf(err, "error while adding a SendUpdate task for the repository %s", id)

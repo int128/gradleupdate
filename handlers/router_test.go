@@ -9,8 +9,8 @@ import (
 func TestNewRouteResolver(t *testing.T) {
 	r := NewRouteResolver()
 
-	t.Run("InternalSendUpdateURL", func(t *testing.T) {
-		r.InternalSendUpdateURL(git.RepositoryID{Owner: "foo", Name: "bar"})
+	t.Run("TaskSendUpdate", func(t *testing.T) {
+		r.TaskSendUpdate(git.RepositoryID{Owner: "foo", Name: "bar"})
 	})
 	t.Run("GetRepositoryURL", func(t *testing.T) {
 		r.GetRepositoryURL(git.RepositoryID{Owner: "foo", Name: "bar"})

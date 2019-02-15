@@ -11,7 +11,7 @@ type Router interface {
 }
 
 type RouteResolver interface {
-	InternalSendUpdateURL(id git.RepositoryID) string
+	TaskSendUpdate(id git.RepositoryID) string
 	GetRepositoryURL(id git.RepositoryID) string
 	GetBadgeURL(id git.RepositoryID) string
 	SendUpdateURL(id git.RepositoryID) string
