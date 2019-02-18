@@ -3,7 +3,7 @@ package infrastructure
 import (
 	"net/http"
 
-	"github.com/google/go-github/v18/github"
+	"github.com/google/go-github/v24/github"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"

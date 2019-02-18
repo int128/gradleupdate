@@ -3,7 +3,7 @@ package di
 import (
 	"net/http"
 
-	"github.com/google/go-github/v18/github"
+	"github.com/google/go-github/v24/github"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 

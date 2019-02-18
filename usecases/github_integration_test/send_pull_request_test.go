@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/go-github/v18/github"
+	"github.com/google/go-github/v24/github"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways"
 	"github.com/int128/gradleupdate/usecases"

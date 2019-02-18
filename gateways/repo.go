@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 
-	"github.com/google/go-github/v18/github"
+	"github.com/google/go-github/v24/github"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
