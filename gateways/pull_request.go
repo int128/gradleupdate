@@ -16,8 +16,8 @@ type PullRequestRepository struct {
 
 func (r *PullRequestRepository) Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error) {
 	payload, _, err := r.Client.PullRequests.Create(ctx, pull.ID.Repository.Owner, pull.ID.Repository.Name, &github.NewPullRequest{
-		Base:  github.String(pull.BaseBranch.Name),
-		Head:  github.String(pull.HeadBranch.Repository.Owner + ":" + pull.HeadBranch.Name),
+		Base:  github.String(pull.BaseBranch.Name.String()),
+		Head:  github.String(pull.HeadBranch.Repository.Owner + ":" + pull.HeadBranch.Name.String()),
 		Title: github.String(pull.Title),
 		Body:  github.String(pull.Body),
 	})
@@ -39,11 +39,11 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull git.PullRequest
 		},
 		HeadBranch: git.BranchID{
 			Repository: git.RepositoryID{Owner: head.GetUser().GetLogin(), Name: head.GetRepo().GetName()},
-			Name:       head.GetRef(),
+			Name:       git.BranchName(head.GetRef()),
 		},
 		BaseBranch: git.BranchID{
 			Repository: git.RepositoryID{Owner: base.GetUser().GetLogin(), Name: base.GetRepo().GetName()},
-			Name:       base.GetRef(),
+			Name:       git.BranchName(base.GetRef()),
 		},
 		Title: payload.GetTitle(),
 		Body:  payload.GetBody(),

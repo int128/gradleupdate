@@ -95,15 +95,22 @@ func (p PullRequest) String() string {
 // BranchID points to a branch in a repository.
 type BranchID struct {
 	Repository RepositoryID
-	Name       string
+	Name       BranchName
 }
 
 func (b BranchID) String() string {
-	return b.Repository.String() + ":" + b.Name
+	return b.Repository.String() + ":" + b.Name.String()
 }
 
-func (b BranchID) Ref() string {
-	return "refs/heads/" + b.Name
+// BranchName represents name of a branch.
+type BranchName string
+
+func (b BranchName) String() string {
+	return string(b)
+}
+
+func (b BranchName) Ref() string {
+	return "refs/heads/" + b.String()
 }
 
 // Branch represents a branch in a repository.

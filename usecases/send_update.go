@@ -74,7 +74,7 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 	newProps := gradle.ReplaceWrapperVersion(precondition.GradleWrapperProperties, precondition.LatestGradleRelease.Version)
 	req := usecases.SendPullRequestRequest{
 		Base:           id,
-		HeadBranchName: fmt.Sprintf("gradle-%s-%s", precondition.LatestGradleRelease.Version, id.Owner),
+		HeadBranchName: gradleupdate.BranchFor(id.Owner, precondition.LatestGradleRelease.Version),
 		CommitMessage:  fmt.Sprintf("Gradle %s", precondition.LatestGradleRelease.Version),
 		CommitFiles: []git.File{
 			{

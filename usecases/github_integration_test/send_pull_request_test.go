@@ -86,7 +86,7 @@ func assertHeadBranchExists(t *testing.T, ctx context.Context, client *github.Cl
 	t.Helper()
 	for _, file := range req.CommitFiles {
 		fc, _, _, err := client.Repositories.GetContents(ctx, forkedRepository.Owner, forkedRepository.Name,
-			file.Path, &github.RepositoryContentGetOptions{Ref: req.HeadBranchName})
+			file.Path, &github.RepositoryContentGetOptions{Ref: req.HeadBranchName.String()})
 		if err != nil {
 			t.Fatalf("could not find %s: %s", file.Path, err)
 		}

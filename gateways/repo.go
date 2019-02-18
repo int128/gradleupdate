@@ -38,7 +38,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id git.RepositoryID) (*g
 				Owner: repository.GetOwner().GetLogin(),
 				Name:  repository.GetName(),
 			},
-			Name: repository.GetDefaultBranch(),
+			Name: git.BranchName(repository.GetDefaultBranch()),
 		},
 	}, nil
 }
@@ -110,13 +110,13 @@ func (r *RepositoryRepository) Fork(ctx context.Context, id git.RepositoryID) (*
 				Owner: fork.GetOwner().GetLogin(),
 				Name:  fork.GetName(),
 			},
-			Name: fork.GetDefaultBranch(),
+			Name: git.BranchName(fork.GetDefaultBranch()),
 		},
 	}, nil
 }
 
 func (r *RepositoryRepository) GetBranch(ctx context.Context, id git.BranchID) (*git.Branch, error) {
-	branch, _, err := r.Client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name)
+	branch, _, err := r.Client.Repositories.GetBranch(ctx, id.Repository.Owner, id.Repository.Name, id.Name.String())
 	if err != nil {
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 404 {

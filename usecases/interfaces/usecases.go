@@ -58,7 +58,7 @@ type SendPullRequest interface {
 
 type SendPullRequestRequest struct {
 	Base           git.RepositoryID
-	HeadBranchName string
+	HeadBranchName git.BranchName
 	CommitMessage  string
 	CommitFiles    []git.File
 	Title          string

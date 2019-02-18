@@ -25,11 +25,11 @@ func (r *GitService) CreateBranch(ctx context.Context, req gateways.PushBranchRe
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		&github.Reference{
-			Ref:    github.String(req.HeadBranch.Ref()),
+			Ref:    github.String(req.HeadBranch.Name.Ref()),
 			Object: &github.GitObject{SHA: headCommit.SHA},
 		})
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not create a ref %s in the head repository %s", req.HeadBranch.Ref(), req.HeadBranch.Repository)
+		return nil, errors.Wrapf(err, "could not create a ref %s in the head repository %s", req.HeadBranch.Name.Ref(), req.HeadBranch.Repository)
 	}
 	return &git.Branch{
 		ID: req.HeadBranch,
@@ -56,12 +56,12 @@ func (r *GitService) UpdateForceBranch(ctx context.Context, req gateways.PushBra
 		req.HeadBranch.Repository.Owner,
 		req.HeadBranch.Repository.Name,
 		&github.Reference{
-			Ref:    github.String(req.HeadBranch.Ref()),
+			Ref:    github.String(req.HeadBranch.Name.Ref()),
 			Object: &github.GitObject{SHA: headCommit.SHA},
 		},
 		true)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not update the ref %s in the head repository %s", req.HeadBranch.Ref(), req.HeadBranch.Repository)
+		return nil, errors.Wrapf(err, "could not update the ref %s in the head repository %s", req.HeadBranch.Name.Ref(), req.HeadBranch.Repository)
 	}
 	return &git.Branch{
 		ID: req.HeadBranch,
