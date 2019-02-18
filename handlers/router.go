@@ -24,7 +24,7 @@ type RouterIn struct {
 
 func NewRouter(in RouterIn) handlers.Router {
 	r := mux.NewRouter()
-	r.Methods("POST").Path("/internal/updates").Handler(&in.BatchSendUpdates)
+	r.Methods("GET").Path("/internal/updates").Handler(&in.BatchSendUpdates)
 	r.Methods("POST").Path("/internal/{owner}/{repo}/update").Handler(&in.TaskSendUpdate).Name("TaskSendUpdate")
 
 	p := r.PathPrefix("/").Subrouter()
