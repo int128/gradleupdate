@@ -7,13 +7,18 @@ import (
 	"github.com/google/go-github/v24/github"
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways"
+	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
 	"github.com/int128/gradleupdate/usecases"
 	interfaces "github.com/int128/gradleupdate/usecases/interfaces"
 )
 
+var sandboxRepository = git.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
+
+var forkedRepository = git.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
+
 func TestSendPullRequestRequest_Do(t *testing.T) {
+	client := gatewaysTestDoubles.NewGitHubClient(t)
 	ctx := context.Background()
-	client := newGitHubClient(t)
 	sendPullRequest := usecases.SendPullRequest{
 		RepositoryRepository:  &gateways.RepositoryRepository{Client: client},
 		PullRequestRepository: &gateways.PullRequestRepository{Client: client},

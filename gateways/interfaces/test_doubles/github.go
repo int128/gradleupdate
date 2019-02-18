@@ -1,4 +1,4 @@
-package usecases_test
+package gatewaysTestDoubles
 
 import (
 	"net/http"
@@ -7,15 +7,12 @@ import (
 	"testing"
 
 	"github.com/google/go-github/v24/github"
-	"github.com/int128/gradleupdate/domain/git"
 	"golang.org/x/oauth2"
 )
 
-var sandboxRepository = git.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
-
-var forkedRepository = git.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
-
-func newGitHubClient(t *testing.T) *github.Client {
+// NewGitHubClient returns a client for GitHub integration tests.
+// This requires env GITHUB_TOKEN and skips the test if it is not set.
+func NewGitHubClient(t *testing.T) *github.Client {
 	t.Helper()
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
