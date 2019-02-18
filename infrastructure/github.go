@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-github/v24/github"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/pkg/errors"
+	"github.com/shurcooL/githubv4"
 	"go.uber.org/dig"
 	"golang.org/x/oauth2"
 )
@@ -16,11 +17,18 @@ type GitHubClientFactory struct {
 	Credentials gateways.Credentials
 }
 
-func (factory *GitHubClientFactory) New() *github.Client {
+func (factory *GitHubClientFactory) NewV3() *github.Client {
 	var transport http.RoundTripper
 	transport = factory.Client.Transport
 	transport = &oauth2Transport{transport, factory.Credentials}
 	return github.NewClient(&http.Client{Transport: transport})
+}
+
+func (factory *GitHubClientFactory) NewV4() *githubv4.Client {
+	var transport http.RoundTripper
+	transport = factory.Client.Transport
+	transport = &oauth2Transport{transport, factory.Credentials}
+	return githubv4.NewClient(&http.Client{Transport: transport})
 }
 
 type oauth2Transport struct {

@@ -8,6 +8,8 @@ require (
 	github.com/gorilla/csrf v1.5.1
 	github.com/gorilla/mux v1.6.2
 	github.com/pkg/errors v0.8.1
+	github.com/shurcooL/githubv4 v0.0.0-20190119021625-d9689b595017
+	github.com/shurcooL/graphql v0.0.0-20181231061246-d48a9a75455f // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/quicktemplate v1.0.0
 	go.uber.org/atomic v1.3.2 // indirect

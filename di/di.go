@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/go-github/v24/github"
 	"github.com/pkg/errors"
+	"github.com/shurcooL/githubv4"
 	"go.uber.org/dig"
 
 	"github.com/int128/gradleupdate/gateways"
@@ -50,6 +51,7 @@ var dependencies = []interface{}{
 	// infrastructure
 	handlers.NewRouter,
 	handlers.NewRouteResolver,
-	func(factory infrastructure.GitHubClientFactory) *github.Client { return factory.New() },
+	func(factory infrastructure.GitHubClientFactory) *github.Client { return factory.NewV3() },
+	func(factory infrastructure.GitHubClientFactory) *githubv4.Client { return factory.NewV4() },
 	func(factory infrastructure.HTTPClientFactory) *http.Client { return factory.New() },
 }
