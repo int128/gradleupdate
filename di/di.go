@@ -36,6 +36,7 @@ var dependencies = []interface{}{
 	func(i usecases.SendPullRequest) usecasesInterfaces.SendPullRequest { return &i },
 
 	// gateways
+	func(i gateways.GetRepositoryQuery) gatewaysInterfaces.GetRepositoryQuery { return &i },
 	func(i gateways.RepositoryRepository) gatewaysInterfaces.RepositoryRepository { return &i },
 	func(i gateways.PullRequestRepository) gatewaysInterfaces.PullRequestRepository { return &i },
 	func(i gateways.GitService) gatewaysInterfaces.GitService { return &i },

@@ -32,7 +32,7 @@ func (r *RepositoryRepository) Get(ctx context.Context, id git.RepositoryID) (*g
 		},
 		Description: repository.GetDescription(),
 		AvatarURL:   repository.GetOwner().GetAvatarURL(),
-		HTMLURL:     repository.GetHTMLURL(),
+		URL:         repository.GetHTMLURL(),
 		DefaultBranch: git.BranchID{
 			Repository: git.RepositoryID{
 				Owner: repository.GetOwner().GetLogin(),
@@ -104,7 +104,7 @@ func (r *RepositoryRepository) Fork(ctx context.Context, id git.RepositoryID) (*
 		},
 		Description: fork.GetDescription(),
 		AvatarURL:   fork.GetOwner().GetAvatarURL(),
-		HTMLURL:     fork.GetHTMLURL(),
+		URL:         fork.GetHTMLURL(),
 		DefaultBranch: git.BranchID{
 			Repository: git.RepositoryID{
 				Owner: fork.GetOwner().GetLogin(),

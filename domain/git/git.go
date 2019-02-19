@@ -25,7 +25,7 @@ type Repository struct {
 	DefaultBranch BranchID
 	Description   string
 	AvatarURL     string
-	HTMLURL       string
+	URL           string
 }
 
 func (r Repository) String() string {
@@ -91,6 +91,8 @@ type PullRequest struct {
 func (p PullRequest) String() string {
 	return p.ID.String()
 }
+
+type PullRequestURL string
 
 // BranchID points to a branch in a repository.
 type BranchID struct {

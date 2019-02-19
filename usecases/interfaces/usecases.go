@@ -32,6 +32,7 @@ type GetRepositoryResponse struct {
 	Repository                  git.Repository
 	LatestGradleRelease         gradle.Release
 	UpdatePreconditionViolation gradleupdate.PreconditionViolation
+	UpdatePullRequestURL        git.PullRequestURL
 }
 
 type GetRepositoryError interface {

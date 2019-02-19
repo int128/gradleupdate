@@ -72,7 +72,7 @@ var dependencies = []interface{}{
 				ID:          id,
 				Description: "Automatic Gradle Update Service",
 				AvatarURL:   "https://avatars0.githubusercontent.com/u/321266",
-				HTMLURL:     "https://github.com/int128/gradleupdate",
+				URL:         "https://github.com/int128/gradleupdate",
 			}
 		}
 		getRepository.EXPECT().
