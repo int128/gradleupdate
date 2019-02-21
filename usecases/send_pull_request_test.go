@@ -17,7 +17,7 @@ var sandboxRepository = git.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
 var forkedRepository = git.RepositoryID{Owner: "gradleupdate", Name: "Spoon-Knife"}
 
 func TestSendPullRequestRequest_Do(t *testing.T) {
-	client := gatewaysTestDoubles.NewGitHubClient(t)
+	client := gatewaysTestDoubles.NewGitHubClientV3(t)
 	ctx := context.Background()
 	sendPullRequest := usecases.SendPullRequest{
 		RepositoryRepository:  &gateways.RepositoryRepository{Client: client},

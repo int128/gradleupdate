@@ -25,10 +25,14 @@
     {% case gradleupdate.ReadyToUpdate %}
     <h3>This repository has the out-of-dated Gradle.</h3>
     <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
-    <p>We will soon send (or have sent) a pull request for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
+
+    {% if r.UpdatePullRequestURL != "" %}
     <p>
-      <a href="{%s r.Repository.HTMLURL %}" target="_blank" class="btn btn-primary">Move to GitHub</a>
-    </p>
+      We have sent
+      <a href="{%v r.UpdatePullRequestURL %}" target="_blank">the pull request</a>
+      for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
+    {% else %}
+    <p>We will soon send a pull request for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
     <form method="POST" action="{%s r.RequestUpdateURL %}">
       <p>
         <button type="submit" class="btn btn-link">
@@ -37,6 +41,7 @@
       </p>
       {%s= csrf %}
     </form>
+    {% endif %}
 
     {% case gradleupdate.AlreadyHasLatestGradle %}
     <h3>This repository has the latest Gradle!</h3>
@@ -89,7 +94,7 @@
       <input type="text" id="badge-html" class="form-control text-monospace" value="{%s r.BadgeHTML %}"/>
     </div>
     <div class="form-group">
-      <a href="{%s r.Repository.HTMLURL %}" target="_blank" class="btn btn-primary">Open GitHub</a>
+      <a href="{%s r.Repository.URL %}" target="_blank" class="btn btn-primary">Open GitHub</a>
     </div>
   </form>
 </div>

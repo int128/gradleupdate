@@ -10,6 +10,7 @@ type Repository struct {
 	Repository                  git.Repository
 	LatestGradleRelease         gradle.Release
 	UpdatePreconditionViolation gradleupdate.PreconditionViolation
+	UpdatePullRequestURL        git.PullRequestURL
 	BadgeMarkdown               string
 	BadgeHTML                   string
 	BadgeURL                    string

@@ -88,139 +88,160 @@ func (r Repository) StreamPage(qw422016 *qt422016.Writer, csrf string) {
 		qw422016.E().S(r.BadgeURL)
 		//line repo.qtpl:27
 		qw422016.N().S(`" alt="badge"/></p>
-    <p>We will soon send (or have sent) a pull request for bump to Gradle `)
-		//line repo.qtpl:28
-		qw422016.E().V(r.LatestGradleRelease.Version)
-		//line repo.qtpl:28
-		qw422016.N().S(`.</p>
+
+    `)
+		//line repo.qtpl:29
+		if r.UpdatePullRequestURL != "" {
+			//line repo.qtpl:29
+			qw422016.N().S(`
     <p>
+      We have sent
       <a href="`)
-		//line repo.qtpl:30
-		qw422016.E().S(r.Repository.HTMLURL)
-		//line repo.qtpl:30
-		qw422016.N().S(`" target="_blank" class="btn btn-primary">Move to GitHub</a>
-    </p>
+			//line repo.qtpl:32
+			qw422016.E().V(r.UpdatePullRequestURL)
+			//line repo.qtpl:32
+			qw422016.N().S(`" target="_blank">the pull request</a>
+      for bump to Gradle `)
+			//line repo.qtpl:33
+			qw422016.E().V(r.LatestGradleRelease.Version)
+			//line repo.qtpl:33
+			qw422016.N().S(`.</p>
+    `)
+			//line repo.qtpl:34
+		} else {
+			//line repo.qtpl:34
+			qw422016.N().S(`
+    <p>We will soon send a pull request for bump to Gradle `)
+			//line repo.qtpl:35
+			qw422016.E().V(r.LatestGradleRelease.Version)
+			//line repo.qtpl:35
+			qw422016.N().S(`.</p>
     <form method="POST" action="`)
-		//line repo.qtpl:32
-		qw422016.E().S(r.RequestUpdateURL)
-		//line repo.qtpl:32
-		qw422016.N().S(`">
+			//line repo.qtpl:36
+			qw422016.E().S(r.RequestUpdateURL)
+			//line repo.qtpl:36
+			qw422016.N().S(`">
       <p>
         <button type="submit" class="btn btn-link">
           Request a Pull Request now
         </button>
       </p>
       `)
-		//line repo.qtpl:38
-		qw422016.N().S(csrf)
-		//line repo.qtpl:38
-		qw422016.N().S(`
+			//line repo.qtpl:42
+			qw422016.N().S(csrf)
+			//line repo.qtpl:42
+			qw422016.N().S(`
     </form>
+    `)
+			//line repo.qtpl:44
+		}
+		//line repo.qtpl:44
+		qw422016.N().S(`
 
     `)
-	//line repo.qtpl:41
+	//line repo.qtpl:46
 	case gradleupdate.AlreadyHasLatestGradle:
-		//line repo.qtpl:41
+		//line repo.qtpl:46
 		qw422016.N().S(`
     <h3>This repository has the latest Gradle!</h3>
     <p>We will send a pull request for updating version when the newer Gradle is released.</p>
     <p><img src="`)
-		//line repo.qtpl:44
+		//line repo.qtpl:49
 		qw422016.E().S(r.BadgeURL)
-		//line repo.qtpl:44
+		//line repo.qtpl:49
 		qw422016.N().S(`" alt="badge"/></p>
 
     `)
-	//line repo.qtpl:46
+	//line repo.qtpl:51
 	case gradleupdate.NoGradleWrapperProperties:
-		//line repo.qtpl:46
+		//line repo.qtpl:51
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> This repository does not have <code>gradle-wrapper.properties</code>.</p>
 
     `)
-	//line repo.qtpl:49
+	//line repo.qtpl:54
 	case gradleupdate.NoGradleVersion:
-		//line repo.qtpl:49
+		//line repo.qtpl:54
 		qw422016.N().S(`
     <p><strong>No Gradle:</strong> No version found in <code>gradle-wrapper.properties</code>.</p>
 
     `)
-	//line repo.qtpl:52
+	//line repo.qtpl:57
 	case gradleupdate.NoReadme:
-		//line repo.qtpl:52
+		//line repo.qtpl:57
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">
       <strong>No Auto Update:</strong> You need to create README.
     </div>
     `)
-		//line repo.qtpl:56
+		//line repo.qtpl:61
 		r.StreamHowToAutoUpdate(qw422016)
-		//line repo.qtpl:56
+		//line repo.qtpl:61
 		qw422016.N().S(`
 
     `)
-	//line repo.qtpl:58
+	//line repo.qtpl:63
 	case gradleupdate.NoReadmeBadge:
-		//line repo.qtpl:58
+		//line repo.qtpl:63
 		qw422016.N().S(`
     <div class="alert alert-primary" role="alert">
       <strong>No Auto Update:</strong> You need to add the badge to README.
     </div>
     `)
-		//line repo.qtpl:62
+		//line repo.qtpl:67
 		r.StreamHowToAutoUpdate(qw422016)
-		//line repo.qtpl:62
+		//line repo.qtpl:67
 		qw422016.N().S(`
 
     `)
-		//line repo.qtpl:64
+		//line repo.qtpl:69
 	}
-	//line repo.qtpl:64
+	//line repo.qtpl:69
 	qw422016.N().S(`
   </div>
 </div>
 
 `)
-	//line repo.qtpl:68
+	//line repo.qtpl:73
 	StreamFooter(qw422016)
-	//line repo.qtpl:68
+	//line repo.qtpl:73
 	qw422016.N().S(`
 
 </body>
 </html>
 `)
-//line repo.qtpl:72
+//line repo.qtpl:77
 }
 
-//line repo.qtpl:72
+//line repo.qtpl:77
 func (r Repository) WritePage(qq422016 qtio422016.Writer, csrf string) {
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	r.StreamPage(qw422016, csrf)
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	qt422016.ReleaseWriter(qw422016)
-//line repo.qtpl:72
+//line repo.qtpl:77
 }
 
-//line repo.qtpl:72
+//line repo.qtpl:77
 func (r Repository) Page(csrf string) string {
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	r.WritePage(qb422016, csrf)
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	qs422016 := string(qb422016.B)
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line repo.qtpl:72
+	//line repo.qtpl:77
 	return qs422016
-//line repo.qtpl:72
+//line repo.qtpl:77
 }
 
-//line repo.qtpl:74
+//line repo.qtpl:79
 func (r Repository) StreamHowToAutoUpdate(qw422016 *qt422016.Writer) {
-	//line repo.qtpl:74
+	//line repo.qtpl:79
 	qw422016.N().S(`
 <div>
   <h3>How to turn on Auto Update?</h3>
@@ -229,62 +250,62 @@ func (r Repository) StreamHowToAutoUpdate(qw422016 *qt422016.Writer) {
     We will send a pull request with the latest version of Gradle.
   </p>
   <p><img src="`)
-	//line repo.qtpl:81
+	//line repo.qtpl:86
 	qw422016.E().S(r.BadgeURL)
-	//line repo.qtpl:81
+	//line repo.qtpl:86
 	qw422016.N().S(`" alt="badge"/></p>
   <form>
     <div class="form-group">
       <label for="badge-markdown" class="font-weight-bold">Markdown:</label>
       <input type="text" id="badge-markdown" class="form-control text-monospace" value="`)
-	//line repo.qtpl:85
+	//line repo.qtpl:90
 	qw422016.E().S(r.BadgeMarkdown)
-	//line repo.qtpl:85
+	//line repo.qtpl:90
 	qw422016.N().S(`"/>
     </div>
     <div class="form-group">
       <label for="badge-html" class="font-weight-bold">HTML:</label>
       <input type="text" id="badge-html" class="form-control text-monospace" value="`)
-	//line repo.qtpl:89
+	//line repo.qtpl:94
 	qw422016.E().S(r.BadgeHTML)
-	//line repo.qtpl:89
+	//line repo.qtpl:94
 	qw422016.N().S(`"/>
     </div>
     <div class="form-group">
       <a href="`)
-	//line repo.qtpl:92
-	qw422016.E().S(r.Repository.HTMLURL)
-	//line repo.qtpl:92
+	//line repo.qtpl:97
+	qw422016.E().S(r.Repository.URL)
+	//line repo.qtpl:97
 	qw422016.N().S(`" target="_blank" class="btn btn-primary">Open GitHub</a>
     </div>
   </form>
 </div>
 `)
-//line repo.qtpl:96
+//line repo.qtpl:101
 }
 
-//line repo.qtpl:96
+//line repo.qtpl:101
 func (r Repository) WriteHowToAutoUpdate(qq422016 qtio422016.Writer) {
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	qw422016 := qt422016.AcquireWriter(qq422016)
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	r.StreamHowToAutoUpdate(qw422016)
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	qt422016.ReleaseWriter(qw422016)
-//line repo.qtpl:96
+//line repo.qtpl:101
 }
 
-//line repo.qtpl:96
+//line repo.qtpl:101
 func (r Repository) HowToAutoUpdate() string {
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	qb422016 := qt422016.AcquireByteBuffer()
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	r.WriteHowToAutoUpdate(qb422016)
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	qs422016 := string(qb422016.B)
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	qt422016.ReleaseByteBuffer(qb422016)
-	//line repo.qtpl:96
+	//line repo.qtpl:101
 	return qs422016
-//line repo.qtpl:96
+//line repo.qtpl:101
 }

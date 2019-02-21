@@ -11,7 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles,Queue
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,GetRepositoryQuery,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles,Queue
 
 type RepositoryError interface {
 	error
@@ -22,6 +22,22 @@ type RepositoryError interface {
 type BadgeLastAccessRepository interface {
 	Save(ctx context.Context, a gradleupdate.BadgeLastAccess) error
 	FindBySince(ctx context.Context, since time.Time) ([]gradleupdate.BadgeLastAccess, error)
+}
+
+type GetRepositoryQuery interface {
+	Do(ctx context.Context, in GetRepositoryQueryIn) (*GetRepositoryQueryOut, error)
+}
+
+type GetRepositoryQueryIn struct {
+	Repository     git.RepositoryID
+	HeadBranchName git.BranchName
+}
+
+type GetRepositoryQueryOut struct {
+	Repository              git.Repository
+	PullRequestURL          git.PullRequestURL // a pull request associated with the head branch
+	Readme                  git.FileContent
+	GradleWrapperProperties git.FileContent
 }
 
 type RepositoryRepository interface {
