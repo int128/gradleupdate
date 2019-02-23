@@ -115,51 +115,14 @@ func (b BranchName) Ref() string {
 	return "refs/heads/" + b.String()
 }
 
-// Branch represents a branch in a repository.
-type Branch struct {
-	ID     BranchID
-	Commit Commit
-}
-
-func (b Branch) String() string {
-	return b.ID.String()
-}
-
-// CommitID points to a branch in a repository.
-type CommitID struct {
-	Repository RepositoryID
-	SHA        CommitSHA
-}
-
 type CommitSHA string
 
 func (sha CommitSHA) String() string {
 	return string(sha)
 }
 
-// Commit represents a commit in a repository.
-type Commit struct {
-	ID      CommitID
-	Parents []CommitID
-	Tree    TreeID
-}
-
-func (c Commit) IsBasedOn(base CommitID) bool {
-	if len(c.Parents) != 1 {
-		return false
-	}
-	parent := c.Parents[0]
-	return parent.SHA == base.SHA
-}
-
 type TreeSHA string
 
 func (sha TreeSHA) String() string {
 	return string(sha)
-}
-
-// TreeID points to a tree in a repository.
-type TreeID struct {
-	Repository RepositoryID
-	SHA        TreeSHA
 }
