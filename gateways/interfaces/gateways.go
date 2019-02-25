@@ -11,7 +11,7 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,GetRepositoryQuery,RepositoryRepository,PullRequestRepository,GitService,GradleReleaseRepository,Credentials,Toggles,Queue
+//go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,GetRepositoryQuery,SendUpdateQuery,RepositoryRepository,PullRequestRepository,GradleReleaseRepository,Credentials,Toggles,Queue
 
 type RepositoryError interface {
 	error
@@ -40,28 +40,43 @@ type GetRepositoryQueryOut struct {
 	GradleWrapperProperties git.FileContent
 }
 
+type SendUpdateQuery interface {
+	Get(ctx context.Context, in SendUpdateQueryIn) (*SendUpdateQueryOut, error)
+	ForkRepository(ctx context.Context, id git.RepositoryID) (*git.RepositoryID, error)
+	CreateBranch(ctx context.Context, branch NewBranch) error
+	UpdateBranch(ctx context.Context, branch NewBranch, force bool) error
+}
+
+type SendUpdateQueryIn struct {
+	Repository     git.RepositoryID
+	HeadBranchName git.BranchName
+}
+
+type SendUpdateQueryOut struct {
+	BaseRepository          git.RepositoryID
+	BaseBranch              git.BranchID
+	BaseCommitSHA           git.CommitSHA
+	BaseTreeSHA             git.TreeSHA
+	HeadBranch              *git.BranchID // the head branch if an associated pull request exists
+	HeadParentCommitSHA     git.CommitSHA // a parent of head branch (empty if the head has 2 or more parents)
+	Readme                  git.FileContent
+	GradleWrapperProperties git.FileContent
+}
+
+type NewBranch struct {
+	Branch          git.BranchID
+	ParentCommitSHA git.CommitSHA
+	ParentTreeSHA   git.TreeSHA
+	CommitMessage   string
+	CommitFiles     []git.File
+}
+
 type RepositoryRepository interface {
-	Get(context.Context, git.RepositoryID) (*git.Repository, error)
 	GetFileContent(context.Context, git.RepositoryID, string) (git.FileContent, error)
-	GetReadme(ctx context.Context, id git.RepositoryID) (git.FileContent, error)
-	Fork(context.Context, git.RepositoryID) (*git.Repository, error)
-	GetBranch(ctx context.Context, branch git.BranchID) (*git.Branch, error)
 }
 
 type PullRequestRepository interface {
 	Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error)
-}
-
-type GitService interface {
-	CreateBranch(ctx context.Context, req PushBranchRequest) (*git.Branch, error)
-	UpdateForceBranch(ctx context.Context, req PushBranchRequest) (*git.Branch, error)
-}
-
-type PushBranchRequest struct {
-	BaseBranch    git.Branch
-	HeadBranch    git.BranchID
-	CommitMessage string
-	CommitFiles   []git.File
 }
 
 type GradleReleaseRepository interface {

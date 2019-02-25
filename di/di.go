@@ -33,13 +33,12 @@ var dependencies = []interface{}{
 	func(i usecases.GetBadge) usecasesInterfaces.GetBadge { return &i },
 	func(i usecases.SendUpdate) usecasesInterfaces.SendUpdate { return &i },
 	func(i usecases.BatchSendUpdates) usecasesInterfaces.BatchSendUpdates { return &i },
-	func(i usecases.SendPullRequest) usecasesInterfaces.SendPullRequest { return &i },
 
 	// gateways
 	func(i gateways.GetRepositoryQuery) gatewaysInterfaces.GetRepositoryQuery { return &i },
+	func(i gateways.SendUpdateQuery) gatewaysInterfaces.SendUpdateQuery { return &i },
 	func(i gateways.RepositoryRepository) gatewaysInterfaces.RepositoryRepository { return &i },
 	func(i gateways.PullRequestRepository) gatewaysInterfaces.PullRequestRepository { return &i },
-	func(i gateways.GitService) gatewaysInterfaces.GitService { return &i },
 	func(i gateways.BadgeLastAccessRepository) gatewaysInterfaces.BadgeLastAccessRepository { return &i },
 	func(i gateways.GradleReleaseRepository) gatewaysInterfaces.GradleReleaseRepository { return &i },
 	gateways.NewToggles,
