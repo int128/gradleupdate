@@ -8,14 +8,15 @@ import (
 	"github.com/int128/gradleupdate/domain/git"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/pkg/errors"
 )
 
 var sandboxRepository = git.RepositoryID{Owner: "octocat", Name: "Spoon-Knife"}
 
 func TestGetRepositoryQuery_Do_GitHubIntegration(t *testing.T) {
 	query := &GetRepositoryQuery{
-		Client: gatewaysTestDoubles.NewGitHubClientV4(t),
+		GetRepositoryQueryIn: GetRepositoryQueryIn{
+			Client: gatewaysTestDoubles.NewGitHubClientV4(t),
+		},
 	}
 	ctx := context.Background()
 
@@ -57,12 +58,8 @@ func TestGetRepositoryQuery_Do_GitHubIntegration(t *testing.T) {
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		repositoryErr, ok := errors.Cause(err).(gateways.RepositoryError)
-		if !ok {
-			t.Fatalf("error wants gateways.RepositoryError but %T: %+v", errors.Cause(err), err)
-		}
-		if !repositoryErr.NoSuchEntity() {
-			t.Errorf("NoSuchEntity wants true but false")
+		if !query.IsNoSuchEntityError(err) {
+			t.Errorf("IsNoSuchEntityError wants true but false")
 		}
 	})
 }

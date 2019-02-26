@@ -8,18 +8,22 @@ import (
 	"github.com/int128/gradleupdate/domain/gradle"
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/gateways/interfaces"
-	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
-// SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
-type SendUpdate struct {
+type SendUpdateIn struct {
 	dig.In
 	SendUpdateQuery         gateways.SendUpdateQuery
 	GradleReleaseRepository gateways.GradleReleaseRepository
 	PullRequestRepository   gateways.PullRequestRepository
 	Logger                  gateways.Logger
+}
+
+// SendUpdate provides a use case to send a pull request for updating Gradle in a repository.
+type SendUpdate struct {
+	SendUpdateIn
+	noSuchRepositoryErrorCauser
 }
 
 func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
@@ -32,10 +36,8 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 		HeadBranchName: gradleupdate.BranchFor(id.Owner, release.Version),
 	})
 	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return errors.Wrapf(&getRepositoryError{error: err, noSuchRepository: true}, "repository %s not found", id)
-			}
+		if usecase.SendUpdateQuery.IsNoSuchEntityError(err) {
+			return errors.WithStack(&noSuchRepositoryError{id})
 		}
 		return errors.Wrapf(err, "error while getting the repository %s", id)
 	}
@@ -49,10 +51,7 @@ func (usecase *SendUpdate) Do(ctx context.Context, id git.RepositoryID) error {
 	preconditionViolation := gradleupdate.CheckPrecondition(precondition)
 	if preconditionViolation != gradleupdate.ReadyToUpdate {
 		usecase.Logger.Infof(ctx, "skip the repository %v due to precondition violation (%v)", out.BaseRepository, preconditionViolation)
-		return errors.WithStack(&sendUpdateError{
-			error:                 fmt.Errorf("precondition violation (%v)", preconditionViolation),
-			preconditionViolation: preconditionViolation,
-		})
+		return errors.WithStack(&sendUpdatePreconditionViolationError{preconditionViolation})
 	}
 
 	if out.HeadBranch == nil {
@@ -99,11 +98,9 @@ func (usecase *SendUpdate) createBranchAndPullRequest(ctx context.Context, out *
 		Body:       formatPullRequestBody(out.BaseRepository, release),
 	}
 	if _, err := usecase.PullRequestRepository.Create(ctx, pull); err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.AlreadyExists() {
-				usecase.Logger.Infof(ctx, "skip creating a pull request: %s", err)
-				return nil
-			}
+		if usecase.PullRequestRepository.IsEntityAlreadyExistsError(err) {
+			usecase.Logger.Infof(ctx, "skip creating a pull request: %s", err)
+			return nil
 		}
 		return errors.Wrapf(err, "error while creating a pull request %s", pull)
 	}
@@ -150,13 +147,17 @@ This is sent by @gradleupdate. See %s for more.`,
 		gradleupdate.NewRepositoryURL(id))
 }
 
-type sendUpdateError struct {
-	error
+func (usecase *SendUpdate) HasPreconditionViolation(err error) gradleupdate.PreconditionViolation {
+	if err, ok := errors.Cause(err).(*sendUpdatePreconditionViolationError); ok {
+		return err.preconditionViolation
+	}
+	return gradleupdate.ReadyToUpdate
+}
+
+type sendUpdatePreconditionViolationError struct {
 	preconditionViolation gradleupdate.PreconditionViolation
 }
 
-func (err *sendUpdateError) PreconditionViolation() gradleupdate.PreconditionViolation {
-	return err.preconditionViolation
+func (err *sendUpdatePreconditionViolationError) Error() string {
+	return fmt.Sprintf("precondition violation (%v)", err.preconditionViolation)
 }
-
-var _ usecases.SendUpdateError = &sendUpdateError{}

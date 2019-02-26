@@ -9,9 +9,14 @@ import (
 	"go.uber.org/dig"
 )
 
-type PullRequestRepository struct {
+type PullRequestRepositoryIn struct {
 	dig.In
 	Client *github.Client
+}
+
+type PullRequestRepository struct {
+	PullRequestRepositoryIn
+	entityAlreadyExistsErrorCauser
 }
 
 func (r *PullRequestRepository) Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error) {
@@ -25,7 +30,7 @@ func (r *PullRequestRepository) Create(ctx context.Context, pull git.PullRequest
 		if err, ok := err.(*github.ErrorResponse); ok {
 			if err.Response.StatusCode == 422 {
 				// GitHub does not return dedicated code on already existing, so catch all for now.
-				return nil, errors.Wrapf(&repositoryError{error: err, alreadyExists: true}, "pull request already exists")
+				return nil, errors.Wrapf(&entityAlreadyExistsError{err}, "pull request already exists")
 			}
 		}
 		return nil, errors.Wrapf(err, "error from GitHub API")

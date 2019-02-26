@@ -100,6 +100,18 @@ func (mr *MockGetRepositoryQueryMockRecorder) Do(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockGetRepositoryQuery)(nil).Do), arg0, arg1)
 }
 
+// IsNoSuchEntityError mocks base method
+func (m *MockGetRepositoryQuery) IsNoSuchEntityError(arg0 error) bool {
+	ret := m.ctrl.Call(m, "IsNoSuchEntityError", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsNoSuchEntityError indicates an expected call of IsNoSuchEntityError
+func (mr *MockGetRepositoryQueryMockRecorder) IsNoSuchEntityError(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoSuchEntityError", reflect.TypeOf((*MockGetRepositoryQuery)(nil).IsNoSuchEntityError), arg0)
+}
+
 // MockSendUpdateQuery is a mock of SendUpdateQuery interface
 type MockSendUpdateQuery struct {
 	ctrl     *gomock.Controller
@@ -161,6 +173,18 @@ func (mr *MockSendUpdateQueryMockRecorder) Get(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockSendUpdateQuery)(nil).Get), arg0, arg1)
 }
 
+// IsNoSuchEntityError mocks base method
+func (m *MockSendUpdateQuery) IsNoSuchEntityError(arg0 error) bool {
+	ret := m.ctrl.Call(m, "IsNoSuchEntityError", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsNoSuchEntityError indicates an expected call of IsNoSuchEntityError
+func (mr *MockSendUpdateQueryMockRecorder) IsNoSuchEntityError(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoSuchEntityError", reflect.TypeOf((*MockSendUpdateQuery)(nil).IsNoSuchEntityError), arg0)
+}
+
 // UpdateBranch mocks base method
 func (m *MockSendUpdateQuery) UpdateBranch(arg0 context.Context, arg1 interfaces.NewBranch, arg2 bool) error {
 	ret := m.ctrl.Call(m, "UpdateBranch", arg0, arg1, arg2)
@@ -209,6 +233,18 @@ func (mr *MockRepositoryRepositoryMockRecorder) GetFileContent(arg0, arg1, arg2 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFileContent", reflect.TypeOf((*MockRepositoryRepository)(nil).GetFileContent), arg0, arg1, arg2)
 }
 
+// IsNoSuchEntityError mocks base method
+func (m *MockRepositoryRepository) IsNoSuchEntityError(arg0 error) bool {
+	ret := m.ctrl.Call(m, "IsNoSuchEntityError", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsNoSuchEntityError indicates an expected call of IsNoSuchEntityError
+func (mr *MockRepositoryRepositoryMockRecorder) IsNoSuchEntityError(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNoSuchEntityError", reflect.TypeOf((*MockRepositoryRepository)(nil).IsNoSuchEntityError), arg0)
+}
+
 // MockPullRequestRepository is a mock of PullRequestRepository interface
 type MockPullRequestRepository struct {
 	ctrl     *gomock.Controller
@@ -243,6 +279,18 @@ func (m *MockPullRequestRepository) Create(arg0 context.Context, arg1 git.PullRe
 // Create indicates an expected call of Create
 func (mr *MockPullRequestRepositoryMockRecorder) Create(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockPullRequestRepository)(nil).Create), arg0, arg1)
+}
+
+// IsEntityAlreadyExistsError mocks base method
+func (m *MockPullRequestRepository) IsEntityAlreadyExistsError(arg0 error) bool {
+	ret := m.ctrl.Call(m, "IsEntityAlreadyExistsError", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsEntityAlreadyExistsError indicates an expected call of IsEntityAlreadyExistsError
+func (mr *MockPullRequestRepositoryMockRecorder) IsEntityAlreadyExistsError(arg0 interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsEntityAlreadyExistsError", reflect.TypeOf((*MockPullRequestRepository)(nil).IsEntityAlreadyExistsError), arg0)
 }
 
 // MockGradleReleaseRepository is a mock of GradleReleaseRepository interface

@@ -11,9 +11,14 @@ import (
 	"go.uber.org/dig"
 )
 
-type GetRepositoryQuery struct {
+type GetRepositoryQueryIn struct {
 	dig.In
 	Client *githubv4.Client
+}
+
+type GetRepositoryQuery struct {
+	GetRepositoryQueryIn
+	noSuchEntityErrorCauser
 }
 
 func (r *GetRepositoryQuery) Do(ctx context.Context, in gateways.GetRepositoryQueryIn) (*gateways.GetRepositoryQueryOut, error) {
@@ -56,7 +61,7 @@ func (r *GetRepositoryQuery) Do(ctx context.Context, in gateways.GetRepositoryQu
 		// so we check the pointer is nil on not found error.
 		// See https://github.com/shurcooL/githubv4/issues/41
 		if q != nil {
-			return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "repository %v not found", in.Repository)
+			return nil, errors.Wrapf(&noSuchEntityError{err}, "no such repository %s", in.Repository)
 		}
 		return nil, errors.Wrapf(err, "GitHub API error")
 	}

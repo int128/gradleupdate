@@ -29,16 +29,28 @@ func New() (*dig.Container, error) {
 
 var dependencies = []interface{}{
 	// usecases
-	func(i usecases.GetRepository) usecasesInterfaces.GetRepository { return &i },
+	func(i usecases.GetRepositoryIn) usecasesInterfaces.GetRepository {
+		return &usecases.GetRepository{GetRepositoryIn: i}
+	},
 	func(i usecases.GetBadge) usecasesInterfaces.GetBadge { return &i },
-	func(i usecases.SendUpdate) usecasesInterfaces.SendUpdate { return &i },
+	func(i usecases.SendUpdateIn) usecasesInterfaces.SendUpdate {
+		return &usecases.SendUpdate{SendUpdateIn: i}
+	},
 	func(i usecases.BatchSendUpdates) usecasesInterfaces.BatchSendUpdates { return &i },
 
 	// gateways
-	func(i gateways.GetRepositoryQuery) gatewaysInterfaces.GetRepositoryQuery { return &i },
-	func(i gateways.SendUpdateQuery) gatewaysInterfaces.SendUpdateQuery { return &i },
-	func(i gateways.RepositoryRepository) gatewaysInterfaces.RepositoryRepository { return &i },
-	func(i gateways.PullRequestRepository) gatewaysInterfaces.PullRequestRepository { return &i },
+	func(i gateways.GetRepositoryQueryIn) gatewaysInterfaces.GetRepositoryQuery {
+		return &gateways.GetRepositoryQuery{GetRepositoryQueryIn: i}
+	},
+	func(i gateways.SendUpdateQueryIn) gatewaysInterfaces.SendUpdateQuery {
+		return &gateways.SendUpdateQuery{SendUpdateQueryIn: i}
+	},
+	func(i gateways.RepositoryRepositoryIn) gatewaysInterfaces.RepositoryRepository {
+		return &gateways.RepositoryRepository{RepositoryRepositoryIn: i}
+	},
+	func(i gateways.PullRequestRepositoryIn) gatewaysInterfaces.PullRequestRepository {
+		return &gateways.PullRequestRepository{PullRequestRepositoryIn: i}
+	},
 	func(i gateways.BadgeLastAccessRepository) gatewaysInterfaces.BadgeLastAccessRepository { return &i },
 	func(i gateways.GradleReleaseRepository) gatewaysInterfaces.GradleReleaseRepository { return &i },
 	gateways.NewToggles,

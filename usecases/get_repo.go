@@ -11,10 +11,15 @@ import (
 	"go.uber.org/dig"
 )
 
-type GetRepository struct {
+type GetRepositoryIn struct {
 	dig.In
 	GetRepositoryQuery      gateways.GetRepositoryQuery
 	GradleReleaseRepository gateways.GradleReleaseRepository
+}
+
+type GetRepository struct {
+	GetRepositoryIn
+	noSuchRepositoryErrorCauser
 }
 
 func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*usecases.GetRepositoryResponse, error) {
@@ -27,10 +32,8 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		HeadBranchName: gradleupdate.BranchFor(id.Owner, release.Version),
 	})
 	if err != nil {
-		if err, ok := errors.Cause(err).(gateways.RepositoryError); ok {
-			if err.NoSuchEntity() {
-				return nil, errors.Wrapf(&getRepositoryError{error: err, noSuchRepository: true}, "repository %s not found", id)
-			}
+		if usecase.GetRepositoryQuery.IsNoSuchEntityError(err) {
+			return nil, errors.WithStack(&noSuchRepositoryError{id})
 		}
 		return nil, errors.Wrapf(err, "error while getting the repository %s", id)
 	}
@@ -47,12 +50,3 @@ func (usecase *GetRepository) Do(ctx context.Context, id git.RepositoryID) (*use
 		UpdatePullRequestURL:        out.PullRequestURL,
 	}, nil
 }
-
-type getRepositoryError struct {
-	error
-	noSuchRepository bool
-}
-
-func (err *getRepositoryError) NoSuchRepository() bool { return err.noSuchRepository }
-
-var _ usecases.GetRepositoryError = &getRepositoryError{}

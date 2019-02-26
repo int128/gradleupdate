@@ -13,11 +13,16 @@ import (
 	"go.uber.org/dig"
 )
 
-// SendUpdateQuery provides GitHub access for the SendUpdate usecase.
-type SendUpdateQuery struct {
+type SendUpdateQueryIn struct {
 	dig.In
 	Client   *githubv4.Client
 	ClientV3 *github.Client
+}
+
+// SendUpdateQuery provides GitHub access for the SendUpdate usecase.
+type SendUpdateQuery struct {
+	SendUpdateQueryIn
+	noSuchEntityErrorCauser
 }
 
 func (r *SendUpdateQuery) Get(ctx context.Context, in gateways.SendUpdateQueryIn) (*gateways.SendUpdateQueryOut, error) {
@@ -85,7 +90,7 @@ func (r *SendUpdateQuery) Get(ctx context.Context, in gateways.SendUpdateQueryIn
 		// so we check the pointer is nil on not found error.
 		// See https://github.com/shurcooL/githubv4/issues/41
 		if q != nil {
-			return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "repository %v not found", in.Repository)
+			return nil, errors.Wrapf(&noSuchEntityError{err}, "no such repository %s", in.Repository)
 		}
 		return nil, errors.Wrapf(err, "GitHub API error")
 	}

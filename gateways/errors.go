@@ -1,14 +1,27 @@
 package gateways
 
-import "github.com/int128/gradleupdate/gateways/interfaces"
+import (
+	"github.com/pkg/errors"
+)
 
-type repositoryError struct {
+type noSuchEntityError struct {
 	error
-	noSuchEntity  bool
-	alreadyExists bool
 }
 
-func (err *repositoryError) NoSuchEntity() bool  { return err.noSuchEntity }
-func (err *repositoryError) AlreadyExists() bool { return err.alreadyExists }
+type noSuchEntityErrorCauser struct{}
 
-var _ gateways.RepositoryError = &repositoryError{}
+func (e *noSuchEntityErrorCauser) IsNoSuchEntityError(err error) bool {
+	_, ok := errors.Cause(err).(*noSuchEntityError)
+	return ok
+}
+
+type entityAlreadyExistsError struct {
+	error
+}
+
+type entityAlreadyExistsErrorCauser struct{}
+
+func (e *entityAlreadyExistsErrorCauser) IsEntityAlreadyExistsError(err error) bool {
+	_, ok := errors.Cause(err).(*entityAlreadyExistsError)
+	return ok
+}

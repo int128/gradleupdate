@@ -13,7 +13,6 @@ import (
 	"github.com/int128/gradleupdate/handlers/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
@@ -31,11 +30,9 @@ func (h *GetRepository) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.GetRepository.Do(ctx, id)
 	if err != nil {
-		if err, ok := errors.Cause(err).(usecases.GetRepositoryError); ok {
-			if err.NoSuchRepository() {
-				notFoundHandler(fmt.Sprintf("no such a repository %s", id)).ServeHTTP(w, r)
-				return
-			}
+		if h.GetRepository.IsNoSuchRepositoryError(err) {
+			notFoundHandler(fmt.Sprintf("no such a repository %s", id)).ServeHTTP(w, r)
+			return
 		}
 		h.Logger.Errorf(ctx, "error while getting the repository %s: %+v", id, err)
 		genericErrorHandler(http.StatusInternalServerError).ServeHTTP(w, r)

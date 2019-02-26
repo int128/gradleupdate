@@ -11,7 +11,6 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 )
 
@@ -91,10 +90,15 @@ func TestGetBadge_Do(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		noSuchEntityErr := errors.New("no such entity")
+
 		repositoryRepository := gatewaysTestDoubles.NewMockRepositoryRepository(ctrl)
 		repositoryRepository.EXPECT().
 			GetFileContent(ctx, repositoryID, gradle.WrapperPropertiesPath).
-			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
+			Return(nil, noSuchEntityErr)
+		repositoryRepository.EXPECT().
+			IsNoSuchEntityError(noSuchEntityErr).
+			Return(true)
 
 		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
 		gradleService.EXPECT().
@@ -117,12 +121,8 @@ func TestGetBadge_Do(t *testing.T) {
 		if err == nil {
 			t.Fatalf("err wants non-nil but nil")
 		}
-		cause, ok := errors.Cause(err).(usecases.GetBadgeError)
-		if !ok {
-			t.Fatalf("cause wants GetBadgeError but %T", cause)
-		}
-		if cause.NoGradleVersion() != true {
-			t.Errorf("NoGradleVersion wants true")
+		if !u.IsNoGradleVersionError(err) {
+			t.Errorf("IsNoGradleVersionError wants true but false")
 		}
 	})
 }

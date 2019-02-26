@@ -94,9 +94,6 @@ func (r *credentialsData) Get(ctx context.Context) (*config.Credentials, error) 
 	var e credentialsEntity
 	k := credentialsKey(ctx, "DEFAULT")
 	if err := datastore.Get(ctx, k, &e); err != nil {
-		if err == datastore.ErrNoSuchEntity {
-			return nil, errors.Wrapf(&repositoryError{error: err, noSuchEntity: true}, "credentials not found")
-		}
 		return nil, errors.Wrapf(err, "error while getting the entity")
 	}
 	csrfKey, err := base64.StdEncoding.DecodeString(e.CSRFKey)

@@ -39,6 +39,7 @@ var dependencies = []interface{}{
 	handlers.NewRouteResolver,
 
 	func(ctrl *gomock.Controller) usecases.GetBadge {
+		noGradleVersionErr := errors.New("no Gradle version")
 		getBadge := usecasesTestDoubles.NewMockGetBadge(ctrl)
 		getBadge.EXPECT().
 			Do(gomock.Not(nil), gomock.Any()).
@@ -56,16 +57,16 @@ var dependencies = []interface{}{
 						UpToDate:       false,
 					}, nil
 				}
-				err := usecasesTestDoubles.NewMockGetBadgeError(ctrl)
-				err.EXPECT().
-					NoGradleVersion().
-					AnyTimes().
-					Return(true)
-				return nil, err
+				return nil, noGradleVersionErr
 			})
+		getBadge.EXPECT().
+			IsNoGradleVersionError(noGradleVersionErr).
+			Return(true).
+			AnyTimes()
 		return getBadge
 	},
 	func(ctrl *gomock.Controller) usecases.GetRepository {
+		noSuchRepositoryErr := errors.New("no such repository")
 		getRepository := usecasesTestDoubles.NewMockGetRepository(ctrl)
 		repositoryOf := func(id git.RepositoryID) git.Repository {
 			return git.Repository{
@@ -93,13 +94,12 @@ var dependencies = []interface{}{
 						UpdatePreconditionViolation: gradleupdate.ReadyToUpdate,
 					}, nil
 				}
-				err := usecasesTestDoubles.NewMockGetRepositoryError(ctrl)
-				err.EXPECT().
-					NoSuchRepository().
-					AnyTimes().
-					Return(true)
-				return nil, err
+				return nil, noSuchRepositoryErr
 			})
+		getRepository.EXPECT().
+			IsNoSuchRepositoryError(noSuchRepositoryErr).
+			Return(true).
+			AnyTimes()
 		return getRepository
 	},
 	func(ctrl *gomock.Controller) usecases.SendUpdate {

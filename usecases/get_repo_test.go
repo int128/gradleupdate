@@ -11,7 +11,6 @@ import (
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/usecases/interfaces"
 	"github.com/pkg/errors"
 )
 
@@ -58,8 +57,10 @@ func TestGetRepository_Do(t *testing.T) {
 				Return(&gradle.Release{Version: "5.0"}, nil)
 
 			u := GetRepository{
-				GetRepositoryQuery:      getRepositoryQuery,
-				GradleReleaseRepository: gradleService,
+				GetRepositoryIn: GetRepositoryIn{
+					GetRepositoryQuery:      getRepositoryQuery,
+					GradleReleaseRepository: gradleService,
+				},
 			}
 			resp, err := u.Do(ctx, repositoryID)
 			if err != nil {
@@ -72,13 +73,18 @@ func TestGetRepository_Do(t *testing.T) {
 	}
 
 	t.Run("NoSuchRepository", func(t *testing.T) {
+		noSuchEntityError := errors.New("NoSuchRepository")
+
 		getRepositoryQuery := gatewaysTestDoubles.NewMockGetRepositoryQuery(ctrl)
 		getRepositoryQuery.EXPECT().
 			Do(ctx, gateways.GetRepositoryQueryIn{
 				Repository:     repositoryID,
 				HeadBranchName: gradleupdate.BranchFor(repositoryID.Owner, "5.0"),
 			}).
-			Return(nil, &gatewaysTestDoubles.NoSuchEntityError{})
+			Return(nil, noSuchEntityError)
+		getRepositoryQuery.EXPECT().
+			IsNoSuchEntityError(noSuchEntityError).
+			Return(true)
 
 		gradleService := gatewaysTestDoubles.NewMockGradleReleaseRepository(ctrl)
 		gradleService.EXPECT().
@@ -86,8 +92,10 @@ func TestGetRepository_Do(t *testing.T) {
 			Return(&gradle.Release{Version: "5.0"}, nil)
 
 		u := GetRepository{
-			GetRepositoryQuery:      getRepositoryQuery,
-			GradleReleaseRepository: gradleService,
+			GetRepositoryIn: GetRepositoryIn{
+				GetRepositoryQuery:      getRepositoryQuery,
+				GradleReleaseRepository: gradleService,
+			},
 		}
 		resp, err := u.Do(ctx, repositoryID)
 		if resp != nil {
@@ -96,12 +104,8 @@ func TestGetRepository_Do(t *testing.T) {
 		if err == nil {
 			t.Fatalf("err wants non-nil but nil")
 		}
-		cause, ok := errors.Cause(err).(usecases.GetRepositoryError)
-		if !ok {
-			t.Fatalf("cause wants GetRepositoryError but %T", cause)
-		}
-		if cause.NoSuchRepository() != true {
-			t.Errorf("NoSuchRepository wants true")
+		if !u.IsNoSuchRepositoryError(err) {
+			t.Errorf("IsNoSuchRepositoryError wants true but false")
 		}
 	})
 }

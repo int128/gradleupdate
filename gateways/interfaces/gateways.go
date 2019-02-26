@@ -13,10 +13,12 @@ import (
 
 //go:generate mockgen -destination test_doubles/mock_gateways.go -package gatewaysTestDoubles github.com/int128/gradleupdate/gateways/interfaces BadgeLastAccessRepository,GetRepositoryQuery,SendUpdateQuery,RepositoryRepository,PullRequestRepository,GradleReleaseRepository,Credentials,Toggles,Queue
 
-type RepositoryError interface {
-	error
-	NoSuchEntity() bool
-	AlreadyExists() bool
+type noSuchEntityErrorCauser interface {
+	IsNoSuchEntityError(err error) bool
+}
+
+type entityAlreadyExistsErrorCauser interface {
+	IsEntityAlreadyExistsError(err error) bool
 }
 
 type BadgeLastAccessRepository interface {
@@ -25,6 +27,7 @@ type BadgeLastAccessRepository interface {
 }
 
 type GetRepositoryQuery interface {
+	noSuchEntityErrorCauser
 	Do(ctx context.Context, in GetRepositoryQueryIn) (*GetRepositoryQueryOut, error)
 }
 
@@ -41,6 +44,7 @@ type GetRepositoryQueryOut struct {
 }
 
 type SendUpdateQuery interface {
+	noSuchEntityErrorCauser
 	Get(ctx context.Context, in SendUpdateQueryIn) (*SendUpdateQueryOut, error)
 	ForkRepository(ctx context.Context, id git.RepositoryID) (*git.RepositoryID, error)
 	CreateBranch(ctx context.Context, branch NewBranch) error
@@ -72,10 +76,12 @@ type NewBranch struct {
 }
 
 type RepositoryRepository interface {
+	noSuchEntityErrorCauser
 	GetFileContent(context.Context, git.RepositoryID, string) (git.FileContent, error)
 }
 
 type PullRequestRepository interface {
+	entityAlreadyExistsErrorCauser
 	Create(ctx context.Context, pull git.PullRequest) (*git.PullRequest, error)
 }
 

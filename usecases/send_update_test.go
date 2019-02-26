@@ -11,8 +11,6 @@ import (
 	"github.com/int128/gradleupdate/domain/testdata"
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/gateways/interfaces/test_doubles"
-	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/pkg/errors"
 )
 
 func TestSendUpdate_Do(t *testing.T) {
@@ -75,10 +73,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 			Return(&git.PullRequest{}, nil)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -115,10 +115,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -166,10 +168,12 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err != nil {
@@ -206,20 +210,18 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
-		if !ok {
-			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
-		}
-		preconditionViolation := sendUpdateError.PreconditionViolation()
+		preconditionViolation := u.HasPreconditionViolation(err)
 		if preconditionViolation != gradleupdate.AlreadyHasLatestGradle {
 			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.AlreadyHasLatestGradle, preconditionViolation)
 		}
@@ -254,20 +256,18 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
-		if !ok {
-			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
-		}
-		preconditionViolation := sendUpdateError.PreconditionViolation()
+		preconditionViolation := u.HasPreconditionViolation(err)
 		if preconditionViolation != gradleupdate.NoGradleWrapperProperties {
 			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoGradleWrapperProperties, preconditionViolation)
 		}
@@ -302,20 +302,18 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
-		if !ok {
-			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
-		}
-		preconditionViolation := sendUpdateError.PreconditionViolation()
+		preconditionViolation := u.HasPreconditionViolation(err)
 		if preconditionViolation != gradleupdate.NoGradleVersion {
 			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoGradleVersion, preconditionViolation)
 		}
@@ -350,20 +348,18 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
-		if !ok {
-			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
-		}
-		preconditionViolation := sendUpdateError.PreconditionViolation()
+		preconditionViolation := u.HasPreconditionViolation(err)
 		if preconditionViolation != gradleupdate.NoReadme {
 			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoReadme, preconditionViolation)
 		}
@@ -398,20 +394,18 @@ This is sent by @gradleupdate. See https://gradleupdate.appspot.com/owner/repo/s
 		pullRequestRepository := gatewaysTestDoubles.NewMockPullRequestRepository(ctrl)
 
 		u := SendUpdate{
-			GradleReleaseRepository: gradleReleaseRepository,
-			SendUpdateQuery:         sendUpdateQuery,
-			PullRequestRepository:   pullRequestRepository,
-			Logger:                  gatewaysTestDoubles.NewLogger(t),
+			SendUpdateIn: SendUpdateIn{
+				GradleReleaseRepository: gradleReleaseRepository,
+				SendUpdateQuery:         sendUpdateQuery,
+				PullRequestRepository:   pullRequestRepository,
+				Logger:                  gatewaysTestDoubles.NewLogger(t),
+			},
 		}
 		err := u.Do(ctx, repositoryID)
 		if err == nil {
 			t.Fatalf("error wants non-nil but nil")
 		}
-		sendUpdateError, ok := errors.Cause(err).(usecases.SendUpdateError)
-		if !ok {
-			t.Fatalf("cause wants SendUpdateError but %+v", errors.Cause(err))
-		}
-		preconditionViolation := sendUpdateError.PreconditionViolation()
+		preconditionViolation := u.HasPreconditionViolation(err)
 		if preconditionViolation != gradleupdate.NoReadmeBadge {
 			t.Errorf("PreconditionViolation wants %v but %v", gradleupdate.NoReadmeBadge, preconditionViolation)
 		}

@@ -8,9 +8,14 @@ import (
 	"github.com/int128/gradleupdate/domain/gradleupdate"
 )
 
-//go:generate mockgen -destination test_doubles/mock_usecases.go -package usecasesTestDoubles github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetBadgeError,GetRepository,GetRepositoryError,SendUpdate,SendUpdateError,BatchSendUpdates,SendPullRequest
+//go:generate mockgen -destination test_doubles/mock_usecases.go -package usecasesTestDoubles github.com/int128/gradleupdate/usecases/interfaces GetBadge,GetRepository,SendUpdate,BatchSendUpdates,SendPullRequest
+
+type noSuchRepositoryErrorCauser interface {
+	IsNoSuchRepositoryError(err error) bool
+}
 
 type GetBadge interface {
+	IsNoGradleVersionError(err error) bool
 	Do(ctx context.Context, id git.RepositoryID) (*GetBadgeResponse, error)
 }
 
@@ -19,12 +24,8 @@ type GetBadgeResponse struct {
 	UpToDate       bool
 }
 
-type GetBadgeError interface {
-	error
-	NoGradleVersion() bool
-}
-
 type GetRepository interface {
+	noSuchRepositoryErrorCauser
 	Do(ctx context.Context, id git.RepositoryID) (*GetRepositoryResponse, error)
 }
 
@@ -35,18 +36,10 @@ type GetRepositoryResponse struct {
 	UpdatePullRequestURL        git.PullRequestURL
 }
 
-type GetRepositoryError interface {
-	error
-	NoSuchRepository() bool
-}
-
 type SendUpdate interface {
+	noSuchRepositoryErrorCauser
 	Do(ctx context.Context, id git.RepositoryID) error
-}
-
-type SendUpdateError interface {
-	error
-	PreconditionViolation() gradleupdate.PreconditionViolation
+	HasPreconditionViolation(err error) gradleupdate.PreconditionViolation
 }
 
 type BatchSendUpdates interface {

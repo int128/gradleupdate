@@ -9,7 +9,6 @@ import (
 	"github.com/int128/gradleupdate/gateways/interfaces"
 	"github.com/int128/gradleupdate/templates"
 	"github.com/int128/gradleupdate/usecases/interfaces"
-	"github.com/pkg/errors"
 	"go.uber.org/dig"
 )
 
@@ -30,12 +29,10 @@ func (h *GetBadge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.GetBadge.Do(ctx, id)
 	if err != nil {
-		if err, ok := errors.Cause(err).(usecases.GetBadgeError); ok {
-			if err.NoGradleVersion() {
-				w.WriteHeader(http.StatusNotFound)
-				templates.DarkBadge("unknown").WriteSVG(w)
-				return
-			}
+		if h.GetBadge.IsNoGradleVersionError(err) {
+			w.WriteHeader(http.StatusNotFound)
+			templates.DarkBadge("unknown").WriteSVG(w)
+			return
 		}
 		h.Logger.Errorf(ctx, "error while getting a badge for the repository %s: %+v", id, err)
 		w.WriteHeader(http.StatusInternalServerError)
