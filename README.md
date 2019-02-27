@@ -1,6 +1,6 @@
 # gradleupdate [![CircleCI](https://circleci.com/gh/int128/gradleupdate.svg?style=shield)](https://circleci.com/gh/int128/gradleupdate)
 
-This provides continuous update of Gradle in your GitHub repositories.
+This is a servie which provides continuous update of Gradle in your GitHub repositories.
 
 
 ## Getting Started
@@ -10,6 +10,10 @@ You need to add the following badge to README in a repository.
 ```markdown
 [![Gradle Status](https://gradleupdate.appspot.com/YOUR/REPO/status.svg)](https://gradleupdate.appspot.com/YOUR/REPO/status)
 ```
+
+Here is an example badge:
+
+[![Gradle Status](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status.svg)](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status)
 
 And then, gradleupdate will send a pull request for the latest version of Gradle wrapper if it is out-of-dated.
 
