@@ -1,12 +1,31 @@
 # gradleupdate [![CircleCI](https://circleci.com/gh/int128/gradleupdate.svg?style=shield)](https://circleci.com/gh/int128/gradleupdate)
 
-This service provides continuous update of Gradle Wrapper.
-It automatically sends a pull request with the latest Gradle version.
+This provides continuous update of Gradle in your GitHub repositories.
 
 
 ## Getting Started
 
-TODO
+You need to add the following badge to README in a repository.
+
+```markdown
+[![Gradle Status](https://gradleupdate.appspot.com/YOUR/REPO/status.svg)](https://gradleupdate.appspot.com/YOUR/REPO/status)
+```
+
+And then, gradleupdate will send a pull request for the latest version of Gradle wrapper if it is out-of-dated.
+
+You can turn off updates by removing the badge.
+
+
+## How it works
+
+gradleupdate checks the following preconditions for each repository:
+
+- `README.md` should have the badge.
+- `gradle/wrapper/gradle-wrapper.properties` should have a valid version string.
+
+If the repository has out-of-dated Gradle version, gradleupdate will send a pull request.
+
+If the pull request already exists, gradleupdate will just rebase the head branch.
 
 
 ## Contributions
@@ -19,13 +38,14 @@ Feel free to open issues and pull requests.
 This application is written in Go and designed for App Engine.
 It consists of the following packages:
 
-- `main` - Bootstraps the application and wires dependencies.
+- `main` - Bootstraps the application.
+- `di` - Wires dependencies.
 - `handlers` - Handles requests.
 - `templates` - Renders pages.
 - `usecases` - Provides application use cases.
-- `domain` - Provides domain of weather forecast.
+- `domain` - Provides domain of Git, Gradle and gradleupdate.
 - `gateways` - Provides conversion between domain models and external models.
-- `infrastructure` - Invokes external APIs.
+- `infrastructure` - Invokes Gradle Services API, GitHub v3 API and GitHub v4 API.
 
 ### Development
 
