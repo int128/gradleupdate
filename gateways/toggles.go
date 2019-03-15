@@ -61,8 +61,11 @@ func (r *togglesData) Get(ctx context.Context) (*config.Toggles, error) {
 		}
 		return nil, errors.Wrapf(err, "error while getting the entity")
 	}
+	if e.BatchSendUpdatesOwners == "" {
+		return &config.Toggles{}, nil
+	}
 	return &config.Toggles{
-		BatchSendUpdatesOwners: strings.Split(e.BatchSendUpdatesOwners, ","),
+		BatchSendUpdatesOwners: e.BatchSendUpdatesOwnersAsArray(),
 	}, nil
 }
 
@@ -72,4 +75,11 @@ func togglesKey(ctx context.Context, name string) *datastore.Key {
 
 type togglesEntity struct {
 	BatchSendUpdatesOwners string
+}
+
+func (e *togglesEntity) BatchSendUpdatesOwnersAsArray() []string {
+	if e.BatchSendUpdatesOwners == "" {
+		return nil
+	}
+	return strings.Split(e.BatchSendUpdatesOwners, ",")
 }
