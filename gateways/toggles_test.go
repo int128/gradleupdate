@@ -16,7 +16,7 @@ func TestNewToggles(t *testing.T) {
 	}
 	defer testerator.SpinDown()
 
-	t.Run("NoDatastore", func(t *testing.T) {
+	t.Run("NoEntity", func(t *testing.T) {
 		toggles := NewToggles()
 		ct, err := toggles.Get(ctx)
 		if err != nil {
@@ -27,7 +27,25 @@ func TestNewToggles(t *testing.T) {
 		}
 	})
 
-	t.Run("FromDatastore", func(t *testing.T) {
+	t.Run("Empty", func(t *testing.T) {
+		toggles := NewToggles()
+		k := togglesKey(ctx, "DEFAULT")
+		if _, err := datastore.Put(ctx, k, &togglesEntity{
+			BatchSendUpdatesOwners: "",
+		}); err != nil {
+			t.Fatalf("error while putting an entity: %s", err)
+		}
+		ct, err := toggles.Get(ctx)
+		if err != nil {
+			t.Fatalf("error while Get: %+v", err)
+		}
+		want := &config.Toggles{}
+		if diff := deep.Equal(want, ct); diff != nil {
+			t.Error(diff)
+		}
+	})
+
+	t.Run("ValidString", func(t *testing.T) {
 		toggles := NewToggles()
 		k := togglesKey(ctx, "DEFAULT")
 		if _, err := datastore.Put(ctx, k, &togglesEntity{
