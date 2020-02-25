@@ -18,7 +18,7 @@ func (h *BatchSendUpdates) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if err := h.BatchSendUpdates.Do(ctx); err != nil {
 		h.Logger.Errorf(ctx, "error while sending updates: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
