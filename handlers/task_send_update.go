@@ -25,8 +25,7 @@ func (h *TaskSendUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.SendUpdate.Do(ctx, id); err != nil {
 		h.Logger.Errorf(ctx, "error while sending a pull request for %s: %+v", id, err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		// do not retry the task
 	}
 	w.WriteHeader(http.StatusOK)
 }
