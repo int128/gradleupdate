@@ -1,6 +1,8 @@
 # gradleupdate [![CircleCI](https://circleci.com/gh/int128/gradleupdate.svg?style=shield)](https://circleci.com/gh/int128/gradleupdate)
 
-This is a servie which provides continuous update of Gradle in your GitHub repositories.
+This service provides a Gradle badge for your GitHub repository.
+
+:warning: **IMPORTANT NOTICE**: It no longer provides the automatic update feature. Still a badge is available.
 
 
 ## Getting Started
@@ -15,21 +17,9 @@ Here is an example badge:
 
 [![Gradle Status](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status.svg)](https://gradleupdate.appspot.com/int128/latest-gradle-wrapper/status)
 
-And then, gradleupdate will send a pull request for the latest version of Gradle wrapper if it is out-of-dated.
+~~And then, gradleupdate will send a pull request for the latest version of Gradle wrapper if it is out-of-dated.~~
 
-You can turn off updates by removing the badge.
-
-
-## How it works
-
-gradleupdate checks the following preconditions for each repository:
-
-- `README.md` should have the badge.
-- `gradle/wrapper/gradle-wrapper.properties` should have a valid version string.
-
-If the repository has out-of-dated Gradle version, gradleupdate will send a pull request.
-
-If the pull request already exists, gradleupdate will just rebase the head branch.
+~~You can turn off updates by removing the badge.~~
 
 
 ## Contributions
