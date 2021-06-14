@@ -1,4 +1,1 @@
-cron:
-  - description:
-    url: /internal/updates
-    schedule: every 1 hours
+cron: []
