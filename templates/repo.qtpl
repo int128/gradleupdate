@@ -26,23 +26,6 @@
     <h3>This repository has the out-of-dated Gradle.</h3>
     <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
 
-    {% if r.UpdatePullRequestURL != "" %}
-    <p>
-      We have sent
-      <a href="{%v r.UpdatePullRequestURL %}" target="_blank">the pull request</a>
-      for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
-    {% else %}
-    <p>We will soon send a pull request for bump to Gradle {%v r.LatestGradleRelease.Version %}.</p>
-    <form method="POST" action="{%s r.RequestUpdateURL %}">
-      <p>
-        <button type="submit" class="btn btn-link">
-          Request a Pull Request now
-        </button>
-      </p>
-      {%s= csrf %}
-    </form>
-    {% endif %}
-
     {% case gradleupdate.AlreadyHasLatestGradle %}
     <h3>This repository has the latest Gradle!</h3>
     <p>We will send a pull request for updating version when the newer Gradle is released.</p>
@@ -54,19 +37,12 @@
     {% case gradleupdate.NoGradleVersion %}
     <p><strong>No Gradle:</strong> No version found in <code>gradle-wrapper.properties</code>.</p>
 
-    {% case gradleupdate.NoReadme %}
-    <div class="alert alert-primary" role="alert">
-      <strong>No Auto Update:</strong> You need to create README.
-    </div>
-    {%= r.HowToAutoUpdate() %}
-
-    {% case gradleupdate.NoReadmeBadge %}
-    <div class="alert alert-primary" role="alert">
-      <strong>No Auto Update:</strong> You need to add the badge to README.
-    </div>
-    {%= r.HowToAutoUpdate() %}
-
     {% endswitch %}
+
+    <div class="alert alert-primary" role="alert">
+      <strong>IMPORTANT NOTICE:</strong> GradleUpdate no longer provides the automatic update feature.
+      Still a badge is available.
+    </div>
   </div>
 </div>
 
@@ -74,28 +50,4 @@
 
 </body>
 </html>
-{% endfunc %}
-
-{% func (r Repository) HowToAutoUpdate() %}
-<div>
-  <h3>How to turn on Auto Update?</h3>
-  <p>
-    Add the badge to README in the repository.
-    We will send a pull request with the latest version of Gradle.
-  </p>
-  <p><img src="{%s r.BadgeURL %}" alt="badge"/></p>
-  <form>
-    <div class="form-group">
-      <label for="badge-markdown" class="font-weight-bold">Markdown:</label>
-      <input type="text" id="badge-markdown" class="form-control text-monospace" value="{%s r.BadgeMarkdown %}"/>
-    </div>
-    <div class="form-group">
-      <label for="badge-html" class="font-weight-bold">HTML:</label>
-      <input type="text" id="badge-html" class="form-control text-monospace" value="{%s r.BadgeHTML %}"/>
-    </div>
-    <div class="form-group">
-      <a href="{%s r.Repository.URL %}" target="_blank" class="btn btn-primary">Open GitHub</a>
-    </div>
-  </form>
-</div>
 {% endfunc %}

@@ -2,7 +2,9 @@
 
 This service provides a Gradle badge for your GitHub repository.
 
-:warning: **IMPORTANT NOTICE**: It no longer provides the automatic update feature. Still a badge is available.
+:warning: **IMPORTANT NOTICE**: GradleUpdate no longer provides the automatic update feature.
+Still a badge is available.
+Please consider migration to [Renovate](https://docs.renovatebot.com/modules/manager/gradle-wrapper/).
 
 
 ## Getting Started
